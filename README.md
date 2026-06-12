@@ -36,6 +36,8 @@ If `barkingmadbarbers.com` is served by a static host instead of this Render web
 
 When the custom domain is attached directly to the Render backend, leave `window.BMB_API_BASE_URL` unset and the site will use same-origin `/api/...` routes.
 
+For GitHub Pages hosting, each app route is also emitted as a static folder with its own `index.html`, so direct links like `/helper` and `/sign-in` load cleanly.
+
 ## Site paths
 
 ```text
