@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: barking-mad-barbers
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: JWT-SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: REACT_APP_BACKEND_URL
+        sync: false
+      - key: SERVE_FRONTEND
+        value: "true"

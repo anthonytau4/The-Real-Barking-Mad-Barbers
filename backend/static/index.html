@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barking Mad Barbers | Tawa Dog Grooming</title>
+  <meta name="description" content="Barking Mad Barbers premium one-on-one dog grooming in Tawa, Wellington. Book Full Groom, Wash & Dry, tidy services and grooming help." />
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <style>
+    :root{
+      --ink:#181511;
+      --soft:#645c51;
+      --muted:#8b8174;
+      --paper:#fffaf1;
+      --milk:#fffefa;
+      --cream:#f0e3cf;
+      --cream2:#e6d3b8;
+      --gold:#b4893f;
+      --gold2:#d8b36b;
+      --charcoal:#29251f;
+      --green:#3f7457;
+      --red:#98493e;
+      --blue:#44677f;
+      --shadow:0 24px 80px rgba(33, 27, 18, .14);
+      --softshadow:0 18px 48px rgba(33, 27, 18, .09);
+      --squircle:34% 28% 33% 30% / 28% 34% 30% 36%;
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 14% 2%, rgba(216,179,107,.36), transparent 34rem),
+        radial-gradient(circle at 88% 8%, rgba(41,37,31,.10), transparent 32rem),
+        radial-gradient(circle at 78% 82%, rgba(180,137,63,.18), transparent 28rem),
+        linear-gradient(135deg, #fffefa 0%, var(--paper) 42%, #ead9bf 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        linear-gradient(rgba(24,21,17,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24,21,17,.03) 1px, transparent 1px);
+      background-size:74px 74px;
+      mask-image:radial-gradient(circle at 50% 0%, #000 0%, transparent 76%);
+      opacity:.55;
+      z-index:-2;
+    }
+    canvas#canvasWash{position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; opacity:.5}
+    a{color:inherit; text-decoration:none}
+    img{display:block; max-width:100%}
+    button,input,select,textarea{font:inherit}
+    .wrap{width:min(var(--max), calc(100% - 36px)); margin:0 auto}
+    .skip{position:absolute; left:16px; top:-80px; background:#111; color:#fff; padding:10px 14px; border-radius:999px; z-index:99}.skip:focus{top:12px}
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,250,241,.72);
+      box-shadow:0 1px 0 rgba(180,137,63,.12);
+    }
+    .nav{height:82px; display:flex; align-items:center; justify-content:space-between; gap:18px; position:relative}
+    .brand{display:flex; align-items:center; gap:12px; min-width:0}
+    .brand img{width:76px; height:52px; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,.10))}
+    .brand strong{display:block; letter-spacing:.06em; text-transform:uppercase; font-size:.95rem; line-height:1}
+    .brand span{display:block; color:var(--muted); font-weight:850; font-size:.84rem; margin-top:4px}
+    .navlinks{display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end}
+    .navlinks a,.navlinks button{
+      border:0; cursor:pointer; background:transparent; padding:10px 13px; border-radius:999px;
+      color:var(--soft); font-weight:900; font-size:.92rem;
+    }
+    .navlinks a:hover,.navlinks a.active,.navlinks button:hover{background:rgba(180,137,63,.13); color:var(--ink)}
+    .navlinks .book-now{background:var(--charcoal); color:#fff; box-shadow:0 10px 24px rgba(24,21,17,.16)}
+    .menu{display:none; border:0; background:var(--charcoal); color:#fff; padding:11px 13px; border-radius:999px; font-weight:950}
+    .route-shell{min-height:calc(100vh - 82px)}
+    .hero{padding:54px 0 72px}
+    .hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:42px; align-items:center}
+    .eyebrow{display:inline-flex; gap:9px; align-items:center; padding:8px 11px; border-radius:999px; background:rgba(255,255,255,.62); box-shadow:var(--softshadow); color:var(--soft); font-weight:950; letter-spacing:.08em; text-transform:uppercase; font-size:.78rem}
+    .eyebrow .dot{width:9px; height:9px; border-radius:999px; background:var(--gold); box-shadow:0 0 0 6px rgba(180,137,63,.12)}
+    h1,h2,h3,p{margin-top:0}
+    .hero h1{font-size:clamp(3.3rem, 8vw, 7.9rem); line-height:.83; letter-spacing:-.075em; margin:22px 0 20px; max-width:850px}
+    .hero h1 span{display:block; color:var(--gold)}
+    .lead{font-size:clamp(1.08rem, 2vw, 1.34rem); line-height:1.62; color:var(--soft); font-weight:650; max-width:720px}
+    .actions{display:flex; flex-wrap:wrap; gap:12px; margin-top:28px}
+    .btn{border:0; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:50px; padding:13px 18px; border-radius:999px; font-weight:950; box-shadow:var(--softshadow)}
+    .btn.primary{background:var(--charcoal); color:#fff}.btn.gold{background:linear-gradient(135deg, var(--gold), var(--gold2)); color:#21180b}.btn.light{background:rgba(255,255,255,.66); color:var(--ink)}.btn.danger{background:rgba(152,73,62,.12); color:var(--red)}
+    .hero-art{position:relative; min-height:620px}
+    .logo-card{position:absolute; z-index:4; top:0; left:50%; transform:translateX(-50%) rotate(.6deg); width:min(450px, 88vw); padding:22px 26px; border-radius:44px; background:rgba(255,255,255,.72); box-shadow:var(--shadow); backdrop-filter:blur(14px)}
+    .photo{position:absolute; overflow:hidden; background:#fff; box-shadow:var(--shadow); isolation:isolate}.photo img{width:100%; height:100%; object-fit:cover}.photo::after{content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(23,19,13,.48), transparent 48%); pointer-events:none}.photo strong{position:absolute; left:22px; bottom:20px; z-index:2; color:#fff; text-shadow:0 5px 22px rgba(0,0,0,.5); font-size:1.08rem}.photo.one{left:0; bottom:10px; width:54%; aspect-ratio:4/5; border-radius:42px; transform:rotate(-4deg)}.photo.two{right:0; top:132px; width:57%; aspect-ratio:4/5; border-radius:42px; transform:rotate(3deg)}
+    .stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:30px; max-width:650px}.stat{padding:17px; border-radius:22px; background:rgba(255,255,255,.52); box-shadow:var(--softshadow)}.stat b{font-size:1.34rem; display:block}.stat span{display:block; color:var(--muted); font-weight:850; font-size:.9rem; margin-top:2px}
+    section{padding:64px 0}.section-head{display:flex; justify-content:space-between; align-items:end; gap:24px; margin-bottom:28px}.section-head h2{font-size:clamp(2.35rem, 5vw, 5rem); line-height:.9; letter-spacing:-.065em; margin:0; max-width:760px}.section-head p{color:var(--soft); line-height:1.65; font-weight:650; max-width:450px; margin:0}
+    .canvas-panel{border-radius:42px; background:linear-gradient(135deg, rgba(255,255,255,.45), rgba(255,250,241,.18)); box-shadow:var(--softshadow); padding:28px; overflow:hidden}
+    .icon-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:15px}.icon-card{min-height:220px; padding:22px; border-radius:32px; background:linear-gradient(155deg, rgba(255,255,255,.52), rgba(255,255,255,.20)); box-shadow:0 18px 45px rgba(33,27,18,.08); position:relative; overflow:hidden}.icon-card::before{content:""; position:absolute; width:160px; height:160px; right:-68px; top:-70px; border-radius:50%; background:rgba(180,137,63,.11)}.sq{width:62px; height:62px; display:grid; place-items:center; border-radius:var(--squircle); background:linear-gradient(135deg,#27231e,#594a37); color:#fff; box-shadow:0 16px 28px rgba(24,21,17,.18); margin-bottom:18px}.sq.gold{background:linear-gradient(135deg,var(--gold),var(--gold2)); color:#24190a}.sq.green{background:linear-gradient(135deg,#3f7457,#88a67c)}.sq.blue{background:linear-gradient(135deg,#44677f,#8bb0c0)}.sq svg{width:31px; height:31px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}.icon-card h3{font-size:1.25rem; letter-spacing:-.025em; margin:0 0 8px}.icon-card p{color:var(--soft); line-height:1.55; font-weight:650; margin:0}
+    .price-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}.service-panel{border-radius:36px; padding:28px; background:rgba(255,255,255,.34); box-shadow:0 12px 35px rgba(33,27,18,.06)}.service-title{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-bottom:16px; margin-bottom:18px; box-shadow:0 1px 0 rgba(180,137,63,.20)}.service-title h3{margin:0; font-size:2rem; letter-spacing:-.045em}.service-title span{font-weight:950; color:var(--gold); white-space:nowrap}.clean-list{list-style:none; padding:0; margin:0; display:grid; gap:12px}.clean-list li{display:flex; gap:10px; align-items:flex-start; color:var(--soft); font-weight:700; line-height:1.4}.tick{width:20px; min-width:20px; height:20px; color:var(--gold); margin-top:1px}.sizes{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:24px}.sizes div{border-radius:18px; padding:13px 8px; text-align:center; background:rgba(180,137,63,.12)}.sizes b{display:block; font-size:.77rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}.sizes span{display:block; font-size:1.26rem; font-weight:1000; margin-top:3px}.split{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px}.extras{display:grid; gap:12px}.extra{display:flex; justify-content:space-between; gap:18px; color:var(--soft); font-weight:850}.extra span:last-child{color:var(--ink); font-size:1.08rem}.price-image{border-radius:38px; overflow:hidden; box-shadow:var(--shadow); background:#fff}.price-image img{width:100%; height:auto}
+    .team-grid{display:grid; grid-template-columns:1.04fr .96fr; gap:18px; align-items:stretch}.team-photo{min-height:570px; overflow:hidden; border-radius:44px; box-shadow:var(--shadow); position:relative; background:#fff}.team-photo img{width:100%; height:100%; object-fit:cover}.team-photo::after{content:""; position:absolute; inset:0; background:linear-gradient(to top, rgba(23,19,13,.46), transparent 56%)}.team-photo .caption{position:absolute; left:26px; right:26px; bottom:24px; z-index:2; color:#fff}.team-photo h3{font-size:2rem; line-height:.95; letter-spacing:-.04em; margin:0 0 7px}.team-photo p{margin:0; line-height:1.45; font-weight:700}.team-side{display:grid; gap:18px}.team-side .team-photo{min-height:276px}.family-band{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px}
+    .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}.field{display:grid; gap:7px}.field.full{grid-column:1/-1}.field label{font-size:.82rem; text-transform:uppercase; letter-spacing:.075em; font-weight:950; color:var(--muted)}.field input,.field select,.field textarea{width:100%; border:0; outline:none; border-radius:20px; background:rgba(255,253,248,.86); box-shadow:inset 0 0 0 1px rgba(180,137,63,.13); padding:15px 16px; color:var(--ink)}.field textarea{min-height:120px; resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{box-shadow:0 0 0 4px rgba(180,137,63,.16), inset 0 0 0 1px var(--gold)}.message{display:none; margin-top:14px; padding:14px 16px; border-radius:18px; font-weight:850}.message.show{display:block}.message.good{background:rgba(63,116,87,.12); color:var(--green)}.message.bad{background:rgba(152,73,62,.12); color:var(--red)}.two-col{display:grid; grid-template-columns:.88fr 1.12fr; gap:24px; align-items:start}.sticky-copy{position:sticky; top:110px}.mini-logo{width:260px; padding:14px 18px; border-radius:28px; background:rgba(255,255,255,.55); box-shadow:var(--softshadow); margin-bottom:20px}.form-card{border-radius:42px; padding:28px; background:rgba(255,255,255,.50); box-shadow:var(--shadow)}
+    .dashboard{display:grid; gap:14px}.booking-list{display:grid; gap:13px; margin-top:18px}.booking-card{border-radius:25px; padding:17px; background:rgba(255,253,248,.78); box-shadow:inset 0 0 0 1px rgba(180,137,63,.12)}.booking-card header{display:flex; justify-content:space-between; gap:12px; align-items:start}.booking-card h4{margin:0; font-size:1.08rem}.booking-card small{color:var(--muted); font-weight:800}.pill{display:inline-flex; align-items:center; padding:7px 10px; border-radius:999px; background:rgba(180,137,63,.14); color:#6d4d16; font-weight:950; font-size:.78rem}.booking-card dl{display:grid; grid-template-columns:105px 1fr; gap:7px 12px; margin:13px 0 0}.booking-card dt{font-weight:950; color:var(--muted)}.booking-card dd{margin:0; color:var(--soft); font-weight:700}.booking-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}.mini-btn{border:0; border-radius:999px; background:rgba(24,21,17,.08); padding:9px 12px; font-weight:950; cursor:pointer}.mini-btn:hover{background:rgba(180,137,63,.18)}
+    .faq{display:grid; gap:12px}.faq details{border-radius:24px; background:rgba(255,255,255,.34); box-shadow:0 12px 35px rgba(33,27,18,.06); padding:16px 18px}.faq summary{cursor:pointer; font-weight:950}.faq p{color:var(--soft); line-height:1.55; font-weight:650; margin:11px 0 0}.contact-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:15px}.contact-card{border-radius:32px; background:rgba(255,255,255,.34); box-shadow:0 12px 35px rgba(33,27,18,.06); padding:22px}.contact-card h3{font-size:1.3rem; margin:14px 0 8px}.contact-card p{color:var(--soft); font-weight:650; line-height:1.55; margin:0}.route-hero{padding:56px 0 28px}.route-hero h1{font-size:clamp(3.2rem,7vw,6.8rem); letter-spacing:-.075em; line-height:.84; margin:20px 0}.route-hero .lead{max-width:820px}.footer{padding:48px 0 70px;color:var(--soft)}.footer-grid{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap}.footer img{width:210px}.footer-links{display:flex; gap:8px; flex-wrap:wrap}.footer-links a{background:rgba(255,255,255,.50); border-radius:999px; padding:10px 13px; font-weight:900}.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap}
+    @media(max-width:1000px){.hero-grid,.two-col,.team-grid{grid-template-columns:1fr}.hero-art{min-height:600px}.section-head{display:block}.section-head p{margin-top:14px}.icon-grid{grid-template-columns:repeat(2,1fr)}.price-grid,.split,.contact-grid{grid-template-columns:1fr}.sticky-copy{position:static}.team-photo{min-height:460px}.family-band{grid-template-columns:1fr}.price-image{max-width:700px;margin:auto}}
+    @media(max-width:760px){.wrap{width:min(100% - 28px, var(--max))}.nav{height:74px}.brand img{width:62px}.brand strong{font-size:.8rem}.brand span{font-size:.74rem}.menu{display:block}.navlinks{display:none; position:absolute; left:0; right:0; top:78px; padding:13px; border-radius:26px; background:rgba(255,250,241,.96); box-shadow:var(--shadow); justify-content:flex-start}.navlinks.open{display:flex}.navlinks a,.navlinks button{width:100%; text-align:left; justify-content:flex-start}.hero{padding-top:34px}.hero h1,.route-hero h1{font-size:clamp(3rem,16vw,5.4rem)}.hero-art{min-height:520px}.logo-card{width:86vw}.photo.one{width:59%; bottom:0}.photo.two{width:62%; top:120px}.stats,.icon-grid,.sizes,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.service-title{display:block}.service-title span{display:block; margin-top:6px}.form-card,.canvas-panel{padding:22px; border-radius:32px}.booking-card dl{grid-template-columns:1fr}.team-photo,.team-side .team-photo{min-height:360px}.actions .btn{width:100%}}
+  </style>
+</head>
+<body>
+  <canvas id="canvasWash" aria-hidden="true"></canvas>
+  <a class="skip" href="#app">Skip to content</a>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="/" data-route>
+        <img src="/assets/logo.png" alt="Barking Mad Barbers logo" />
+        <span><strong>Barking Mad Barbers</strong><span>Tawa dog grooming</span></span>
+      </a>
+      <button class="menu" id="menuBtn" type="button">Menu</button>
+      <nav class="navlinks" id="navLinks" aria-label="Main navigation">
+        <a href="/services" data-route>Services</a>
+        <a href="/Sanctuary" data-route>Sanctuary</a>
+        <a href="/our-family" data-route>Our Family</a>
+        <a href="/team" data-route>Team</a>
+        <a href="/helper" data-route>Helper</a>
+        <a href="/contact" data-route>Contact</a>
+        <a href="/sign-in" data-route>Sign in</a>
+        <a class="book-now" href="/book" data-route>Book</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="route-shell" tabindex="-1"></main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <img src="/assets/logo.png" alt="Barking Mad Barbers logo" />
+      <div>
+        <strong>Barking Mad Barbers</strong><br />
+        <span>Premium one-on-one dog grooming in Tawa, Wellington.</span>
+      </div>
+      <div class="footer-links">
+        <a href="/services" data-route>Services</a>
+        <a href="/book" data-route>Book</a>
+        <a href="/admin" data-route>Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const $ = (selector, root=document) => root.querySelector(selector);
+    const $$ = (selector, root=document) => Array.from(root.querySelectorAll(selector));
+    const USER_TOKEN_KEY = 'bmb_user_token_v2';
+    const USER_PROFILE_KEY = 'bmb_user_profile_v2';
+    const ADMIN_TOKEN_KEY = 'bmb_admin_token_v2';
+    const ADMIN_EMAIL_KEY = 'bmb_admin_email_v2';
+
+    const iconPaths = {
+      scissors:'<path d="M5 5l14 14M19 5L5 19"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/>',
+      bath:'<path d="M5 13h14v2a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-2h1z"/><path d="M7 13V8a3 3 0 0 1 3-3h1"/><path d="M14 5h3v3"/><path d="M8 20l-1 2M17 20l1 2"/>',
+      paw:'<circle cx="7" cy="8" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="17" cy="8" r="2"/><circle cx="9" cy="13" r="2"/><circle cx="15" cy="13" r="2"/><path d="M8 18c1-3 7-3 8 0 .5 1.6-.7 3-2.4 2.4a5 5 0 0 0-3.2 0C8.7 21 7.5 19.6 8 18z"/>',
+      shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-5"/>',
+      heart:'<path d="M20.8 8.6c0 5.4-8.8 10.4-8.8 10.4S3.2 14 3.2 8.6A4.6 4.6 0 0 1 12 6a4.6 4.6 0 0 1 8.8 2.6z"/>',
+      calendar:'<rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/><path d="M8 14h3M13 14h3M8 18h3"/>',
+      user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.6-4 14.4-4 16 0"/>',
+      home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-6h4v6"/>',
+      spark:'<path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/><path d="M19 16l.8 3.2L23 20l-3.2.8L19 24l-.8-3.2L15 20l3.2-.8L19 16z"/>',
+      message:'<path d="M4 5h16v11H8l-4 4V5z"/><path d="M8 9h8M8 13h5"/>',
+      lock:'<rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M12 15v2"/>',
+      phone:'<path d="M8 3h8l1 4-3 2a14 14 0 0 0 5 5l2-3 4 1v8a2 2 0 0 1-2 2C12 22 2 12 2 5a2 2 0 0 1 2-2h4z"/>',
+      check:'<path d="M20 6L9 17l-5-5"/>',
+      map:'<path d="M9 18l-6 3V6l6-3 6 3 6-3v15l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/>'
+    };
+    function icon(name, cls=''){return `<span class="sq ${cls}"><svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name]}</svg></span>`}
+    function tick(){return `<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`}
+    function routeName(path=location.pathname){
+      if(path === '/') return '/';
+      const clean = path.replace(/\/$/,'');
+      if(clean.toLowerCase() === '/sanctuary') return '/Sanctuary';
+      return clean;
+    }
+    function userProfile(){try{return JSON.parse(localStorage.getItem(USER_PROFILE_KEY)||'null')}catch{return null}}
+    function authHeaders(kind='user'){
+      const token = localStorage.getItem(kind === 'admin' ? ADMIN_TOKEN_KEY : USER_TOKEN_KEY);
+      return token ? {'Authorization': `Bearer ${token}`} : {};
+    }
+    async function api(path, options={}){
+      const res = await fetch(path, {headers:{'Content-Type':'application/json', ...(options.headers||{})}, ...options});
+      let data = null;
+      try{data = await res.json()}catch{data = {detail: await res.text()}}
+      if(!res.ok) throw new Error(data.detail || data.message || 'Request failed');
+      return data;
+    }
+
+    const serviceItems = ['Warm Bath - Shampoo & Condition','Blow Dry','Brush out','Nail Trim','Anal Gland Expression'];
+    const fullItems = ['Warm Bath - Shampoo & Condition','Blow Dry','Brush out','Full Body Clip','Scissor-Finish - Face & Feet','Nail Trim','Ear Cleaning','Anal Gland Expression'];
+    const extras = [['Flea Shampoo','$20'],['Nail Trim','$20'],['Teeth Brush','$10'],['Face Tidy','$10'],['Anal Gland Expression','$20']];
+
+    function heroHome(){return `
+      <div class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <div class="eyebrow"><span class="dot"></span> Premium one-on-one grooming</div>
+            <h1>Clean coats. Calm dogs. <span>Happy tails.</span></h1>
+            <p class="lead">Premium one-on-one dog grooming in Tawa, Wellington with simple prices, fast booking and a calm, friendly feel.</p>
+            <div class="actions">
+              <a class="btn primary" href="/book" data-route>${tick()} Book a groom</a>
+              <a class="btn light" href="/services" data-route>View services</a>
+              <a class="btn gold" href="/sign-in" data-route>Sign in</a>
+            </div>
+            <div class="stats">
+              <div class="stat"><b>1-on-1</b><span>care style</span></div>
+              <div class="stat"><b>From $45</b><span>wash & dry</span></div>
+              <div class="stat"><b>Tawa</b><span>Wellington, NZ</span></div>
+            </div>
+          </div>
+          <div class="hero-art" aria-label="Barking Mad Barbers team photos">
+            <div class="logo-card"><img src="/assets/logo.png" alt="Barking Mad Barbers logo"></div>
+            <div class="photo one"><img src="/assets/team-dog.webp" alt="Team member with a dog"><strong>Dog-loving, calm and friendly.</strong></div>
+            <div class="photo two"><img src="/assets/team-beach.webp" alt="Barking Mad Barbers team member"><strong>Local care with a family feel.</strong></div>
+          </div>
+        </div>
+      </div>
+      ${homeSections()}`}
+
+    function homeSections(){return `
+      <section>
+        <div class="wrap section-head"><h2>Everything easier to find.</h2><p>Services, booking, helper, contact and customer sign-in are now simple to find without digging around.</p></div>
+        <div class="wrap icon-grid">
+          ${iconCard('scissors','Services','Full Groom, Wash & Dry, extras and notes in a clean layout.','gold')}
+          ${iconCard('home','Sanctuary','A calming page for the grooming space and comfort-first approach.','')}
+          ${iconCard('user','Our Family','A customer area built around dogs, owners and simple saved details.','blue')}
+          ${iconCard('calendar','Book','A quicker booking form with details filled in after sign-in.','green')}
+        </div>
+      </section>
+      <section>
+        <div class="wrap two-col">
+          <div class="sticky-copy">
+            <div class="mini-logo"><img src="/assets/logo.png" alt="Barking Mad Barbers logo"></div>
+            <div class="eyebrow"><span class="dot"></span> Quick pick</div>
+            <h2 style="font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:-.06em;margin:18px 0">Choose the groom without digging.</h2>
+            <p class="lead">The main services are clear, the add-ons are separated and the notes are visible before anyone books.</p>
+          </div>
+          <div class="price-grid" style="grid-template-columns:1fr">
+            ${servicePanel('Full Groom','from $80',fullItems,[['Tiny','$80'],['Small','$90'],['Medium','$110'],['Large','$130']])}
+            ${servicePanel('Wash & Dry','from $45',serviceItems.concat(['Cologne']),[['Tiny','$45'],['Small','$50'],['Medium','$55'],['Large','$60']])}
+          </div>
+        </div>
+      </section>`}
+
+    function iconCard(iconName,title,text,cls=''){return `<article class="icon-card">${icon(iconName,cls)}<h3>${title}</h3><p>${text}</p></article>`}
+    function servicePanel(title,from,items,sizes){return `<article class="service-panel"><div class="service-title"><h3>${title}</h3><span>${from}</span></div><ul class="clean-list">${items.map(x=>`<li>${tick()}<span>${x}</span></li>`).join('')}</ul><div class="sizes">${sizes.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join('')}</div></article>`}
+
+    function routeHero(title,lead,eyebrow='Barking Mad Barbers'){return `<div class="route-hero"><div class="wrap"><div class="eyebrow"><span class="dot"></span> ${eyebrow}</div><h1>${title}</h1><p class="lead">${lead}</p></div></div>`}
+
+    function servicesPage(){return `${routeHero('Services & prices','Clear grooming options with the original price guide preserved and the service choices easier to scan.','Services')}
+      <section>
+        <div class="wrap price-grid">
+          ${servicePanel('Full Groom','from $80',fullItems,[['Tiny','$80'],['Small','$90'],['Medium','$110'],['Large','$130']])}
+          ${servicePanel('Wash & Dry','from $45',serviceItems.concat(['Cologne']),[['Tiny','$45'],['Small','$50'],['Medium','$55'],['Large','$60']])}
+        </div>
+        <div class="wrap split">
+          <article class="service-panel"><div class="service-title"><h3>Extras</h3><span>add-ons</span></div><div class="extras">${extras.map(([a,b])=>`<div class="extra"><span>${a}</span><span>${b}</span></div>`).join('')}</div></article>
+          <article class="service-panel"><div class="service-title"><h3>Notes</h3><span>before booking</span></div><ul class="clean-list"><li>${tick()}<span>Additional charges might apply if your dog is badly matted.</span></li><li>${tick()}<span>Flea shampoo will be added to the groom if fleas are found.</span></li><li>${tick()}<span>There is a 50% cancellation fee if not notified 1 day prior.</span></li></ul></article>
+        </div>
+      </section>
+      <section>
+        <div class="wrap two-col">
+          <div class="sticky-copy"><h2 style="font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:-.06em">Original guide, cleaner page.</h2><p class="lead">The full image is still here, but the page also gives people fast readable service cards.</p><div class="actions"><a class="btn primary" href="/book" data-route>Book from services</a></div></div>
+          <div class="price-image"><img src="/assets/price-guide.webp" alt="Barking Mad Barbers price guide"></div>
+        </div>
+      </section>`}
+
+    function sanctuaryPage(){return `${routeHero('The Sanctuary','A calm, kind grooming space focused on one dog at a time, gentle handling and a cleaner experience.','Sanctuary')}
+      <section><div class="wrap icon-grid">
+        ${iconCard('heart','Comfort first','The groom is planned around how the dog is coping, not just how fast the appointment can move.','gold')}
+        ${iconCard('shield','Safe handling','Extra care for nervous dogs, older dogs, puppies and coat issues that need patience.','green')}
+        ${iconCard('bath','Clean routine','Bath, dry and brush steps are simple to understand before the dog arrives.','blue')}
+        ${iconCard('spark','Fresh finish','A polished finish without making the website feel crowded or hard to use.','')}
+      </div></section>
+      <section><div class="wrap canvas-panel"><div class="section-head"><h2>No noisy boxes. Just clean space.</h2><p>The design uses soft canvas panels, squircle icons and roomy sections so the site feels premium without giant visible div borders everywhere.</p></div><div class="family-band">${iconCard('paw','Dog-led pace','Comfort, confidence and coat condition come first.','gold')}${iconCard('home','In-home feel','Warm, local and personal instead of cold and corporate.','')}${iconCard('check','Clear expectations','Prices, notes and booking details stay easy to find.','green')}</div></div></section>`}
+
+    function familyPage(){return `${routeHero('Our Family','A friendly customer space for owners and dogs, with sign-in details used to make booking quicker.','Our Family')}
+      <section><div class="wrap two-col"><div class="sticky-copy"><div class="mini-logo"><img src="/assets/logo.png" alt="Barking Mad Barbers logo"></div><h2 style="font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:-.06em">Built for regulars and new dogs.</h2><p class="lead">People can sign in, keep their basic details ready, and book without feeling like the site is making them work.</p><div class="actions"><a class="btn primary" href="/sign-in" data-route>Sign in</a><a class="btn light" href="/book" data-route>Book now</a></div></div><div class="icon-grid" style="grid-template-columns:1fr 1fr">${iconCard('user','Owner details','Name, email and phone can be ready when booking.','blue')}${iconCard('paw','Dog details','Dog name and size are easy to add.','gold')}${iconCard('calendar','Booking history','Signed-in customers can see their own request list.','green')}${iconCard('message','Simple updates','Booking requests are clearer for the admin dashboard.','')}</div></div></section><section><div class="wrap canvas-panel"><div id="myBookingsMount"></div></div></section>`}
+
+    function teamPage(){return `${routeHero('Our Team','Meet the Barking Mad Barbers team through the photos supplied for this site.','Team')}
+      <section><div class="wrap team-grid"><article class="team-photo"><img src="/assets/team-dog.webp" alt="Team member with a dog"><div class="caption"><h3>Hands-on care.</h3><p>Friendly support, real dog energy and a warm Barking Mad Barbers feeling.</p></div></article><div class="team-side"><article class="team-photo"><img src="/assets/team-beach.webp" alt="Barking Mad Barbers team member at the beach"><div class="caption"><h3>Local and approachable.</h3><p>Simple, personal and built for the real Barking Mad Barbers family.</p></div></article><article class="team-photo" style="background:rgba(255,255,255,.68);display:grid;place-items:center;padding:30px"><img src="/assets/logo.png" alt="Barking Mad Barbers logo" style="height:auto;object-fit:contain"></article></div></div></section><section><div class="wrap icon-grid">${iconCard('heart','Kindness','A calmer design that matches careful dog handling.','gold')}${iconCard('scissors','Skill','The groom details are clear before a customer books.','')}${iconCard('paw','Dog focus','Small-to-medium dog grooming is easy to understand.','green')}${iconCard('spark','Pride','The brand feels clean, confident and more official.','blue')}</div></section>`}
+
+    function bookPage(){const p = userProfile() || {}; return `${routeHero('Book a groom','Send the main details in one tidy form. Signed-in details fill in automatically.','Booking')}
+      <section><div class="wrap two-col"><div class="sticky-copy"><div class="mini-logo"><img src="/assets/logo.png" alt="Barking Mad Barbers logo"></div><h2 style="font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:-.06em">Quick request. Clear details.</h2><p class="lead">This creates a booking request for the admin dashboard. The team can then confirm the final time and price.</p><div class="actions"><a class="btn light" href="/services" data-route>Check prices</a><a class="btn gold" href="/sign-in" data-route>Sign in first</a></div></div><form class="form-card" id="bookingForm"><div class="form-grid"><div class="field"><label for="ownerName">Your name</label><input id="ownerName" name="owner_name" required value="${escapeHtml(p.name||'')}"></div><div class="field"><label for="phone">Phone</label><input id="phone" name="phone" required value="${escapeHtml(p.phone||'')}"></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" value="${escapeHtml(p.email||'')}"></div><div class="field"><label for="dogName">Dog name</label><input id="dogName" name="dog_name" required value="${escapeHtml(p.dog_name||'')}"></div><div class="field"><label for="dogSize">Dog size</label><select id="dogSize" name="dog_size" required><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label for="service">Service</label><select id="service" name="service" required><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Nail Trim</option><option>Face Tidy</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div><div class="field"><label for="date">Preferred date</label><input id="date" name="preferred_date" type="date"></div><div class="field"><label for="time">Preferred time</label><input id="time" name="preferred_time" placeholder="Morning / afternoon / exact time"></div><div class="field full"><label for="notes">Notes</label><textarea id="notes" name="notes" placeholder="Coat condition, behaviour, matting, fleas, preferred style, anything helpful..."></textarea></div></div><button class="btn primary" style="margin-top:16px;width:100%" type="submit">Send booking request</button><div class="message" id="bookingMsg"></div></form></div></section>`}
+
+    function helperPage(){return `${routeHero('Grooming Helper','Ask quick grooming questions, check simple advice and jump straight to booking when ready.','Helper')}
+      <section><div class="wrap two-col"><div class="canvas-panel"><h2 style="font-size:clamp(2.1rem,4vw,3.6rem);line-height:.95;letter-spacing:-.055em">Ask the helper.</h2><form id="helperForm" class="dashboard"><div class="field"><label for="helperQuestion">Question</label><textarea id="helperQuestion" required placeholder="Example: My dog has knots behind the ears, should I book a full groom?"></textarea></div><div class="form-grid"><div class="field"><label for="helperSize">Dog size</label><input id="helperSize" placeholder="Small, medium..."></div><div class="field"><label for="helperCoat">Coat type</label><input id="helperCoat" placeholder="Curly, long, double coat..."></div></div><button class="btn primary" type="submit">Ask helper</button><div class="message" id="helperMsg"></div></form></div><div class="faq"><details open><summary>What if my dog is badly matted?</summary><p>Book with notes about where the matting is. Comfort comes first, and extra charges may apply for badly matted coats.</p></details><details><summary>What if fleas are found?</summary><p>Flea shampoo is added to the groom if fleas are found.</p></details><details><summary>How much notice for cancellation?</summary><p>The price guide notes a 50% cancellation fee if not notified 1 day prior.</p></details><details><summary>Can I just book nail trim or face tidy?</summary><p>Yes, the extras are available in the booking form so the request is clear.</p></details></div></div></section>`}
+
+    function contactPage(){return `${routeHero('Contact','Make it easy to ask questions, book a groom or check what service fits your dog.','Contact')}
+      <section><div class="wrap contact-grid">${contactCard('phone','Text 027 247 2493','Best for quick questions, booking details and changes, especially when the team is mid-groom.','gold')}${contactCard('map','Tawa, Wellington','Home-based Barking Mad Barbers grooming in Tawa, Wellington. Appointments only.','blue')}${contactCard('message','Email','barkingmadbarbers@gmail.com for longer notes, questions, or booking details that need more space.','green')}</div></section><section><div class="wrap canvas-panel"><div class="section-head"><h2>Need a direct link?</h2><p>Send customers to the exact page they need: /services, /book, /helper or /sign-in.</p></div><div class="actions"><a class="btn primary" href="/book" data-route>Book now</a><a class="btn light" href="sms:0272472493">Text now</a><a class="btn gold" href="/services" data-route>View prices</a></div></div></section>`}
+    function contactCard(ic,title,text,cls){return `<article class="contact-card">${icon(ic,cls)}<h3>${title}</h3><p>${text}</p></article>`}
+
+    function signInPage(){const p=userProfile(); return `${routeHero('Sign in','Save your basic details so booking feels faster next time.','Customer sign in')}
+      <section><div class="wrap two-col"><div class="sticky-copy"><div class="mini-logo"><img src="/assets/logo.png" alt="Barking Mad Barbers logo"></div><h2 style="font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:-.06em">For customers, not just staff.</h2><p class="lead">Use a simple customer sign-in for booking details. Admin has its own page.</p><div class="actions"><a class="btn light" href="/admin" data-route>Admin area</a><a class="btn primary" href="/book" data-route>Go to booking</a></div></div><form class="form-card" id="userSignForm"><div class="form-grid"><div class="field"><label for="userName">Name</label><input id="userName" required value="${escapeHtml(p?.name||'')}"></div><div class="field"><label for="userEmail">Email</label><input id="userEmail" type="email" required value="${escapeHtml(p?.email||'')}"></div><div class="field"><label for="userPhone">Phone</label><input id="userPhone" value="${escapeHtml(p?.phone||'')}"></div><div class="field"><label for="userDog">Dog name</label><input id="userDog" value="${escapeHtml(p?.dog_name||'')}"></div></div><button class="btn primary" type="submit" style="width:100%;margin-top:16px">Continue</button><div class="message ${p?'show good':''}" id="signMsg">${p?`Signed in as ${escapeHtml(p.name||p.email)}.`:''}</div><button class="btn danger" type="button" id="signOutBtn" style="width:100%;margin-top:10px;${p?'':'display:none'}">Sign out</button></form></div></section>`}
+
+    function adminPage(){return `${routeHero('Admin','Review booking requests and update their status from one simple dashboard.','Admin')}
+      <section><div class="wrap two-col"><div class="sticky-copy"><div class="mini-logo"><img src="/assets/logo.png" alt="Barking Mad Barbers logo"></div><h2 style="font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:-.06em">Private staff controls.</h2><p class="lead">Uses ADMIN_EMAILS, ADMIN_PASSWORD and JWT-SECRET from Render.</p><div class="actions"><a class="btn light" href="/book" data-route>Booking page</a><a class="btn gold" href="/services" data-route>Prices</a></div></div><div class="form-card"><form id="adminLoginForm" class="dashboard"><div class="form-grid"><div class="field"><label for="adminEmail">Admin email</label><input id="adminEmail" type="email" required autocomplete="email" value="${escapeHtml(localStorage.getItem(ADMIN_EMAIL_KEY)||'')}"></div><div class="field"><label for="adminPassword">Password</label><input id="adminPassword" type="password" required autocomplete="current-password"></div></div><button class="btn primary" type="submit">Open dashboard</button><div class="message" id="adminMsg"></div></form><div id="adminDash" style="display:none"><div class="dashboard"><button class="btn light" id="refreshBookings" type="button">Refresh bookings</button><button class="btn danger" id="adminSignOut" type="button">Sign out</button></div><div class="booking-list" id="bookingList"></div></div></div></div></section>`}
+
+    function notFound(){return `${routeHero('Page not found','That page does not exist yet. Use the menu to jump back into Barking Mad Barbers.','404')}<section><div class="wrap actions"><a class="btn primary" href="/" data-route>Home</a><a class="btn light" href="/book" data-route>Book</a></div></section>`}
+
+    const routes = {'/':heroHome,'/services':servicesPage,'/Sanctuary':sanctuaryPage,'/our-family':familyPage,'/team':teamPage,'/book':bookPage,'/helper':helperPage,'/contact':contactPage,'/sign-in':signInPage,'/admin':adminPage};
+    function escapeHtml(value){return String(value||'').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+    function navigate(path, replace=false){const clean=routeName(path); if(replace) history.replaceState({},'',clean); else history.pushState({},'',clean); render();}
+    function render(){
+      const path = routeName();
+      const view = routes[path] || notFound;
+      $('#app').innerHTML = view();
+      $$('.navlinks a').forEach(a => a.classList.toggle('active', routeName(a.getAttribute('href')) === path));
+      $('#navLinks').classList.remove('open');
+      document.title = path === '/' ? 'Barking Mad Barbers | Tawa Dog Grooming' : `${document.querySelector('.route-hero h1')?.textContent || 'Barking Mad Barbers'} | Barking Mad Barbers`;
+      requestAnimationFrame(() => $('#app').focus({preventScroll:true}));
+      afterRender(path);
+    }
+
+    function afterRender(path){
+      if(path === '/book') setupBooking();
+      if(path === '/helper') setupHelper();
+      if(path === '/sign-in') setupUserSignIn();
+      if(path === '/admin') setupAdmin();
+      if(path === '/our-family') loadMine();
+    }
+
+    function setupBooking(){
+      const form = $('#bookingForm'); const msg = $('#bookingMsg'); if(!form) return;
+      form.addEventListener('submit', async e => {
+        e.preventDefault(); msg.className = 'message show'; msg.textContent = 'Sending request...';
+        const body = Object.fromEntries(new FormData(form).entries());
+        try{ await api('/api/bookings', {method:'POST', headers:authHeaders('user'), body:JSON.stringify(body)}); msg.className='message show good'; msg.textContent='Booking request sent. The team can now review it.'; form.reset(); }
+        catch(err){ msg.className='message show bad'; msg.textContent=err.message; }
+      });
+    }
+    function setupHelper(){
+      const form = $('#helperForm'); const msg = $('#helperMsg'); if(!form) return;
+      form.addEventListener('submit', async e => {
+        e.preventDefault(); msg.className='message show'; msg.textContent='Thinking...';
+        try{ const data = await api('/api/helper', {method:'POST', body:JSON.stringify({question:$('#helperQuestion').value, dog_size:$('#helperSize').value, coat_type:$('#helperCoat').value})}); msg.className='message show good'; msg.textContent=data.answer; }
+        catch(err){ msg.className='message show bad'; msg.textContent=err.message; }
+      });
+    }
+    function setupUserSignIn(){
+      const form = $('#userSignForm'); const msg = $('#signMsg'); const out = $('#signOutBtn'); if(!form) return;
+      form.addEventListener('submit', async e => {
+        e.preventDefault(); msg.className='message show'; msg.textContent='Signing in...';
+        const body = {name:$('#userName').value, email:$('#userEmail').value, phone:$('#userPhone').value, dog_name:$('#userDog').value};
+        try{ const data = await api('/api/user/sign-in', {method:'POST', body:JSON.stringify(body)}); localStorage.setItem(USER_TOKEN_KEY, data.token); localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(data.profile)); msg.className='message show good'; msg.textContent=`Signed in as ${data.profile.name}.`; out.style.display='inline-flex'; }
+        catch(err){ msg.className='message show bad'; msg.textContent=err.message; }
+      });
+      out?.addEventListener('click', () => {localStorage.removeItem(USER_TOKEN_KEY); localStorage.removeItem(USER_PROFILE_KEY); render();});
+    }
+    function setupAdmin(){
+      const form = $('#adminLoginForm'); const dash = $('#adminDash'); const msg = $('#adminMsg');
+      async function showDash(){form.style.display='none'; dash.style.display='block'; await loadAdminBookings();}
+      if(localStorage.getItem(ADMIN_TOKEN_KEY)) showDash().catch(()=>{localStorage.removeItem(ADMIN_TOKEN_KEY);});
+      form?.addEventListener('submit', async e => {
+        e.preventDefault(); msg.className='message show'; msg.textContent='Opening dashboard...';
+        try{ const data = await api('/api/admin/login', {method:'POST', body:JSON.stringify({email:$('#adminEmail').value.trim(), password:$('#adminPassword').value})}); localStorage.setItem(ADMIN_TOKEN_KEY, data.token); localStorage.setItem(ADMIN_EMAIL_KEY, data.email); msg.className='message show good'; msg.textContent='Dashboard ready.'; await showDash(); }
+        catch(err){ msg.className='message show bad'; msg.textContent=err.message; }
+      });
+      $('#refreshBookings')?.addEventListener('click', loadAdminBookings);
+      $('#adminSignOut')?.addEventListener('click', () => {localStorage.removeItem(ADMIN_TOKEN_KEY); render();});
+    }
+    async function loadAdminBookings(){
+      const list = $('#bookingList'); if(!list) return; list.innerHTML = '<div class="message show">Loading bookings...</div>';
+      try{ const data = await api('/api/admin/bookings', {headers:authHeaders('admin')}); list.innerHTML = renderBookings(data.bookings, true); bindBookingActions(); }
+      catch(err){ list.innerHTML = `<div class="message show bad">${escapeHtml(err.message)}</div>`; }
+    }
+    function renderBookings(bookings, admin=false){
+      if(!bookings.length) return '<div class="message show good">No booking requests yet.</div>';
+      return bookings.map(b => `<article class="booking-card" data-id="${escapeHtml(b.id)}"><header><div><h4>${escapeHtml(b.dog_name)} — ${escapeHtml(b.service)}</h4><small>${escapeHtml(b.owner_name)} · ${escapeHtml(b.created_at || '').slice(0,10)}</small></div><span class="pill">${escapeHtml(b.status || 'New')}</span></header><dl><dt>Phone</dt><dd>${escapeHtml(b.phone)}</dd><dt>Email</dt><dd>${escapeHtml(b.email || '—')}</dd><dt>Size</dt><dd>${escapeHtml(b.dog_size)}</dd><dt>Preferred</dt><dd>${escapeHtml([b.preferred_date,b.preferred_time].filter(Boolean).join(' · ') || '—')}</dd><dt>Notes</dt><dd>${escapeHtml(b.notes || '—')}</dd>${b.staff_notes?`<dt>Staff</dt><dd>${escapeHtml(b.staff_notes)}</dd>`:''}</dl>${admin?`<div class="booking-actions"><button class="mini-btn" data-status="Contacted">Mark contacted</button><button class="mini-btn" data-status="Confirmed">Confirm</button><button class="mini-btn" data-status="Done">Done</button><button class="mini-btn" data-delete="1">Delete</button></div>`:''}</article>`).join('');
+    }
+    function bindBookingActions(){
+      $$('#bookingList .mini-btn').forEach(btn => btn.addEventListener('click', async e => {
+        const card = e.target.closest('.booking-card'); const id = card.dataset.id;
+        try{ if(btn.dataset.delete){ await api(`/api/admin/bookings/${encodeURIComponent(id)}`, {method:'DELETE', headers:authHeaders('admin')}); } else { await api(`/api/admin/bookings/${encodeURIComponent(id)}`, {method:'PATCH', headers:authHeaders('admin'), body:JSON.stringify({status:btn.dataset.status})}); } await loadAdminBookings(); }
+        catch(err){ alert(err.message); }
+      }));
+    }
+    async function loadMine(){
+      const mount = $('#myBookingsMount'); if(!mount) return;
+      if(!localStorage.getItem(USER_TOKEN_KEY)){mount.innerHTML = `<div class="section-head"><h2>Your dog area.</h2><p>Sign in to keep details ready and view your own booking requests.</p></div><div class="actions"><a class="btn primary" href="/sign-in" data-route>Sign in</a><a class="btn light" href="/book" data-route>Book without signing in</a></div>`; return;}
+      mount.innerHTML = '<div class="message show">Loading your booking requests...</div>';
+      try{ const data = await api('/api/bookings/mine', {headers:authHeaders('user')}); mount.innerHTML = `<div class="section-head"><h2>Your bookings.</h2><p>Here are the booking requests connected to your email.</p></div><div class="booking-list">${renderBookings(data.bookings,false)}</div>`; }
+      catch{ mount.innerHTML = `<div class="section-head"><h2>Your dog area.</h2><p>Please sign in again to view saved booking requests.</p></div><div class="actions"><a class="btn primary" href="/sign-in" data-route>Sign in</a></div>`; }
+    }
+
+    document.addEventListener('click', e => {
+      const a = e.target.closest('a[data-route]');
+      if(a){ e.preventDefault(); navigate(a.getAttribute('href')); }
+    });
+    window.addEventListener('popstate', render);
+    $('#menuBtn').addEventListener('click', () => $('#navLinks').classList.toggle('open'));
+
+    function canvasWash(){
+      const canvas = $('#canvasWash'), ctx = canvas.getContext('2d'); let w,h,dpr,spots=[];
+      function resize(){dpr=Math.min(devicePixelRatio||1,2); w=canvas.width=innerWidth*dpr; h=canvas.height=innerHeight*dpr; canvas.style.width=innerWidth+'px'; canvas.style.height=innerHeight+'px'; spots=Array.from({length:38},()=>({x:Math.random()*w,y:Math.random()*h,r:(Math.random()*3+1)*dpr,v:(Math.random()*.22+.05)*dpr,a:Math.random()*Math.PI*2}));}
+      function draw(){ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(180,137,63,.16)'; for(const s of spots){s.y-=s.v; s.x+=Math.sin(s.a+=.012)*.12*dpr; if(s.y<-12*dpr){s.y=h+12*dpr; s.x=Math.random()*w} ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill()} requestAnimationFrame(draw)}
+      addEventListener('resize', resize, {passive:true}); resize(); draw();
+    }
+    canvasWash();
+    render();
+  </script>
+</body>
+</html>
