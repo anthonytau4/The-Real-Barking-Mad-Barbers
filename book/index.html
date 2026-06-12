@@ -5,12 +5,80 @@
   const routePath = '/book';
   const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
   const nativeFetch = window.fetch.bind(window);
+
+  function status(el, msg, kind = '') {
+    if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`;
+  }
+
+  function formData(form) {
+    return Object.fromEntries(new FormData(form).entries());
+  }
+
+  function bookingSmsUrl(data) {
+    const message = [
+      'Hi Barking Mad Barbers, I would like to enquire about booking a groom.',
+      'Please text when you can, as you may be with a dog and unable to answer calls.',
+      'If a phone call is easier, please text and let me know. I understand you will call back when you are able.',
+      `Name: ${data.owner_name || ''}`,
+      `Phone: ${data.phone || ''}`,
+      `Email: ${data.email || ''}`,
+      `Dog name: ${data.dog_name || ''}`,
+      `Dog size: ${data.dog_size || ''}`,
+      `Service: ${data.service || ''}`,
+      `Preferred date: ${data.preferred_date || ''}`,
+      `Preferred time: ${data.preferred_time || ''}`,
+      `Notes: ${data.notes || ''}`
+    ].filter(line => !line.endsWith(': ')).join('\n');
+    return `sms:0272472493?&body=${encodeURIComponent(message)}`;
+  }
+
+  function apiUrl(path) {
+    return apiBase && path.startsWith('/api/') ? apiBase + path : path;
+  }
+
+  async function submitBookingWithSmsFallback(form) {
+    const payload = formData(form);
+    const el = document.getElementById('bookingStatus');
+    status(el, 'Sending booking request...');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      const token = localStorage.getItem('bmb_user_token') || '';
+      if (token) headers.Authorization = 'Bearer ' + token;
+      const response = await nativeFetch(apiUrl('/api/bookings'), {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('Booking server unavailable.');
+      form.reset();
+      status(el, 'Booking request sent. Barking Mad Barbers can confirm the details with you soon.', 'good');
+    } catch (error) {
+      status(el, 'The online booking server is unavailable, so we are opening a text message with your enquiry ready to send.', 'good');
+      window.location.href = bookingSmsUrl(payload);
+    }
+  }
+
+  function installBookingFallback() {
+    const form = document.getElementById('bookingForm');
+    if (!form) return;
+    form.onsubmit = event => {
+      event.preventDefault();
+      submitBookingWithSmsFallback(form);
+    };
+  }
+
   window.fetch = (input, init) => {
     if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input;
     return nativeFetch(input, init);
   };
+
   history.replaceState(null, '', routePath);
   nativeFetch('/index.html', { cache: 'no-store' })
     .then(response => response.text())
-    .then(html => { document.open(); document.write(html); document.close(); });
+    .then(html => {
+      document.open();
+      document.write(html);
+      document.close();
+      setTimeout(installBookingFallback, 0);
+    });
 </script>
