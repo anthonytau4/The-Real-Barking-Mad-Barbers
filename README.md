@@ -28,6 +28,14 @@ SERVE_FRONTEND
 
 `GEMINI_API_KEY` and `GEMINI_MODEL` power the Helper page. `OPENAI_API_KEY` is kept only as a fallback because it was in the Render variable list.
 
+If `barkingmadbarbers.com` is served by a static host instead of this Render web service, set `REACT_APP_BACKEND_URL` to the public Render backend URL and add this before the app script in the served HTML:
+
+```html
+<script>window.BMB_API_BASE_URL = "https://YOUR-RENDER-SERVICE.onrender.com";</script>
+```
+
+When the custom domain is attached directly to the Render backend, leave `window.BMB_API_BASE_URL` unset and the site will use same-origin `/api/...` routes.
+
 ## Site paths
 
 ```text
