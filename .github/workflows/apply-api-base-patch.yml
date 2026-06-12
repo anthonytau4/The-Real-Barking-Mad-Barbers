@@ -1,0 +1,54 @@
+name: Apply API base URL patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/apply-api-base-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Patch HTML API helper
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [Path('index.html'), Path('backend/static/index.html')]
+          old_const = "    const AS = '/assets/';\n"
+          new_const = "    const AS = '/assets/';\n    const API_BASE_URL = (window.BMB_API_BASE_URL || '').replace(/\\/+$/, '');\n"
+          old_api = "    async function api(path, opts={}){const res=await fetch(path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts}); const data=await res.json().catch(()=>({detail:'Could not read server response.'})); if(!res.ok) throw new Error(data.detail||data.message||'Request failed'); return data;}\n"
+          new_api = """    function apiUrl(path){return API_BASE_URL ? API_BASE_URL + path : path}
+    async function api(path, opts={}){
+      const res=await fetch(apiUrl(path),{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});
+      const data=await res.json().catch(()=>({detail:'Could not read server response. Check that REACT_APP_BACKEND_URL points to the Render backend, not the static site.'}));
+      if(!res.ok) throw new Error(data.detail||data.message||'Request failed');
+      return data;
+    }
+"""
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+              if 'const API_BASE_URL' not in text:
+                  text = text.replace(old_const, new_const, 1)
+              if 'function apiUrl(path)' not in text:
+                  text = text.replace(old_api, new_api, 1)
+              path.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/apply-api-base-patch.yml')
+          workflow.unlink(missing_ok=True)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html backend/static/index.html .github/workflows/apply-api-base-patch.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix frontend API base URL handling"
+          git push
