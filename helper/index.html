@@ -6,7 +6,12 @@
   const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
   const nativeFetch = window.fetch.bind(window);
   window.fetch = (input, init) => {
+    const url = typeof input === 'string' ? input : (input && input.url) || '';
+    const isApi = url.startsWith('/api/') || /\/api\//.test(url);
     if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input;
+    if (isApi && init && typeof init.body === 'string' && /^[\s\r\n]*[\[{]/.test(init.body)) {
+      init = { ...init, headers: { 'Content-Type': 'application/json', ...(init.headers || {}) } };
+    }
     return nativeFetch(input, init);
   };
   history.replaceState(null, '', routePath);
