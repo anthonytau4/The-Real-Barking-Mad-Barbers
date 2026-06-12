@@ -14,7 +14,101 @@
     return Object.fromEntries(new FormData(form).entries());
   }
 
+  function installBookingPolishStyles() {
+    if (document.getElementById('booking-polish-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'booking-polish-styles';
+    style.textContent = `
+      #bookingForm { gap: 18px; }
+      .dog-enquiry-panel {
+        border: 1px solid rgba(183,131,42,.22);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,250,242,.76));
+        padding: 18px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 12px 28px rgba(18,16,11,.07);
+        display: grid;
+        gap: 14px;
+      }
+      .dog-panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+      .dog-panel-title { display:grid; gap:4px; }
+      .dog-panel-title strong { font-size:18px; color:#17140f; }
+      .dog-panel-title span { color:#6a5f54; font-weight:650; line-height:1.45; }
+      .dog-list { display:grid; gap:12px; }
+      .dog-card {
+        border: 1px solid rgba(183,131,42,.18);
+        border-radius: 20px;
+        background: #fff;
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+      .dog-card-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+      .dog-card-head strong { color:#17140f; font-size:15px; letter-spacing:.02em; text-transform:uppercase; }
+      .dog-card-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; }
+      .add-dog-btn, .remove-dog-btn {
+        border: 0;
+        cursor: pointer;
+        border-radius: 999px;
+        font-weight: 950;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+      }
+      .add-dog-btn { padding: 12px 16px; background:#17140f; color:#fff; box-shadow:0 12px 22px rgba(18,16,11,.16); }
+      .remove-dog-btn { padding: 8px 12px; background:#fff5f3; color:#8d2a24; box-shadow: inset 0 0 0 1px rgba(150,39,39,.18); }
+      .sms-note {
+        color:#5f574c;
+        background:#fffaf2;
+        border:1px solid rgba(183,131,42,.18);
+        border-radius:18px;
+        padding:12px 14px;
+        font-weight:650;
+        line-height:1.5;
+      }
+      @media (max-width: 760px) { .dog-card-grid { grid-template-columns: 1fr; } }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function dogSummary(dog, index) {
+    const parts = [dog.name || `Dog ${index + 1}`, dog.size, dog.service].filter(Boolean);
+    return parts.join(' - ');
+  }
+
+  function collectDogs(form) {
+    const firstDog = {
+      name: form.dog_name?.value.trim() || '',
+      size: form.dog_size?.value.trim() || '',
+      service: form.service?.value.trim() || ''
+    };
+    const extraDogs = [...form.querySelectorAll('[data-extra-dog]')].map(card => ({
+      name: card.querySelector('[data-dog-name]')?.value.trim() || '',
+      size: card.querySelector('[data-dog-size]')?.value.trim() || '',
+      service: card.querySelector('[data-dog-service]')?.value.trim() || ''
+    })).filter(dog => dog.name || dog.size || dog.service);
+    return [firstDog, ...extraDogs].filter(dog => dog.name || dog.size || dog.service);
+  }
+
+  function buildBookingPayload(form) {
+    const payload = formData(form);
+    const dogs = collectDogs(form);
+    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog, index)}`);
+    if (dogs[0]) {
+      payload.dog_name = dogs[0].name;
+      payload.dog_size = dogs[0].size;
+      payload.service = dogs[0].service;
+    }
+    if (dogLines.length > 1) {
+      payload.notes = [payload.notes || '', 'Multiple dogs:', ...dogLines].filter(Boolean).join('\n');
+    }
+    payload._dogs = dogs;
+    return payload;
+  }
+
   function bookingSmsUrl(data) {
+    const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, service: data.service }];
+    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog, index)}`);
     const message = [
       'Hi Barking Mad Barbers, I would like to enquire about booking a groom.',
       'Please text when you can, as you may be with a dog and unable to answer calls.',
@@ -22,9 +116,7 @@
       `Name: ${data.owner_name || ''}`,
       `Phone: ${data.phone || ''}`,
       `Email: ${data.email || ''}`,
-      `Dog name: ${data.dog_name || ''}`,
-      `Dog size: ${data.dog_size || ''}`,
-      `Service: ${data.service || ''}`,
+      ...dogLines,
       `Preferred date: ${data.preferred_date || ''}`,
       `Preferred time: ${data.preferred_time || ''}`,
       `Notes: ${data.notes || ''}`
@@ -37,7 +129,9 @@
   }
 
   async function submitBookingWithSmsFallback(form) {
-    const payload = formData(form);
+    const payload = buildBookingPayload(form);
+    const apiPayload = { ...payload };
+    delete apiPayload._dogs;
     const el = document.getElementById('bookingStatus');
     status(el, 'Sending booking request...');
     try {
@@ -47,10 +141,12 @@
       const response = await nativeFetch(apiUrl('/api/bookings'), {
         method: 'POST',
         headers,
-        body: JSON.stringify(payload)
+        body: JSON.stringify(apiPayload)
       });
       if (!response.ok) throw new Error('Booking server unavailable.');
       form.reset();
+      form.querySelectorAll('[data-extra-dog]').forEach(card => card.remove());
+      refreshDogLabels(form);
       status(el, 'Booking request sent. Barking Mad Barbers can confirm the details with you soon.', 'good');
     } catch (error) {
       status(el, 'The online booking server is unavailable, so we are opening a text message with your enquiry ready to send.', 'good');
@@ -58,9 +154,54 @@
     }
   }
 
+  function refreshDogLabels(form) {
+    form.querySelectorAll('[data-extra-dog]').forEach((card, index) => {
+      const label = card.querySelector('[data-dog-label]');
+      if (label) label.textContent = `Dog ${index + 2}`;
+    });
+  }
+
+  function addDogCard(form) {
+    const list = form.querySelector('.dog-list');
+    if (!list) return;
+    const card = document.createElement('div');
+    card.className = 'dog-card';
+    card.dataset.extraDog = 'true';
+    card.innerHTML = `
+      <div class="dog-card-head"><strong data-dog-label>Dog</strong><button class="remove-dog-btn" type="button">Remove</button></div>
+      <div class="dog-card-grid">
+        <div class="field"><label>Dog name</label><input data-dog-name autocomplete="off"></div>
+        <div class="field"><label>Dog size</label><select data-dog-size><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div>
+        <div class="field"><label>Service</label><select data-dog-service><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div>
+      </div>`;
+    card.querySelector('.remove-dog-btn').onclick = () => { card.remove(); refreshDogLabels(form); };
+    list.appendChild(card);
+    refreshDogLabels(form);
+    card.querySelector('[data-dog-name]')?.focus();
+  }
+
+  function installMultiDogUi(form) {
+    if (form.querySelector('.dog-enquiry-panel')) return;
+    installBookingPolishStyles();
+    const serviceField = form.service?.closest('.form-grid');
+    if (!serviceField) return;
+    const panel = document.createElement('section');
+    panel.className = 'dog-enquiry-panel';
+    panel.innerHTML = `
+      <div class="dog-panel-head">
+        <div class="dog-panel-title"><strong>Dogs for this enquiry</strong><span>Add each dog so the team can plan the right time, service and coat care.</span></div>
+        <button class="add-dog-btn" type="button">+ Add dog</button>
+      </div>
+      <div class="dog-list" aria-live="polite"></div>
+      <div class="sms-note">If online booking is unavailable, your enquiry opens as a ready-to-send text to 027 247 2493.</div>`;
+    serviceField.after(panel);
+    panel.querySelector('.add-dog-btn').onclick = () => addDogCard(form);
+  }
+
   function installBookingFallback() {
     const form = document.getElementById('bookingForm');
     if (!form) return;
+    installMultiDogUi(form);
     form.onsubmit = event => {
       event.preventDefault();
       submitBookingWithSmsFallback(form);
