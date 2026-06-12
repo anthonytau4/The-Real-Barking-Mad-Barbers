@@ -1,6 +1,6 @@
-# Barking Mad Barbers — Complete Python Render build
+# Barking Mad Barbers - Python Render build
 
-This is the compact GitHub-ready version for the current Render Python 3 setup.
+This is the GitHub-ready version for the current Render Python setup.
 
 ## Render settings
 
@@ -21,22 +21,35 @@ GEMINI_API_KEY
 GEMINI_MODEL
 GOOGLE_CLIENT_ID
 JWT-SECRET
+JWT_SECRET
 OPENAI_API_KEY
 REACT_APP_BACKEND_URL
 SERVE_FRONTEND
+DATA_DIR
 ```
 
-`GEMINI_API_KEY` and `GEMINI_MODEL` power the Helper page. `OPENAI_API_KEY` is kept only as a fallback because it was in the Render variable list.
+`JWT_SECRET` should be set even if `JWT-SECRET` already exists. The backend accepts both names, but `JWT_SECRET` is the safest Render env name.
 
-If `barkingmadbarbers.com` is served by a static host instead of this Render web service, set `REACT_APP_BACKEND_URL` to the public Render backend URL and add this before the app script in the served HTML:
+Admin/customer records are stored in SQLite at `DATA_DIR/barking_mad.sqlite3`. On Render, add a persistent disk and set `DATA_DIR` to the mounted path, for example `/var/data`. Without a persistent disk, Render can still clear local files during rebuilds.
 
-```html
-<script>window.BMB_API_BASE_URL = "https://YOUR-RENDER-SERVICE.onrender.com";</script>
+Optional email notifications for bookings, contact messages, gallery submissions, and requests use these env vars when configured:
+
+```text
+SMTP_HOST
+SMTP_PORT
+SMTP_USER
+SMTP_PASSWORD
+SMTP_FROM
+SMTP_TLS
+ADMIN_NOTIFICATION_EMAILS
 ```
 
-When the custom domain is attached directly to the Render backend, leave `window.BMB_API_BASE_URL` unset and the site will use same-origin `/api/...` routes.
+## Admin security
 
-For GitHub Pages hosting, each app route is also emitted as a static folder with its own `index.html`, so direct links like `/helper` and `/sign-in` load cleanly.
+- Public registration is blocked for emails listed in `ADMIN_EMAILS`.
+- Admin routes require a JWT with `is_admin: true`.
+- Admin tokens are only issued when the email is in `ADMIN_EMAILS` and the admin password is correct, or when Google returns a verified email that is in `ADMIN_EMAILS`.
+- Google sign-in must use the same `GOOGLE_CLIENT_ID` configured in Render and Google Cloud.
 
 ## Site paths
 
@@ -60,17 +73,13 @@ For GitHub Pages hosting, each app route is also emitted as a static folder with
 backend/
   server.py
   requirements.txt
-  .env.example
   static/
     index.html
     assets/
-      logo.png
+      brand-logo.png
       favicon.png
-      price-guide.webp
+      hero-advert.png
       team-beach.webp
       team-dog.webp
-render.yaml
 README.md
 ```
-
-Only the provided Barking Mad Barbers images are included. The uploaded reference zip was used only for structure and business details, not copied as the project.
