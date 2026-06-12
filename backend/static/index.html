@@ -3,266 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Barking Mad Barbers | Premium Dog Grooming Tawa</title>
-  <meta name="description" content="Barking Mad Barbers dog grooming in Tawa, Wellington. Premium full grooms, wash and dry, sanctuary care, easy bookings, customer sign in and admin dashboard." />
-  <meta name="theme-color" content="#12100b" />
+  <title>Barking Mad Barbers | Dog Grooming Tawa</title>
+  <meta name="description" content="Premium dog grooming in Tawa, Wellington. Book online, ask the grooming helper, or text Barking Mad Barbers." />
   <link rel="icon" type="image/png" href="/assets/favicon.png" />
   <style>
-    :root{
-      --ink:#12100b;
-      --muted:#5f574c;
-      --soft:#f8f3ea;
-      --cream:#fffaf2;
-      --gold:#b7832a;
-      --gold2:#d8b36a;
-      --black:#17140f;
-      --white:#ffffff;
-      --line:rgba(183,131,42,.25);
-      --shadow:0 26px 70px rgba(18,16,11,.12);
-      --shadow2:0 12px 28px rgba(18,16,11,.10);
-      --radius:34px;
-      --squircle:30px;
-      --max:1180px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      color:var(--ink);
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 10% 8%, rgba(216,179,106,.20), transparent 28%),
-        radial-gradient(circle at 92% 4%, rgba(183,131,42,.14), transparent 24%),
-        linear-gradient(135deg,#fffdf8 0%,#fbf5ea 48%,#fffaf3 100%);
-      min-height:100vh;
-    }
-    body:before{
-      content:""; position:fixed; inset:0; pointer-events:none; opacity:.4; z-index:-1;
-      background-image:linear-gradient(rgba(18,16,11,.035) 1px, transparent 1px),linear-gradient(90deg, rgba(18,16,11,.025) 1px, transparent 1px);
-      background-size:56px 56px;
-    }
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-    button,input,select,textarea{font:inherit}
-    .top-gold{height:6px;background:linear-gradient(90deg,#8f6116,#e7c778,#8f6116)}
-    .nav{
-      position:sticky; top:0; z-index:20; backdrop-filter:blur(22px);
-      background:rgba(255,250,242,.88); border-bottom:1px solid var(--line);
-    }
-    .nav-inner{max-width:var(--max);margin:0 auto;padding:15px 20px;display:flex;align-items:center;gap:20px;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:14px;min-width:230px}
-    .brand img{width:78px;height:auto;filter:drop-shadow(0 8px 12px rgba(18,16,11,.12))}
-    .brand-title{font-weight:950;letter-spacing:.13em;text-transform:uppercase;font-size:20px;line-height:1;color:#19150f}
-    .brand-sub{color:#84776a;font-weight:850;margin-top:7px;letter-spacing:.04em}
-    .nav-links{display:flex;align-items:center;gap:7px;justify-content:center;flex:1;flex-wrap:wrap}
-    .nav-link{padding:12px 14px;border-radius:999px;color:#5a5248;font-weight:850;transition:.2s ease;white-space:nowrap}
-    .nav-link:hover,.nav-link.active{background:#fff;color:#15120d;box-shadow:inset 0 0 0 2px rgba(183,131,42,.22)}
-    .nav-actions{display:flex;gap:10px;align-items:center}
-    .btn{border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:14px 20px;font-weight:950;transition:.2s ease;text-align:center}
-    .btn-gold{background:linear-gradient(135deg,#9e6a18,#d5a84a);color:white;box-shadow:0 15px 28px rgba(183,131,42,.25)}
-    .btn-gold:hover{transform:translateY(-2px);box-shadow:0 18px 34px rgba(183,131,42,.33)}
-    .btn-dark{background:#17140f;color:white;box-shadow:0 15px 28px rgba(18,16,11,.20)}
-    .btn-soft{background:white;color:#17140f;box-shadow:inset 0 0 0 1px rgba(183,131,42,.22),0 12px 26px rgba(18,16,11,.08)}
-    .hamburger{display:none;border:0;background:white;border-radius:18px;width:48px;height:48px;box-shadow:inset 0 0 0 1px var(--line);font-size:24px}
-    main{min-height:70vh}
-    .wrap{max-width:var(--max);margin:0 auto;padding:42px 20px}
-    .hero{position:relative;overflow:hidden;padding:34px 0 34px}
-    .hero-grid{display:grid;grid-template-columns:.82fr 1.18fr;gap:34px;align-items:center}
-    .eyebrow{color:var(--gold);font-size:13px;letter-spacing:.22em;font-weight:950;text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:20px}
-    .eyebrow:after{content:"";height:1px;width:72px;background:linear-gradient(90deg,var(--gold),transparent)}
-    h1,h2,h3{margin:0;color:#11100d}
-    .display{font-family:Georgia, 'Times New Roman', serif;font-size:clamp(54px,7vw,94px);line-height:.92;letter-spacing:-.065em;font-weight:900}
-    .display .gold,.gold{color:var(--gold)}
-    .lead{font-size:clamp(18px,2vw,24px);line-height:1.65;color:#4e463d;font-weight:600;margin:26px 0 28px;max-width:580px}
-    .hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:26px 0}
-    .trust{display:flex;gap:14px;align-items:center;color:#5d544b;font-weight:780;margin-top:26px}
-    .stars{color:var(--gold);letter-spacing:2px;font-size:19px}
-    .poster-card{
-      position:relative;border-radius:38px;padding:14px;background:linear-gradient(145deg,#fff,#f6ead8);box-shadow:var(--shadow);overflow:hidden;
-    }
-    .poster-card:before{content:"";position:absolute;inset:0;border-radius:38px;padding:1px;background:linear-gradient(140deg,rgba(183,131,42,.75),rgba(255,255,255,.4),rgba(18,16,11,.12));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-    .poster-card img{width:100%;border-radius:28px;box-shadow:0 20px 54px rgba(18,16,11,.18);background:#fff;}
-    .poster-caption{position:absolute;left:32px;right:32px;bottom:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;pointer-events:none}
-    .mini-pill{background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border:1px solid rgba(183,131,42,.28);border-radius:999px;padding:11px 16px;font-weight:950;color:#17140f;box-shadow:0 12px 28px rgba(18,16,11,.10)}
-    .section{padding:38px 0}
-    .section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:24px}
-    .kicker{font-weight:950;color:var(--gold);letter-spacing:.19em;text-transform:uppercase;font-size:12px;margin-bottom:10px}
-    .section-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(36px,4.5vw,62px);line-height:1;letter-spacing:-.045em}
-    .section-copy{color:#665d52;line-height:1.75;font-weight:650;max-width:680px;font-size:17px}
-    .grid{display:grid;gap:18px}
-    .grid-4{grid-template-columns:repeat(4,1fr)}
-    .grid-3{grid-template-columns:repeat(3,1fr)}
-    .grid-2{grid-template-columns:repeat(2,1fr)}
-    .card,.clean-card{
-      background:rgba(255,255,255,.72);border:1px solid rgba(183,131,42,.16);border-radius:var(--squircle);padding:26px;box-shadow:var(--shadow2);position:relative;overflow:hidden;
-    }
-    .clean-card{background:rgba(255,252,247,.72)}
-    .card:after,.clean-card:after{content:"";position:absolute;left:20px;right:20px;top:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.45}
-    .icon-sq{width:58px;height:58px;border-radius:22px;background:linear-gradient(145deg,#fff6df,#ffffff);display:grid;place-items:center;color:var(--gold);box-shadow:inset 0 0 0 1px rgba(183,131,42,.26),0 12px 24px rgba(183,131,42,.10);margin-bottom:18px}
-    .icon-sq svg{width:32px;height:32px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-    .card h3,.clean-card h3{font-family:Georgia,'Times New Roman',serif;font-size:28px;letter-spacing:-.025em;margin-bottom:10px}
-    .card p,.clean-card p{margin:0;color:#61584e;line-height:1.65;font-weight:610}
-    .price-card{padding:0;overflow:hidden}
-    .price-top{background:#17140f;color:white;padding:24px 26px;display:flex;justify-content:space-between;gap:12px;align-items:center}
-    .price-top h3{color:white;margin:0;font-family:Georgia,'Times New Roman',serif;font-size:34px}
-    .from{color:#d8b36a;font-weight:950;font-size:22px;white-space:nowrap}
-    .price-list{padding:22px 26px;display:grid;gap:12px}
-    .price-row{display:flex;justify-content:space-between;gap:16px;border-bottom:1px dashed rgba(183,131,42,.28);padding-bottom:10px;color:#4f463d;font-weight:780}
-    .price-row:last-child{border-bottom:0;padding-bottom:0}
-    .page-hero{padding:52px 0 24px}
-    .page-hero-grid{display:grid;grid-template-columns:1fr 390px;gap:34px;align-items:center}
-    .page-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(54px,8vw,94px);line-height:.9;letter-spacing:-.06em}
-    .page-poster{border-radius:30px;padding:10px;background:linear-gradient(145deg,#fff,#f7ead5);box-shadow:var(--shadow2)}
-    .page-poster img{border-radius:22px;max-height:520px;width:100%;object-fit:cover;object-position:top}
-    .subnav-pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
-    .pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;color:#52493f;font-weight:850}
-    .form{display:grid;gap:14px}
-    .field{display:grid;gap:8px}
-    label{font-weight:900;color:#2f2a24}
-    input,select,textarea{width:100%;border:1px solid rgba(183,131,42,.25);background:rgba(255,255,255,.92);border-radius:18px;padding:14px 16px;color:#17140f;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
-    textarea{min-height:122px;resize:vertical}
-    input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(183,131,42,.12)}
-    .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-    .status{border-radius:18px;padding:14px 16px;background:#fff;color:#3e362e;border:1px solid var(--line);font-weight:760;line-height:1.55}
-    .status.good{border-color:rgba(49,128,66,.25);background:#f4fff7;color:#1f6430}.status.bad{border-color:rgba(150,39,39,.25);background:#fff5f3;color:#8d2a24}
-    .admin-list{display:grid;gap:14px;margin-top:18px}.booking-item{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:var(--shadow2)}
-    .booking-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.tag{display:inline-flex;align-items:center;border-radius:999px;background:#17140f;color:#fff;padding:6px 11px;font-weight:900;font-size:12px}.tag.goldtag{background:#f4e5c8;color:#81560f}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.note-list{display:grid;gap:12px}.note{display:flex;gap:12px;align-items:flex-start;color:#574f45;font-weight:680;line-height:1.55}.dot{width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:8px;flex:0 0 auto}
-    .footer{margin-top:60px;background:#14110d;color:#fff;padding:42px 20px;border-top:4px solid var(--gold)}
-    .footer-inner{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:28px}.footer h3{color:#fff}.footer p,.footer a{color:#e9ded0;line-height:1.7}.footer .gold{color:#d8b36a}
-    .mobile-drawer{display:none}
-    .hidden{display:none!important}
-    @media (max-width: 980px){
-      .nav-links,.nav-actions{display:none}.hamburger{display:block}.nav-inner{padding:12px 16px}.brand{min-width:auto}.brand-title{font-size:16px}.brand-sub{font-size:13px}.brand img{width:64px}
-      .mobile-drawer.open{display:grid;gap:8px;padding:0 16px 16px}.mobile-drawer .nav-link,.mobile-drawer .btn{width:100%;justify-content:center}
-      .hero-grid,.page-hero-grid,.split{grid-template-columns:1fr}.display{font-size:clamp(52px,13vw,82px)}.page-poster{max-width:520px;margin:0 auto}.grid-4,.grid-3,.grid-2{grid-template-columns:1fr 1fr}.footer-inner{grid-template-columns:1fr}.hero{padding-top:20px}.poster-caption{display:none}
-    }
-    @media (max-width: 620px){
-      .wrap{padding:28px 14px}.grid-4,.grid-3,.grid-2,.form-grid{grid-template-columns:1fr}.section-head{display:block}.poster-card{border-radius:28px;padding:8px}.poster-card img{border-radius:22px}.card,.clean-card{padding:22px;border-radius:24px}.price-top{display:block}.from{display:block;margin-top:8px}.hero-actions .btn{width:100%}.trust{align-items:flex-start}.page-title{font-size:52px}.footer{margin-top:30px}.brand-sub{display:none}.nav-inner{gap:10px}.brand-title{font-size:15px}.brand img{width:58px}.top-gold{height:5px}
-    }
+    :root{--ink:#16130f;--muted:#665d52;--line:#e7d7bd;--gold:#b78228;--cream:#fff9f0;--soft:#f7efe3;--white:#fff;--dark:#17130e;--shadow:0 18px 48px rgba(22,19,15,.12);--max:1120px}
+    *{box-sizing:border-box} body{margin:0;color:var(--ink);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#fffdf8,#f8efe1 52%,#fff9f0)} a{color:inherit;text-decoration:none} img{max-width:100%;display:block} button,input,select,textarea{font:inherit} .top{height:6px;background:linear-gradient(90deg,#8f6116,#e7c778,#8f6116)}
+    .nav{position:sticky;top:0;z-index:10;background:rgba(255,249,240,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)} .navin{max-width:var(--max);margin:auto;padding:14px 18px;display:flex;gap:18px;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center;font-weight:950;letter-spacing:.08em;text-transform:uppercase}.brand img{width:58px}.links{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.links a,.btn{border:0;border-radius:999px;padding:11px 15px;font-weight:850}.links a.active,.links a:hover{background:#fff;box-shadow:inset 0 0 0 1px var(--line)}.btn{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}.gold{color:var(--gold)}.btn.gold{background:linear-gradient(135deg,#9c6717,#d5aa4e);color:#fff;box-shadow:0 12px 26px rgba(183,130,40,.25)}.btn.dark{background:var(--dark);color:#fff}.btn.soft{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+    main{min-height:72vh}.wrap{max-width:var(--max);margin:auto;padding:42px 18px}.hero{display:grid;grid-template-columns:.9fr 1.1fr;gap:34px;align-items:center}.eyebrow{color:var(--gold);font-size:12px;font-weight:950;letter-spacing:.2em;text-transform:uppercase}.display,.page-title,.section-title{font-family:Georgia,"Times New Roman",serif;line-height:.95;letter-spacing:-.04em}.display{font-size:clamp(52px,8vw,92px);margin:18px 0}.page-title{font-size:clamp(48px,7vw,82px);margin:12px 0}.section-title{font-size:clamp(34px,4vw,56px);margin:0}.lead{font-size:19px;line-height:1.7;color:#4f463d;font-weight:600}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}.poster{background:#fff;border:1px solid var(--line);border-radius:24px;padding:10px;box-shadow:var(--shadow)}.poster img{border-radius:18px;width:100%}.grid{display:grid;gap:16px}.grid3{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:repeat(2,1fr)}.card{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}.card h3{font-family:Georgia,"Times New Roman",serif;font-size:28px;margin:0 0 9px}.card p{color:var(--muted);line-height:1.65;font-weight:600}.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.form{display:grid;gap:14px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}label{font-weight:850}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:15px;padding:13px 14px;background:#fff;color:var(--ink)}textarea{min-height:112px;resize:vertical}.status{border:1px solid var(--line);border-radius:15px;background:#fff;padding:13px 14px;line-height:1.55;font-weight:650}.status.good{background:#f2fff6;border-color:#b8dfc1;color:#235d31}.status.bad{background:#fff4f2;border-color:#efc3bb;color:#8b2b22}.dogbox{border:1px dashed var(--line);border-radius:18px;padding:14px;display:grid;gap:12px;background:#fffdf9}.doghead{display:flex;justify-content:space-between;align-items:center;gap:10px}.list{display:grid;gap:12px}.booking{background:#fff;border:1px solid var(--line);border-radius:18px;padding:15px}.tag{display:inline-flex;border-radius:999px;background:#f2dfba;color:#7a510f;padding:5px 10px;font-size:12px;font-weight:900}.footer{background:#15110d;color:#fff;margin-top:36px}.footer .wrap{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px}.footer p,.footer a{color:#eadfce;line-height:1.7}.hidden{display:none}
+    @media(max-width:850px){.navin{align-items:flex-start;flex-direction:column}.hero,.split,.grid2,.grid3,.footer .wrap{grid-template-columns:1fr}.row{grid-template-columns:1fr}.links{width:100%}.links a,.links .btn{flex:1;text-align:center}.wrap{padding:30px 14px}.display{font-size:52px}}
   </style>
 </head>
 <body>
-  <div class="top-gold"></div>
-  <header class="nav">
-    <div class="nav-inner">
-      <a class="brand" href="/" data-link aria-label="Barking Mad Barbers home">
-        <img src="/assets/brand-logo.png" alt="Barking Mad Barbers logo" />
-        <div><div class="brand-title">Barking Mad Barbers</div><div class="brand-sub">Dog grooming • Tawa</div></div>
-      </a>
-      <nav class="nav-links" aria-label="Main navigation"><a href="/services" data-link class="nav-link">Services</a><a href="/Sanctuary" data-link class="nav-link">Sanctuary</a><a href="/our-family" data-link class="nav-link">Our Family</a><a href="/team" data-link class="nav-link">Team</a><a href="/helper" data-link class="nav-link">Helper</a><a href="/contact" data-link class="nav-link">Contact</a></nav>
-      <div class="nav-actions"><a href="/sign-in" class="nav-link" data-link>Sign in</a><a href="/book" class="btn btn-gold" data-link>Book Now</a></div>
-      <button class="hamburger" aria-label="Open menu" onclick="toggleMenu()">☰</button>
-    </div>
-    <div class="mobile-drawer" id="mobileDrawer"><a href="/services" data-link class="nav-link">Services</a><a href="/Sanctuary" data-link class="nav-link">Sanctuary</a><a href="/our-family" data-link class="nav-link">Our Family</a><a href="/team" data-link class="nav-link">Team</a><a href="/helper" data-link class="nav-link">Helper</a><a href="/contact" data-link class="nav-link">Contact</a><a href="/sign-in" data-link class="nav-link">Sign in</a><a href="/book" data-link class="btn btn-gold">Book Now</a></div>
-  </header>
-  <main id="app">
-<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow">Tawa dog grooming</div><h1 class="display">Groomed with <span class="gold">Love.</span><br/>Treated like <span class="gold">Family.</span></h1><p class="lead">Premium white, black and gold care with calm appointments, clean finishes and easy booking for dogs across Wellington.</p><div class="hero-actions"><a href="/book" data-link class="btn btn-gold">Book Your Dog's Groom</a><a href="/services" data-link class="btn btn-soft">View Services</a></div><div class="trust"><div><div class="stars">★★★★★</div><strong>Bookings only • Mon–Sat 8:30–3:00</strong></div></div></div><div><div class="poster-card"><img src="/assets/hero-advert.png" alt="Barking Mad Barbers grooming price advert with full groom and wash and dry details"/></div><div class="poster-caption"><span class="mini-pill">Full Groom from $80</span><span class="mini-pill">Wash & Dry from $45</span><span class="mini-pill">5A Tawa Street</span></div></div></div></section>
-<section class="section"><div class="wrap"><div class="section-head"><div><div class="kicker">Why Barking Mad</div><h2 class="section-title">A premium groom without the stress.</h2></div><p class="section-copy">The whole site carries the same premium poster style: warm white space, black typography, gold detail, and simple pages that are easy to use.</p></div><div class="grid grid-4"><article class="card"><span class="icon-sq">🐾</span><h3>Calm Sanctuary</h3><p>A peaceful, low-stress space where dogs feel safe and loved.</p></article><article class="card"><span class="icon-sq">✦</span><h3>Premium Products</h3><p>Gentle products for a healthy skin and coat finish.</p></article><article class="card"><span class="icon-sq">★</span><h3>Experienced Team</h3><p>Skilled grooming with patient one-on-one attention.</p></article><article class="card"><span class="icon-sq">□</span><h3>Easy Bookings</h3><p>Simple booking requests that fit your schedule.</p></article></div></div></section>
-</main>
-  <footer class="footer">
-    <div class="footer-inner">
-      <div><h3>Barking Mad <span class="gold">Barbers</span></h3><p>Premium dog grooming in Tawa, Wellington. Clean, calm, friendly care for dogs who deserve the very best.</p></div>
-      <div><h3>Visit</h3><p>5A Tawa Street<br/>Tawa, Wellington<br/>Bookings only — no walk-ins</p></div>
-      <div><h3>Contact</h3><p><a href="tel:0272472493">027 247 2493</a><br/><a href="mailto:barkingmadbarbers@gmail.com">barkingmadbarbers@gmail.com</a><br/>Mon–Sat 8:30–3:00</p></div>
-    </div>
-  </footer>
+  <div class="top"></div>
+  <header class="nav"><div class="navin"><a class="brand" href="/" data-link><img src="/assets/brand-logo.png" alt="Barking Mad Barbers logo"><span>Barking Mad Barbers</span></a><nav class="links" id="nav"></nav></div></header>
+  <main id="app"></main>
+  <footer class="footer"><div class="wrap"><div><h3>Barking Mad <span class="gold">Barbers</span></h3><p>Premium dog grooming in Tawa, Wellington.</p></div><div><h3>Visit</h3><p>5A Tawa Street<br>Tawa, Wellington<br>Bookings only</p></div><div><h3>Contact</h3><p><a href="sms:0272472493">027 247 2493</a><br><a href="mailto:barkingmadbarbers@gmail.com">barkingmadbarbers@gmail.com</a><br>Mon-Sat 8:30-3:00</p></div></div></footer>
   <script>
-    const AS = '/assets/';
-    const navItems = [
-      ['Services','/services'], ['Sanctuary','/Sanctuary'], ['Our Family','/our-family'], ['Team','/team'], ['Helper','/helper'], ['Contact','/contact']
-    ];
-    const servicePrices = {
-      full:[['Tiny','$80'],['Small','$90'],['Medium','$110'],['Large','$130']],
-      wash:[['Tiny','$45'],['Small','$50'],['Medium','$55'],['Large','$60']],
-      extras:[['Flea Shampoo','$20'],['Nail Trim','$20'],['Teeth Brush','$10'],['Face Tidy','$10'],['Anal Gland Expression','$20']]
-    };
-    const icons = {
-      paw:'<svg viewBox="0 0 24 24"><path d="M8.6 10.4c1.2 0 2.1 1.1 2.1 2.5s-.9 2.5-2.1 2.5-2.1-1.1-2.1-2.5.9-2.5 2.1-2.5Z"/><path d="M15.4 10.4c1.2 0 2.1 1.1 2.1 2.5s-.9 2.5-2.1 2.5-2.1-1.1-2.1-2.5.9-2.5 2.1-2.5Z"/><path d="M10 6.2c1.1 0 2 1.1 2 2.4s-.9 2.4-2 2.4-2-1.1-2-2.4.9-2.4 2-2.4Z"/><path d="M14 6.2c1.1 0 2 1.1 2 2.4S15.1 11 14 11s-2-1.1-2-2.4.9-2.4 2-2.4Z"/><path d="M7.8 18.2c.6-2.2 2-3.5 4.2-3.5s3.6 1.3 4.2 3.5c.3 1.1-.5 2.1-1.6 2.1H9.4c-1.1 0-1.9-1-1.6-2.1Z"/></svg>',
-      bath:'<svg viewBox="0 0 24 24"><path d="M5 11h14v3.5A4.5 4.5 0 0 1 14.5 19h-5A4.5 4.5 0 0 1 5 14.5V11Z"/><path d="M3.5 11h17"/><path d="M7 19l-1 2"/><path d="M17 19l1 2"/><path d="M8 8c0-2 1.2-3 3-3h1"/><path d="M12 5v3"/><path d="M16 6h.01"/><path d="M18 4h.01"/><path d="M19 8h.01"/></svg>',
-      heart:'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9.1C1.6 7.4 3.7 4.5 7 4.5c2 0 3.3 1.1 5 3 1.7-1.9 3-3 5-3 3.3 0 5.4 2.9 4 6.4C19 15.6 12 20 12 20Z"/><path d="M9 12.2h6"/><path d="M12 9.2v6"/></svg>',
-      bottle:'<svg viewBox="0 0 24 24"><path d="M9 3h6"/><path d="M10 3v4l-2 2v10a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V9l-2-2V3"/><path d="M8 13h8"/><path d="M18 7l2-2"/><path d="M19 10h2"/></svg>',
-      trophy:'<svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0V4Z"/><path d="M8 6H4v2a4 4 0 0 0 4 4"/><path d="M16 6h4v2a4 4 0 0 1-4 4"/><path d="M12 13v4"/><path d="M8 21h8"/><path d="M9 17h6"/><path d="m12 7 .7 1.4 1.5.2-1.1 1.1.3 1.5-1.4-.7-1.4.7.3-1.5-1.1-1.1 1.5-.2L12 7Z"/></svg>',
-      calendar:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M4 10h16"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/></svg>',
-      scissors:'<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20"/><path d="M8.5 15.5 20 4"/></svg>',
-      user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
-      message:'<svg viewBox="0 0 24 24"><path d="M4 5h16v11H7l-3 3V5Z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg>'
-    };
-    function icon(name){return `<span class="icon-sq">${icons[name]||icons.paw}</span>`}
-    function poster(className='poster-card'){return `<div class="${className}"><img src="${AS}hero-advert.png" alt="Barking Mad Barbers grooming price advert with full groom and wash and dry details"/></div>`}
-    function setNav(){
-      const html = navItems.map(([name,url])=>`<a href="${url}" data-link class="nav-link">${name}</a>`).join('');
-      document.querySelector('.nav-links').innerHTML = html;
-      document.getElementById('mobileDrawer').innerHTML = html + `<a href="/sign-in" data-link class="nav-link">Sign in</a><a href="/book" data-link class="btn btn-gold">Book Now</a>`;
-    }
-    function pathKey(path=location.pathname){
-      let p = decodeURIComponent(path).replace(/\/+$/,'') || '/';
-      let l = p.toLowerCase();
-      if(l==='/sanctuary') return 'sanctuary';
-      if(l==='/our-family'||l==='/ourfamily'||l==='/family') return 'our-family';
-      if(l==='/services'||l==='/service') return 'services';
-      if(l==='/team'||l==='/our-team') return 'team';
-      if(l==='/book'||l==='/booking'||l==='/bookings') return 'book';
-      if(l==='/helper'||l==='/help') return 'helper';
-      if(l==='/contact') return 'contact';
-      if(l==='/sign-in'||l==='/signin'||l==='/login') return 'sign-in';
-      if(l==='/admin') return 'admin';
-      if(l==='/') return 'home';
-      return 'home';
-    }
-    function markActive(){
-      const key=pathKey();
-      document.querySelectorAll('.nav-link').forEach(a=>{
-        a.classList.toggle('active', pathKey(new URL(a.href).pathname)===key);
-      });
-    }
-    function pageShell(title, kicker, copy, body, options={}){
-      return `<div class="wrap page-hero"><div class="page-hero-grid"><div><div class="kicker">${kicker}</div><h1 class="page-title">${title}</h1><p class="lead">${copy}</p>${options.pills||''}</div>${poster('page-poster')}</div></div><div class="wrap">${body}</div>`;
-    }
-    function home(){return `<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow">Tawa dog grooming</div><h1 class="display">Groomed with <span class="gold">Love.</span><br/>Treated like <span class="gold">Family.</span></h1><p class="lead">Premium white, black and gold care with calm appointments, clean finishes and easy booking for dogs across Wellington.</p><div class="hero-actions"><a href="/book" data-link class="btn btn-gold">${icons.paw} Book Your Dog's Groom</a><a href="/services" data-link class="btn btn-soft">View Services</a></div><div class="trust"><div><div class="stars">★★★★★</div><strong>Bookings only • Mon–Sat 8:30–3:00</strong></div></div></div><div>${poster()}<div class="poster-caption"><span class="mini-pill">Full Groom from $80</span><span class="mini-pill">Wash & Dry from $45</span><span class="mini-pill">5A Tawa Street</span></div></div></div></section><section class="section"><div class="wrap"><div class="section-head"><div><div class="kicker">Why Barking Mad</div><h2 class="section-title">A premium groom without the stress.</h2></div><p class="section-copy">The whole site now carries the same premium poster style: warm white space, black typography, gold detail, and simple pages that are easy to use.</p></div><div class="grid grid-4">${feature('heart','Calm Sanctuary','A peaceful, low-stress space where dogs feel safe and loved.')} ${feature('bottle','Premium Products','Gentle products for a healthy skin and coat finish.')} ${feature('trophy','Experienced Team','Skilled grooming with patient one-on-one attention.')} ${feature('calendar','Easy Bookings','Simple booking requests that fit your schedule.')}</div></div></section>${servicePreview()}${ctaBand()}`}
-    function feature(i,t,c){return `<article class="card">${icon(i)}<h3>${t}</h3><p>${c}</p></article>`}
-    function servicePreview(){return `<section class="section"><div class="wrap"><div class="section-head"><div><div class="kicker">Services</div><h2 class="section-title">Clear pricing, beautiful finish.</h2></div><a href="/book" data-link class="btn btn-dark">Book Now</a></div><div class="grid grid-2">${priceCard('Full Groom','from $80',servicePrices.full,'Warm bath, blow dry, brush out, full body clip, scissor-finish face and feet, nail trim, ear cleaning and anal gland expression.')} ${priceCard('Wash & Dry','from $45',servicePrices.wash,'Warm bath, blow dry, brush out, nail trim, anal gland expression and cologne.')}</div></div></section>`}
-    function priceCard(title,from,rows,copy){return `<article class="card price-card"><div class="price-top"><h3>${title}</h3><div class="from">${from}</div></div><div class="price-list"><p>${copy}</p>${rows.map(r=>`<div class="price-row"><span>${r[0]}</span><strong>${r[1]}</strong></div>`).join('')}</div></article>`}
-    function services(){return pageShell('Services & <span class="gold">Prices</span>','Premium grooming','Choose the service that fits your dog. Final pricing can change if the coat is badly matted or needs extra time.', `<div class="grid grid-2">${priceCard('Full Groom','from $80',servicePrices.full,'Warm bath, shampoo and condition, blow dry, brush out, full body clip, scissor-finish face and feet, nail trim, ear cleaning and anal gland expression.')} ${priceCard('Wash & Dry','from $45',servicePrices.wash,'Warm bath, shampoo and condition, blow dry, brush out, nail trim, anal gland expression and cologne.')}</div><section class="section"><div class="section-head"><div><div class="kicker">Extras</div><h2 class="section-title">Add-on care.</h2></div></div><div class="grid grid-3">${servicePrices.extras.map(r=>`<article class="clean-card">${icon(r[0].includes('Nail')?'scissors':r[0].includes('Flea')?'bottle':'paw')}<h3>${r[0]}</h3><p><strong class="gold">${r[1]}</strong> added to your groom when needed.</p></article>`).join('')}</div></section><div class="clean-card"><h3>Notes</h3><div class="note-list"><div class="note"><span class="dot"></span><span>Additional charges might apply if your dog is badly matted.</span></div><div class="note"><span class="dot"></span><span>Flea shampoo will be added to the groom if fleas are found.</span></div><div class="note"><span class="dot"></span><span>There is a 50% cancellation fee if not notified 1 day prior.</span></div></div></div>`)}
-    function sanctuary(){return pageShell('Calm <span class="gold">Sanctuary</span>','Low-stress care','A clean, quiet, appointment-only space made for dogs who need patience, routine and kindness.', `<div class="grid grid-3">${feature('heart','Calm first','We work around comfort, coat condition and confidence.')} ${feature('paw','One-on-one attention','Less rush, less chaos, more care for each dog.')} ${feature('bottle','Clean products','Gentle grooming products and tidy finish standards.')}</div><section class="section"><div class="split"><div class="clean-card"><h3>What makes it calmer?</h3><p>Bookings are kept focused and personal, with clear service choices and a simple flow from enquiry to grooming day.</p></div><div class="clean-card"><h3>Before the groom</h3><p>Tell us about matting, fleas, nerves, age, size and coat type. That helps us plan the safest groom.</p></div></div></section>`)}
-    function family(){return pageShell('Our <span class="gold">Family</span>','Loved like our own','Barking Mad Barbers is built around trust, warmth and treating every dog like part of the family.', `<div class="split"><div class="clean-card"><h3>Family feeling, premium finish.</h3><p>The look is cleaner now across every page: white space, gold details, black headings and the front poster as the brand anchor.</p></div><div class="clean-card"><h3>For dog parents</h3><p>Clear prices, easy bookings, sign-in for customers and helpful guidance when you are unsure what your dog needs.</p></div></div><section class="section"><div class="grid grid-3">${feature('heart','Kind handling','A gentle approach for nervous and confident dogs.')} ${feature('calendar','Appointment only','No walk-ins, so the day stays calm and planned.')} ${feature('message','Simple contact','Message or book online without fuss.')}</div></section>`)}
-    function team(){return pageShell('Meet the <span class="gold">Team</span>','Our team','The team page uses only the images you supplied and keeps the same premium poster style.', `<div class="grid grid-2"><article class="clean-card"><img src="${AS}team-dog.webp" alt="Barking Mad Barbers team member with dog" style="border-radius:24px;aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Dog-loving care</h3><p>Friendly, calm and focused on a finish that suits your dog.</p></article><article class="clean-card"><img src="${AS}team-beach.webp" alt="Barking Mad Barbers family photo at the beach" style="border-radius:24px;aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Local Tawa family</h3><p>A Wellington grooming business with a warm, personal feel.</p></article></div>`)}
-    function book(){return pageShell('Book a <span class="gold">Groom</span>','Bookings only','Send a booking request. The team can confirm details, time and final price.', `<div class="split"><form class="card form" id="bookingForm"><div class="form-grid"><div class="field"><label>Your name</label><input name="owner_name" required autocomplete="name"></div><div class="field"><label>Phone</label><input name="phone" required autocomplete="tel"></div></div><div class="form-grid"><div class="field"><label>Email</label><input name="email" type="email" autocomplete="email"></div><div class="field"><label>Dog name</label><input name="dog_name" required></div></div><div class="form-grid"><div class="field"><label>Dog size</label><select name="dog_size" required><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label>Service</label><select name="service" required><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div></div><div class="form-grid"><div class="field"><label>Preferred date</label><input name="preferred_date" type="date"></div><div class="field"><label>Preferred time</label><input name="preferred_time" placeholder="Morning / afternoon / exact time"></div></div><div class="field"><label>Notes</label><textarea name="notes" placeholder="Coat type, matting, fleas, nerves, anything we should know"></textarea></div><button class="btn btn-gold" type="submit">Send Booking Request</button><div id="bookingStatus"></div></form><div><div class="clean-card"><h3>Before you book</h3><div class="note-list"><div class="note"><span class="dot"></span><span>Bookings only — no walk-ins.</span></div><div class="note"><span class="dot"></span><span>Mon–Sat 8:30–3:00.</span></div><div class="note"><span class="dot"></span><span>Final price depends on size, coat and condition.</span></div></div></div></div></div>`)}
-    function helper(){return pageShell('Grooming <span class="gold">Helper</span>','Gemini helper','Ask quick grooming questions. Gemini answers first when the Render env key is set.', `<div class="split"><form class="card form" id="helperForm"><div class="form-grid"><div class="field"><label>Dog size</label><select name="dog_size"><option value="">Not sure</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label>Coat type</label><input name="coat_type" placeholder="Curly, long, double coat, matted..."></div></div><div class="field"><label>Question</label><textarea name="question" required placeholder="Example: My dog has knots, should I book a full groom?"></textarea></div><button class="btn btn-gold" type="submit">Ask Helper</button><div id="helperStatus"></div></form><div class="clean-card"><h3>Good questions</h3><p>Ask about matting, service choice, pricing, fleas, cancellations or preparing your dog for a calmer groom.</p></div></div>`)}
-    function contact(){return pageShell('Contact <span class="gold">Us</span>','Tawa, Wellington','Message to book, ask a question or confirm what service your dog needs.', `<div class="grid grid-3">${feature('message','Phone','027 247 2493')} ${feature('calendar','Hours','Mon–Sat 8:30–3:00')} ${feature('paw','Location','5A Tawa Street, Tawa Wellington')}</div><section class="section"><div class="clean-card"><h3>Email</h3><p><a href="mailto:barkingmadbarbers@gmail.com">barkingmadbarbers@gmail.com</a></p><div class="hero-actions"><a class="btn btn-gold" href="/book" data-link>Book online</a><a class="btn btn-soft" href="tel:0272472493">Call now</a></div></div></section>`)}
-    function signIn(){return pageShell('Customer <span class="gold">Sign in</span>','For anyone','Sign in once so booking forms can remember your details.', `<div class="split"><form class="card form" id="signinForm"><div class="field"><label>Name</label><input name="name" required autocomplete="name"></div><div class="field"><label>Email</label><input name="email" required type="email" autocomplete="email"></div><div class="field"><label>Phone</label><input name="phone" autocomplete="tel"></div><div class="field"><label>Dog name</label><input name="dog_name"></div><button class="btn btn-gold" type="submit">Sign in</button><div id="signinStatus"></div></form><div class="clean-card" id="profileBox"><h3>Your profile</h3><p>Sign in to view your booking requests and save your details for next time.</p></div></div><section class="section"><div class="clean-card"><h3>Your bookings</h3><div id="myBookings" class="admin-list"></div></div></section>`)}
-    function admin(){return pageShell('Admin <span class="gold">Dashboard</span>','Staff only','View and manage booking requests after logging in with the Render admin env details.', `<div class="split"><form class="card form" id="adminLoginForm"><div class="field"><label>Admin email</label><input name="email" required type="email"></div><div class="field"><label>Password</label><input name="password" required type="password"></div><button class="btn btn-dark" type="submit">Admin login</button><div id="adminLoginStatus"></div></form><div class="clean-card"><h3>Bookings</h3><p>After login, requests appear below with status controls.</p><button class="btn btn-soft" onclick="loadAdminBookings()">Refresh bookings</button></div></div><section class="section"><div id="adminBookings" class="admin-list"></div></section>`)}
-    function ctaBand(){return `<section class="section"><div class="wrap"><div class="clean-card" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Ready?</div><h2 class="section-title">Make their next groom feel premium.</h2><p class="section-copy">Book a calm appointment at 5A Tawa Street, Tawa Wellington.</p></div><a href="/book" data-link class="btn btn-gold">Message to book</a></div></div></section>`}
-    function render(){
-      const key=pathKey();
-      const views={home,services,sanctuary,'our-family':family,team,book,helper,contact,'sign-in':signIn,admin};
-      document.getElementById('app').innerHTML = (views[key]||home)();
-      markActive(); bindLinks(); bindForms(); window.scrollTo({top:0,behavior:'instant'});
-      if(key==='sign-in'){renderProfile(); loadMyBookings()} if(key==='admin'){loadAdminBookings(false)}
-    }
-    function bindLinks(){document.querySelectorAll('[data-link]').forEach(a=>{a.onclick=e=>{const u=new URL(a.href); if(u.origin===location.origin){e.preventDefault(); history.pushState({},'',u.pathname); document.getElementById('mobileDrawer').classList.remove('open'); render();}}})}
-    function toggleMenu(){document.getElementById('mobileDrawer').classList.toggle('open')}
-    window.addEventListener('popstate',render);
-    async function api(path, opts={}){const res=await fetch(path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts}); const data=await res.json().catch(()=>({detail:'Could not read server response.'})); if(!res.ok) throw new Error(data.detail||data.message||'Request failed'); return data;}
-    function formData(form){return Object.fromEntries(new FormData(form).entries())}
-    function getUser(){try{return JSON.parse(localStorage.getItem('bmb_user_profile')||'null')}catch{return null}}
-    function getUserToken(){return localStorage.getItem('bmb_user_token')||''}
-    function getAdminToken(){return localStorage.getItem('bmb_admin_token')||''}
-    function status(el,msg,kind=''){if(el) el.innerHTML=`<div class="status ${kind}">${msg}</div>`}
-    function bindForms(){
-      const b=document.getElementById('bookingForm'); if(b){const prof=getUser(); if(prof){['owner_name','email','phone'].forEach(n=>{if(b[n]) b[n].value = n==='owner_name'?prof.name||'':prof[n]||''}); if(b.dog_name) b.dog_name.value=prof.dog_name||''} b.onsubmit=async e=>{e.preventDefault(); const el=document.getElementById('bookingStatus'); status(el,'Sending booking request...'); try{const headers={}; const t=getUserToken(); if(t) headers.Authorization='Bearer '+t; await api('/api/bookings',{method:'POST',headers,body:JSON.stringify(formData(b))}); b.reset(); status(el,'Booking request sent. Barking Mad Barbers can confirm the details with you soon.','good')}catch(err){status(el,err.message,'bad')}}}
-      const h=document.getElementById('helperForm'); if(h) h.onsubmit=async e=>{e.preventDefault(); const el=document.getElementById('helperStatus'); status(el,'Asking helper...'); try{const data=await api('/api/helper',{method:'POST',body:JSON.stringify(formData(h))}); status(el,data.answer||'Done.','good')}catch(err){status(el,err.message,'bad')}};
-      const s=document.getElementById('signinForm'); if(s) s.onsubmit=async e=>{e.preventDefault(); const el=document.getElementById('signinStatus'); status(el,'Signing in...'); try{const data=await api('/api/user/sign-in',{method:'POST',body:JSON.stringify(formData(s))}); localStorage.setItem('bmb_user_token',data.token); localStorage.setItem('bmb_user_profile',JSON.stringify(data.profile)); status(el,'Signed in. Your details are ready for booking.','good'); renderProfile(); loadMyBookings()}catch(err){status(el,err.message,'bad')}};
-      const a=document.getElementById('adminLoginForm'); if(a) a.onsubmit=async e=>{e.preventDefault(); const el=document.getElementById('adminLoginStatus'); status(el,'Signing in...'); try{const data=await api('/api/admin/login',{method:'POST',body:JSON.stringify(formData(a))}); localStorage.setItem('bmb_admin_token',data.token); status(el,'Admin signed in.','good'); loadAdminBookings()}catch(err){status(el,err.message,'bad')}};
-    }
-    function renderProfile(){const box=document.getElementById('profileBox'); if(!box) return; const p=getUser(); if(!p){box.innerHTML='<h3>Your profile</h3><p>Sign in to save booking details and view your requests.</p>'; return} box.innerHTML=`<h3>Signed in</h3><p><strong>${p.name||''}</strong><br>${p.email||''}<br>${p.phone||''}<br>${p.dog_name?('Dog: '+p.dog_name):''}</p><button class="btn btn-soft" onclick="localStorage.removeItem('bmb_user_token');localStorage.removeItem('bmb_user_profile');render()">Sign out</button>`}
-    async function loadMyBookings(){const el=document.getElementById('myBookings'); if(!el) return; const t=getUserToken(); if(!t){el.innerHTML='<div class="status">Sign in to see your booking requests.</div>';return} try{const data=await api('/api/bookings/mine',{headers:{Authorization:'Bearer '+t}}); el.innerHTML=(data.bookings||[]).length ? data.bookings.map(bookingCard).join('') : '<div class="status">No bookings yet.</div>'}catch(err){el.innerHTML=`<div class="status bad">${err.message}</div>`}}
-    function bookingCard(b){return `<article class="booking-item"><div class="booking-top"><strong>${b.dog_name||'Dog'} — ${b.service||'Service'}</strong><span class="tag goldtag">${b.status||'New'}</span></div><p><strong>${b.owner_name||''}</strong> • ${b.phone||''} • ${b.email||''}</p><p>${b.dog_size||''} • ${b.preferred_date||''} ${b.preferred_time||''}</p><p>${b.notes||''}</p>${b.staff_notes?`<p><strong>Staff notes:</strong> ${b.staff_notes}</p>`:''}</article>`}
-    async function loadAdminBookings(showErrors=true){const el=document.getElementById('adminBookings'); if(!el) return; const t=getAdminToken(); if(!t){el.innerHTML='<div class="status">Admin login needed.</div>';return} try{const data=await api('/api/admin/bookings',{headers:{Authorization:'Bearer '+t}}); el.innerHTML=(data.bookings||[]).length? data.bookings.map(adminCard).join(''):'<div class="status">No bookings yet.</div>'}catch(err){if(showErrors) el.innerHTML=`<div class="status bad">${err.message}</div>`}}
-    function adminCard(b){return `<article class="booking-item"><div class="booking-top"><strong>${b.dog_name||'Dog'} — ${b.service||'Service'}</strong><span class="tag">${b.status||'New'}</span></div><p><strong>${b.owner_name||''}</strong> • ${b.phone||''} • ${b.email||''}</p><p>${b.dog_size||''} • ${b.preferred_date||''} ${b.preferred_time||''}</p><p>${b.notes||''}</p><div class="form-grid"><select onchange="updateBooking('${b.id}', this.value, null)"><option>${b.status||'New'}</option><option>New</option><option>Contacted</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option></select><button class="btn btn-soft" onclick="deleteBooking('${b.id}')">Delete</button></div></article>`}
-    async function updateBooking(id,status,notes){try{await api('/api/admin/bookings/'+id,{method:'PATCH',headers:{Authorization:'Bearer '+getAdminToken()},body:JSON.stringify({status,staff_notes:notes})}); loadAdminBookings()}catch(err){alert(err.message)}}
-    async function deleteBooking(id){if(!confirm('Delete this booking?')) return; try{await api('/api/admin/bookings/'+id,{method:'DELETE',headers:{Authorization:'Bearer '+getAdminToken()}}); loadAdminBookings()}catch(err){alert(err.message)}}
-    setNav(); render();
+    const API_BASE_URL = (window.BMB_API_BASE_URL || 'https://barking-mad-backend.onrender.com').replace(/\/+$/, '');
+    const PHONE='0272472493';
+    const navItems=[['Home','/'],['Services','/services'],['Sanctuary','/Sanctuary'],['Our Family','/our-family'],['Team','/team'],['Helper','/helper'],['Contact','/contact'],['Sign in','/sign-in'],['Book','/book']];
+    const $=s=>document.querySelector(s); const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    function key(path=location.pathname){let p=decodeURIComponent(path).replace(/\/+$/,'').toLowerCase()||'/'; if(p==='/sanctuary')return'sanctuary'; if(['/our-family','/ourfamily','/family'].includes(p))return'our-family'; if(['/book','/booking','/bookings'].includes(p))return'book'; if(['/helper','/help'].includes(p))return'helper'; if(['/sign-in','/signin','/login'].includes(p))return'sign-in'; return p.slice(1)||'home'}
+    function setNav(){ $('#nav').innerHTML=navItems.map(([n,u])=>`<a href="${u}" data-link class="${key(u)===key()?'active':''} ${n==='Book'?'btn gold':''}">${n}</a>`).join('') }
+    function bindLinks(){document.querySelectorAll('[data-link]').forEach(a=>a.onclick=e=>{const u=new URL(a.href); if(u.origin===location.origin){e.preventDefault(); history.pushState({},'',u.pathname); render();}})}
+    async function api(path, opts={}){const res=await fetch(API_BASE_URL+path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts}); const data=await res.json().catch(()=>({detail:'Could not read server response.'})); if(!res.ok){const err=new Error(data.detail||data.message||'Request failed'); err.status=res.status; throw err} return data}
+    function fd(form){return Object.fromEntries(new FormData(form).entries())} function status(id,msg,kind=''){const el=$(id); if(el) el.innerHTML=`<div class="status ${kind}">${msg}</div>`}
+    function userToken(){return localStorage.getItem('bmb_user_token')||''} function adminToken(){return localStorage.getItem('bmb_admin_token')||''} function clearUser(){localStorage.removeItem('bmb_user_token');localStorage.removeItem('bmb_user_profile')} function clearAdmin(){localStorage.removeItem('bmb_admin_token')} function authErr(e){return e&&(e.status===401||/not authenticated|sign in|required/i.test(e.message||''))}
+    function smsUrl(data){const lines=['Hi Barking Mad Barbers, I would like to enquire about booking a groom.','Please text when you can, as you may be with a dog and unable to answer calls.','If a phone call is easier, please text and let me know. I understand you will call back when you are able.','',`Name: ${data.owner_name||''}`,`Phone: ${data.phone||''}`,`Email: ${data.email||''}`,`Preferred date: ${data.preferred_date||''}`,`Preferred time: ${data.preferred_time||''}`,`Dogs: ${dogSummary()}`,`Notes: ${data.notes||''}`].filter(x=>x&&!x.endsWith(': ')); return `sms:${PHONE}?&body=${encodeURIComponent(lines.join('\n'))}`}
+    function dogSummary(){return [...document.querySelectorAll('.dogbox')].map((box,i)=>{const g=n=>box.querySelector(`[name="${n}"]`)?.value||''; return `${i+1}. ${g('dog_name')} - ${g('dog_size')} - ${g('service')}`}).join('; ')}
+    function hero(){return `<section class="wrap hero"><div><div class="eyebrow">Tawa dog grooming</div><h1 class="display">Groomed with <span class="gold">love.</span><br>Treated like <span class="gold">family.</span></h1><p class="lead">Premium, calm, appointment-only dog grooming in Tawa, Wellington.</p><div class="actions"><a class="btn gold" href="/book" data-link>Book a groom</a><a class="btn soft" href="/services" data-link>View services</a></div></div><div class="poster"><img src="/assets/hero-advert.png" alt="Barking Mad Barbers grooming price guide"></div></section>${cards()}`}
+    function cards(){return `<section class="wrap"><div class="grid grid3"><article class="card"><h3>Calm care</h3><p>One-on-one grooming with a gentle, patient approach.</p></article><article class="card"><h3>Clear pricing</h3><p>Full Groom from $80 and Wash & Dry from $45.</p></article><article class="card"><h3>Easy contact</h3><p>Book online or send a ready-made text if the server is busy.</p></article></div></section>`}
+    function shell(title,kicker,copy,body){return `<section class="wrap"><div class="eyebrow">${kicker}</div><h1 class="page-title">${title}</h1><p class="lead">${copy}</p>${body}</section>`}
+    function services(){return shell('Services & <span class="gold">Prices</span>','Premium grooming','Final pricing depends on size, coat condition and service.',`<div class="grid grid2"><article class="card"><h3>Full Groom</h3><p>Warm bath, shampoo and condition, blow dry, brush out, clip, face and feet finish, nail trim, ears and anal gland expression.</p><p><strong>Tiny $80, Small $90, Medium $110, Large $130</strong></p></article><article class="card"><h3>Wash & Dry</h3><p>Warm bath, shampoo and condition, blow dry, brush out, nail trim, anal gland expression and cologne.</p><p><strong>Tiny $45, Small $50, Medium $55, Large $60</strong></p></article></div><div class="card" style="margin-top:16px"><h3>Extras</h3><p>Flea shampoo $20, nail trim $20, teeth brush $10, face tidy $10, anal gland expression $20.</p></div>`)}
+    function sanctuary(){return shell('Calm <span class="gold">Sanctuary</span>','Low-stress care','A clean, quiet, appointment-only space made for patient grooming.',cards())}
+    function family(){return shell('Our <span class="gold">Family</span>','Loved like our own','Warm local care with a premium finish.',cards())}
+    function team(){return shell('Meet the <span class="gold">Team</span>','Our team','Local Tawa care for dogs and their people.',`<div class="grid grid2"><article class="card"><img src="/assets/team-dog.webp" alt="Team member with dog" style="border-radius:16px;margin-bottom:14px"><h3>Dog-loving care</h3><p>Friendly, calm and focused on your dog.</p></article><article class="card"><img src="/assets/team-beach.webp" alt="Barking Mad Barbers family" style="border-radius:16px;margin-bottom:14px"><h3>Local family</h3><p>A Wellington grooming business with a personal feel.</p></article></div>`)}
+    function dogBox(i=1){return `<div class="dogbox"><div class="doghead"><strong>Dog ${i}</strong><button class="btn soft remove-dog" type="button">Remove</button></div><div class="row"><div class="field"><label>Dog name</label><input name="dog_name" required></div><div class="field"><label>Dog size</label><select name="dog_size" required><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div></div><div class="field"><label>Service</label><select name="service" required><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div></div>`}
+    function book(){return shell('Book a <span class="gold">Groom</span>','Bookings only','Send a booking request. If the server is down, your phone opens a ready-made text to send.',`<div class="split"><form class="card form" id="bookingForm"><div class="row"><div class="field"><label>Your name</label><input name="owner_name" required autocomplete="name"></div><div class="field"><label>Phone</label><input name="phone" required autocomplete="tel"></div></div><div class="row"><div class="field"><label>Email</label><input name="email" type="email" autocomplete="email"></div><div class="field"><label>Preferred date</label><input name="preferred_date" type="date"></div></div><div class="field"><label>Preferred time</label><input name="preferred_time" placeholder="Morning / afternoon / exact time"></div><div id="dogs">${dogBox(1)}</div><button class="btn soft" id="addDog" type="button">Add dog</button><div class="field"><label>Notes</label><textarea name="notes" placeholder="Coat type, matting, fleas, nerves, anything we should know"></textarea></div><button class="btn gold" type="submit">Send booking request</button><div id="bookingStatus"></div></form><div class="card"><h3>Text is best</h3><p>We may be with a dog and unable to answer calls. Please text when you can. If a phone call is easier, send a quick text and we will call back when we are able.</p></div></div>`)}
+    function helper(){return shell('Grooming <span class="gold">Helper</span>','Gemini helper','Ask a quick grooming question.',`<div class="split"><form class="card form" id="helperForm"><div class="row"><div class="field"><label>Dog size</label><select name="dog_size"><option value="">Not sure</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label>Coat type</label><input name="coat_type" placeholder="Curly, long, double coat, matted"></div></div><div class="field"><label>Question</label><textarea name="question" required placeholder="Example: My dog has knots, should I book a full groom?"></textarea></div><button class="btn gold" type="submit">Ask helper</button><div id="helperStatus"></div></form><div class="card"><h3>Powered by Gemini</h3><p>For urgent health concerns, contact a vet.</p></div></div>`)}
+    function contact(){return shell('Contact <span class="gold">Us</span>','Tawa, Wellington','Message to book, ask a question or confirm the best service.',`<div class="grid grid3"><article class="card"><h3>Phone</h3><p><a href="sms:${PHONE}">${PHONE}</a></p></article><article class="card"><h3>Email</h3><p><a href="mailto:barkingmadbarbers@gmail.com">barkingmadbarbers@gmail.com</a></p></article><article class="card"><h3>Location</h3><p>5A Tawa Street, Tawa, Wellington</p></article></div>`)}
+    function signin(){return shell('Customer <span class="gold">Sign in</span>','For customers','Save your details and view booking requests.',`<div class="split"><form class="card form" id="signinForm"><div class="field"><label>Name</label><input name="name" required></div><div class="field"><label>Email</label><input name="email" type="email" required></div><div class="field"><label>Phone</label><input name="phone"></div><div class="field"><label>Dog name</label><input name="dog_name"></div><button class="btn gold" type="submit">Sign in</button><div id="signinStatus"></div></form><div class="card"><h3>Your bookings</h3><div id="myBookings" class="list"></div></div></div>`)}
+    function admin(){return shell('Admin <span class="gold">Dashboard</span>','Staff only','Log in to manage booking requests.',`<div class="split"><form class="card form" id="adminLoginForm"><div class="field"><label>Admin email</label><input name="email" type="email" required></div><div class="field"><label>Password</label><input name="password" type="password" required></div><button class="btn dark" type="submit">Admin login</button><div id="adminLoginStatus"></div></form><div class="card"><h3>Bookings</h3><button class="btn soft" onclick="loadAdminBookings()">Refresh bookings</button></div></div><div id="adminBookings" class="wrap list"></div>`)}
+    function bindForms(){const b=$('#bookingForm'); if(b){$('#addDog').onclick=()=>{const d=$('#dogs'); d.insertAdjacentHTML('beforeend',dogBox(d.children.length+1)); refreshDogButtons()}; refreshDogButtons(); b.onsubmit=submitBooking} const h=$('#helperForm'); if(h)h.onsubmit=submitHelper; const s=$('#signinForm'); if(s){s.onsubmit=submitSignIn; loadMyBookings()} const a=$('#adminLoginForm'); if(a){a.onsubmit=submitAdmin; loadAdminBookings(false)}}
+    function refreshDogButtons(){document.querySelectorAll('.dogbox').forEach((box,i)=>{box.querySelector('strong').textContent=`Dog ${i+1}`; const btn=box.querySelector('.remove-dog'); btn.classList.toggle('hidden',document.querySelectorAll('.dogbox').length===1); btn.onclick=()=>{box.remove();refreshDogButtons()}})}
+    async function submitBooking(e){e.preventDefault(); const form=e.currentTarget; const data=fd(form); data.dog_name=document.querySelector('[name="dog_name"]')?.value||''; data.dog_size=document.querySelector('[name="dog_size"]')?.value||''; data.service=document.querySelector('[name="service"]')?.value||''; data.notes=[data.notes||'', dogSummary()?`Dogs: ${dogSummary()}`:''].filter(Boolean).join('\n'); status('#bookingStatus','Sending booking request...'); try{const headers={}; if(userToken())headers.Authorization='Bearer '+userToken(); await api('/api/bookings',{method:'POST',headers,body:JSON.stringify(data)}); form.reset(); status('#bookingStatus','Booking request sent. Barking Mad Barbers can confirm the details with you soon.','good')}catch(err){if(authErr(err)&&userToken()){clearUser(); try{await api('/api/bookings',{method:'POST',body:JSON.stringify(data)}); form.reset(); status('#bookingStatus','Booking request sent. Please sign in again later to view it.','good'); return}catch{}} status('#bookingStatus','The online booking server is unavailable, so we are opening a text message with your enquiry ready to send.','good'); setTimeout(()=>{location.href=smsUrl(fd(form))},600)}}
+    async function submitHelper(e){e.preventDefault(); status('#helperStatus','Asking helper...'); try{const data=await api('/api/helper',{method:'POST',body:JSON.stringify(fd(e.currentTarget))}); status('#helperStatus',esc(data.answer||data.reply||'Done.'),'good')}catch(err){status('#helperStatus',esc(err.message),'bad')}}
+    async function submitSignIn(e){e.preventDefault(); status('#signinStatus','Signing in...'); try{const data=await api('/api/user/sign-in',{method:'POST',body:JSON.stringify(fd(e.currentTarget))}); localStorage.setItem('bmb_user_token',data.token); localStorage.setItem('bmb_user_profile',JSON.stringify(data.profile)); status('#signinStatus','Signed in. Your details are ready for booking.','good'); loadMyBookings()}catch(err){status('#signinStatus',esc(err.message),'bad')}}
+    async function submitAdmin(e){e.preventDefault(); status('#adminLoginStatus','Signing in...'); try{const data=await api('/api/admin/login',{method:'POST',body:JSON.stringify(fd(e.currentTarget))}); localStorage.setItem('bmb_admin_token',data.token); status('#adminLoginStatus','Admin signed in.','good'); loadAdminBookings()}catch(err){status('#adminLoginStatus',esc(err.message),'bad')}}
+    function bookingCard(b){return `<article class="booking"><strong>${esc(b.dog_name||'Dog')} - ${esc(b.service||'Service')}</strong> <span class="tag">${esc(b.status||'New')}</span><p>${esc(b.owner_name||'')} | ${esc(b.phone||'')} | ${esc(b.email||'')}</p><p>${esc(b.dog_size||'')} ${esc(b.preferred_date||'')} ${esc(b.preferred_time||'')}</p><p>${esc(b.notes||'')}</p></article>`}
+    async function loadMyBookings(){const el=$('#myBookings'); if(!el)return; if(!userToken()){el.innerHTML='<div class="status">Sign in to see your booking requests.</div>';return} try{const d=await api('/api/bookings/mine',{headers:{Authorization:'Bearer '+userToken()}}); el.innerHTML=(d.bookings||[]).length?(d.bookings||[]).map(bookingCard).join(''):'<div class="status">No bookings yet.</div>'}catch(err){if(authErr(err)){clearUser(); el.innerHTML='<div class="status">Your session expired. Please sign in again.</div>';return} el.innerHTML=`<div class="status bad">${esc(err.message)}</div>`}}
+    async function loadAdminBookings(show=true){const el=$('#adminBookings'); if(!el)return; if(!adminToken()){el.innerHTML='<div class="status">Admin login needed.</div>';return} try{const d=await api('/api/admin/bookings',{headers:{Authorization:'Bearer '+adminToken()}}); el.innerHTML=(d.bookings||[]).length?(d.bookings||[]).map(bookingCard).join(''):'<div class="status">No bookings yet.</div>'}catch(err){if(authErr(err)){clearAdmin(); el.innerHTML='<div class="status">Your admin session expired. Please sign in again.</div>';return} if(show)el.innerHTML=`<div class="status bad">${esc(err.message)}</div>`}}
+    function render(){setNav(); const views={home:hero,services,sanctuary,'our-family':family,team,book,helper,contact,'sign-in':signin,admin}; $('#app').innerHTML=(views[key()]||hero)(); bindLinks(); bindForms(); scrollTo(0,0)}
+    addEventListener('popstate',render); render();
   </script>
 </body>
 </html>
