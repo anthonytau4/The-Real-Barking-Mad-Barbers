@@ -27,7 +27,12 @@ DATA_DIR = BASE_DIR / "data"
 BOOKINGS_FILE = DATA_DIR / "bookings.json"
 USERS_FILE = DATA_DIR / "users.json"
 
-JWT_SECRET = os.getenv("JWT-SECRET") or os.getenv("JWT_SECRET") or "dev-change-me-before-live"
+JWT_SECRET = (
+    os.getenv("JWT_SECRET")
+    or os.getenv("JWT-SECRET")
+    or os.getenv("JWT_SECRET_KEY")
+    or "dev-change-me-before-live"
+)
 TOKEN_TTL_SECONDS = int(os.getenv("TOKEN_TTL_SECONDS", str(60 * 60 * 24 * 45)))
 SERVE_FRONTEND = os.getenv("SERVE_FRONTEND", "true").strip().lower() not in {"0", "false", "no", "off"}
 
@@ -197,6 +202,11 @@ def health() -> Dict[str, Any]:
         "helper_configured": bool(os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")),
         "time": now_iso(),
     }
+
+
+@app.get("/ap/health")
+def health_typo_alias() -> Dict[str, Any]:
+    return health()
 
 
 @app.get("/api/config")
@@ -414,6 +424,11 @@ def no_cache_index_response():
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
     return response
+
+
+@app.head("/")
+def index_head():
+    return JSONResponse({})
 
 
 @app.get("/")
