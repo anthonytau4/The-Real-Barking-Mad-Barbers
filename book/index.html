@@ -2,9 +2,15 @@
 <meta charset="utf-8">
 <title>Barking Mad Barbers</title>
 <script>
-  window.BMB_API_BASE_URL = localStorage.getItem('bmb_api_base_url') || '';
-  history.replaceState(null, '', '/book');
-  fetch('/index.html', { cache: 'no-store' })
+  const routePath = '/book';
+  const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = (input, init) => {
+    if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input;
+    return nativeFetch(input, init);
+  };
+  history.replaceState(null, '', routePath);
+  nativeFetch('/index.html', { cache: 'no-store' })
     .then(response => response.text())
     .then(html => { document.open(); document.write(html); document.close(); });
 </script>
