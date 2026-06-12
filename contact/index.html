@@ -1,0 +1,10 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Barking Mad Barbers</title>
+<script>
+  window.BMB_API_BASE_URL = localStorage.getItem('bmb_api_base_url') || '';
+  history.replaceState(null, '', '/contact');
+  fetch('/index.html', { cache: 'no-store' })
+    .then(response => response.text())
+    .then(html => { document.open(); document.write(html); document.close(); });
+</script>
