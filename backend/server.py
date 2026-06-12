@@ -409,10 +409,17 @@ async def helper(payload: HelperPayload) -> Dict[str, Any]:
     return {"answer": local_helper_answer(payload), "source": "local"}
 
 
+def no_cache_index_response():
+    response = FileResponse(STATIC_DIR / "index.html")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
+
+
 @app.get("/")
 def index():
     if SERVE_FRONTEND and (STATIC_DIR / "index.html").exists():
-        return FileResponse(STATIC_DIR / "index.html")
+        return no_cache_index_response()
     return JSONResponse({"ok": True, "service": "Barking Mad Barbers API"})
 
 
@@ -429,5 +436,5 @@ def frontend_fallback(full_path: str):
     if inside_static and requested.is_file():
         return FileResponse(requested)
     if SERVE_FRONTEND and (STATIC_DIR / "index.html").exists():
-        return FileResponse(STATIC_DIR / "index.html")
+        return no_cache_index_response()
     raise HTTPException(status_code=404, detail="Not found.")

@@ -1,0 +1,30 @@
+Barking Mad Barbers - corrected upload
+
+This package includes the actual site at BOTH:
+- /index.html
+- /backend/static/index.html
+
+That prevents GitHub Pages/static hosting from showing a README-style page.
+
+For the current Render Python 3 service, use:
+Root directory: backend
+Build command: pip install -r requirements.txt
+Start command: uvicorn server:app --host 0.0.0.0 --port $PORT
+
+Important:
+If barkingmadbarbers.com shows a plain documentation/README page, the domain is not hitting the FastAPI app correctly. It is likely pointing to a static/GitHub Pages style host or an old service.
+For bookings/helper/admin to work, the domain needs to be connected to the Render Python web service running backend/server.py.
+
+Env variables expected on Render:
+ADMIN_EMAILS
+ADMIN_PASSWORD
+ALLOWED_ORIGIN
+APP_URL
+CORS_ORIGINS
+GEMINI_API_KEY
+GEMINI_MODEL
+GOOGLE_CLIENT_ID
+JWT-SECRET
+OPENAI_API_KEY
+REACT_APP_BACKEND_URL
+SERVE_FRONTEND
