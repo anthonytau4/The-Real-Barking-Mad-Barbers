@@ -5,23 +5,15 @@
   const routePath = '/book';
   const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
   const nativeFetch = window.fetch.bind(window);
-
   function status(el, msg, kind = '') { if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`; }
   function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
-
   function installStyle() {
     if (document.getElementById('bmb-book-fallback-style')) return;
     const style = document.createElement('style');
     style.id = 'bmb-book-fallback-style';
-    style.textContent = `
-      body{background:linear-gradient(180deg,#fff 0%,#fffdf8 30%,#f7efe1 100%)!important}.nav{background:transparent!important;border:0!important;padding:12px 14px 0!important}.nav-inner{background:#080806!important;border:1px solid rgba(216,179,106,.42)!important;border-radius:999px!important;box-shadow:0 18px 44px rgba(18,16,11,.24)!important}.brand,.brand-title,.nav-link{color:#fff!important}.brand-sub{color:#d8b36a!important}.brand img{width:74px!important;height:46px!important;object-fit:contain!important;background:#fff!important;padding:3px!important}.nav-link:hover,.nav-link.active{background:linear-gradient(135deg,#b48731,#ead188)!important;color:#14110d!important}.btn-gold{background:linear-gradient(135deg,#a77a24,#ead188)!important;color:#14110d!important}
-      #bookingForm{background:#fff!important;border:1px solid rgba(183,131,42,.24)!important;border-radius:30px!important;box-shadow:0 28px 70px rgba(18,16,11,.13)!important;overflow:hidden!important;padding:0!important;gap:0!important}.booking-live-head{background:#0a0907;color:#fff;padding:24px 26px;border-bottom:4px solid #c69b49;display:flex;justify-content:space-between;gap:16px;align-items:center}.booking-live-head h3{color:#fff;margin:0;font-size:30px}.booking-live-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-live-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-live-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-live-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}
-      .dog-entry,.dog-card{border:1px solid rgba(183,131,42,.30)!important;background:linear-gradient(180deg,#fffdf8,#fff8ed)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(18,16,11,.07)!important}.dog-entry-head,.dog-panel-head{background:#17140f!important;color:#fff!important;padding:13px 16px!important}.dog-entry-title{color:#fff!important}.dog-entry-fields,.dog-list{padding:16px!important}.dog-enquiry-panel{border:1px solid rgba(183,131,42,.30);border-radius:24px;background:#fff8ed;overflow:hidden}.dog-panel-title strong{color:#fff}.dog-panel-title span{display:block;color:#e6d9c3;font-weight:650;margin-top:4px}.dog-card{padding:14px!important;display:grid;gap:12px}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24}.add-dog-btn.full{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.sms-open-card .hero-actions{margin:12px 0 0}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a;flex:0 0 auto;box-shadow:none}
-      @media(max-width:980px){.booking-live-layout{grid-template-columns:1fr}.nav-inner{border-radius:28px!important}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}.brand-title,.brand-sub{display:none!important}.brand{min-width:auto!important}.brand img{width:68px!important}.booking-live-head{display:block}.booking-live-body{padding:18px}.sms-notice{padding:18px}}
-    `;
+    style.textContent = `body{background:linear-gradient(180deg,#fff 0%,#fffdf8 30%,#f7efe1 100%)!important}.nav{background:transparent!important;border:0!important;padding:12px 14px 0!important}.nav-inner{background:#080806!important;border:1px solid rgba(216,179,106,.42)!important;border-radius:999px!important;box-shadow:0 18px 44px rgba(18,16,11,.24)!important}.brand,.brand-title,.nav-link{color:#fff!important}.brand-sub{color:#d8b36a!important}.brand img{width:74px!important;height:46px!important;object-fit:contain!important;background:#fff!important;padding:3px!important}.nav-link:hover,.nav-link.active{background:linear-gradient(135deg,#b48731,#ead188)!important;color:#14110d!important}.btn-gold{background:linear-gradient(135deg,#a77a24,#ead188)!important;color:#14110d!important}#bookingForm{background:#fff!important;border:1px solid rgba(183,131,42,.24)!important;border-radius:30px!important;box-shadow:0 28px 70px rgba(18,16,11,.13)!important;overflow:hidden!important;padding:0!important;gap:0!important}.booking-live-head{background:#0a0907;color:#fff;padding:24px 26px;border-bottom:4px solid #c69b49;display:flex;justify-content:space-between;gap:16px;align-items:center}.booking-live-head h3{color:#fff;margin:0;font-size:30px}.booking-live-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-live-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-live-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-live-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}.dog-entry,.dog-card{border:1px solid rgba(183,131,42,.30)!important;background:linear-gradient(180deg,#fffdf8,#fff8ed)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(18,16,11,.07)!important}.dog-entry-head,.dog-panel-head{background:#17140f!important;color:#fff!important;padding:13px 16px!important}.dog-entry-title{color:#fff!important}.dog-entry-fields,.dog-list{padding:16px!important}.dog-enquiry-panel{border:1px solid rgba(183,131,42,.30);border-radius:24px;background:#fff8ed;overflow:hidden}.dog-panel-title strong{color:#fff}.dog-panel-title span{display:block;color:#e6d9c3;font-weight:650;margin-top:4px}.dog-card{padding:14px!important;display:grid;gap:12px}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24}.add-dog-btn.full{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.sms-open-card .hero-actions{margin:12px 0 0}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a;flex:0 0 auto;box-shadow:none}@media(max-width:980px){.booking-live-layout{grid-template-columns:1fr}.nav-inner{border-radius:28px!important}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}.brand-title,.brand-sub{display:none!important}.brand{min-width:auto!important}.brand img{width:68px!important}.booking-live-head{display:block}.booking-live-body{padding:18px}.sms-notice{padding:18px}}`;
     document.head.appendChild(style);
   }
-
   function wrapBookingForm(form) {
     if (form.dataset.referenceWrapped) return;
     form.dataset.referenceWrapped = 'true';
@@ -45,7 +37,6 @@
       side.prepend(notice);
     }
   }
-
   function ensureConsent(form) {
     if (form.querySelector('[name="booking_sms_consent"]')) return;
     const submit = form.querySelector('[type="submit"]');
@@ -54,7 +45,6 @@
     consent.innerHTML = '<input name="booking_sms_consent" type="checkbox" required><span>I understand this enquiry will open as a text message to Barking Mad Barbers.</span>';
     submit?.before(consent);
   }
-
   function dogSummary(dog) { return `${[dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'}${dog.name ? ` (${dog.name})` : ''}${dog.service ? ` - ${dog.service}` : ''}`; }
   function dogSmsLine(dog, index) { return `${index + 1} - ${dog.name || 'Dog'} - ${[dog.size, dog.breed].filter(Boolean).join(' ')}`.trim(); }
   function ensureFirstBreedField(form) {
@@ -66,25 +56,13 @@
     breedField.innerHTML = '<label>Breed</label><input name="breed" required placeholder="Staffie, Pitbull, Cavoodle...">';
     sizeField.after(breedField);
   }
-
   function collectDogs(form) {
     const cards = [...form.querySelectorAll('.dog-entry')];
-    if (cards.length) return cards.map(card => ({
-      name: card.querySelector('[name="dog_name"]')?.value.trim() || '',
-      size: card.querySelector('[name="dog_size"]')?.value.trim() || '',
-      breed: card.querySelector('[name="breed"]')?.value.trim() || '',
-      service: card.querySelector('[name="service"]')?.value.trim() || ''
-    })).filter(dog => dog.name || dog.size || dog.breed || dog.service);
+    if (cards.length) return cards.map(card => ({name: card.querySelector('[name="dog_name"]')?.value.trim() || '', size: card.querySelector('[name="dog_size"]')?.value.trim() || '', breed: card.querySelector('[name="breed"]')?.value.trim() || '', service: card.querySelector('[name="service"]')?.value.trim() || ''})).filter(dog => dog.name || dog.size || dog.breed || dog.service);
     const firstDog = { name: form.dog_name?.value.trim() || '', size: form.dog_size?.value.trim() || '', breed: form.breed?.value.trim() || '', service: form.service?.value.trim() || '' };
-    const extras = [...form.querySelectorAll('[data-extra-dog]')].map(card => ({
-      name: card.querySelector('[data-dog-name]')?.value.trim() || '',
-      size: card.querySelector('[data-dog-size]')?.value.trim() || '',
-      breed: card.querySelector('[data-dog-breed]')?.value.trim() || '',
-      service: card.querySelector('[data-dog-service]')?.value.trim() || ''
-    })).filter(dog => dog.name || dog.size || dog.breed || dog.service);
+    const extras = [...form.querySelectorAll('[data-extra-dog]')].map(card => ({name: card.querySelector('[data-dog-name]')?.value.trim() || '', size: card.querySelector('[data-dog-size]')?.value.trim() || '', breed: card.querySelector('[data-dog-breed]')?.value.trim() || '', service: card.querySelector('[data-dog-service]')?.value.trim() || ''})).filter(dog => dog.name || dog.size || dog.breed || dog.service);
     return [firstDog, ...extras].filter(dog => dog.name || dog.size || dog.breed || dog.service);
   }
-
   function buildBookingPayload(form) {
     const payload = formData(form);
     const dogs = collectDogs(form);
@@ -94,22 +72,19 @@
     payload._dogs = dogs;
     return payload;
   }
-
   function bookingSmsUrl(data) {
     const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, breed: data.breed, service: data.service }];
     const appointment = (data.preferred_time || '').trim() ? `I would like my appointment at ${data.preferred_time.trim()}` : 'I would like my appointment whenever';
-    const message = ["Hi Barking Mad Barbers I'd like to enquire about a dog.", '', ...dogs.map(dogSmsLine), '', appointment, '', 'Cheers', [data.owner_name || '', data.phone || ''].filter(Boolean).join(' ')]
-      .filter((line, index, lines) => line || lines[index - 1] !== '').join('\n');
+    const signoff = ['Cheers', data.owner_name || '', data.phone || ''].filter(Boolean).join(' ');
+    const message = ["Hi Barking Mad Barbers I'd like to enquire about a dog.", '', ...dogs.map(dogSmsLine), '', appointment, '', signoff].filter((line, index, lines) => line || lines[index - 1] !== '').join('\n');
     return `sms:0272472493?body=${encodeURIComponent(message)}`;
   }
-
   function openSms(data) {
     const url = bookingSmsUrl(data);
     const el = document.getElementById('bookingStatus');
     if (el) el.innerHTML = `<div class="status good sms-open-card">Your text message is ready. If Messages does not open automatically, tap below.<div class="hero-actions"><a class="btn btn-gold" href="${url}">Open text message</a></div></div>`;
     window.location.assign(url);
   }
-
   function refreshDogLabels(form) { form.querySelectorAll('[data-extra-dog]').forEach((card, index) => { const label = card.querySelector('[data-dog-label]'); if (label) label.textContent = `Dog ${index + 2}`; }); }
   function addDogCard(form) {
     const list = form.querySelector('.dog-list');
@@ -123,7 +98,6 @@
     refreshDogLabels(form);
     card.querySelector('[data-dog-breed]')?.focus();
   }
-
   function installMultiDogUi(form) {
     ensureFirstBreedField(form);
     ensureConsent(form);
@@ -137,27 +111,15 @@
     serviceField.after(panel);
     panel.querySelector('.add-dog-btn').onclick = () => addDogCard(form);
   }
-
   function installBookingFallback() {
     installStyle();
     const form = document.getElementById('bookingForm');
     if (!form) return;
     wrapBookingForm(form);
     installMultiDogUi(form);
-    form.onsubmit = event => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
-      status(document.getElementById('bookingStatus'), 'Opening your text message...', 'good');
-      openSms(buildBookingPayload(form));
-    };
+    form.onsubmit = event => { event.preventDefault(); if (!form.reportValidity()) return; status(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(buildBookingPayload(form)); };
   }
-
-  window.fetch = (input, init) => {
-    if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input;
-    return nativeFetch(input, init);
-  };
+  window.fetch = (input, init) => { if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input; return nativeFetch(input, init); };
   history.replaceState(null, '', routePath);
-  nativeFetch('/index.html', { cache: 'no-store' }).then(response => response.text()).then(html => {
-    document.open(); document.write(html); document.close(); setTimeout(installBookingFallback, 0);
-  });
+  nativeFetch('/index.html', { cache: 'no-store' }).then(response => response.text()).then(html => { document.open(); document.write(html); document.close(); setTimeout(installBookingFallback, 0); });
 </script>
