@@ -8,7 +8,6 @@
 
   function status(el, msg, kind = '') { if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`; }
   function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
-  function apiUrl(path) { return apiBase && path.startsWith('/api/') ? apiBase + path : path; }
 
   function installStyle() {
     if (document.getElementById('bmb-book-fallback-style')) return;
@@ -17,7 +16,7 @@
     style.textContent = `
       body{background:linear-gradient(180deg,#fff 0%,#fffdf8 30%,#f7efe1 100%)!important}.nav{background:transparent!important;border:0!important;padding:12px 14px 0!important}.nav-inner{background:#080806!important;border:1px solid rgba(216,179,106,.42)!important;border-radius:999px!important;box-shadow:0 18px 44px rgba(18,16,11,.24)!important}.brand,.brand-title,.nav-link{color:#fff!important}.brand-sub{color:#d8b36a!important}.brand img{width:74px!important;height:46px!important;object-fit:contain!important;background:#fff!important;padding:3px!important}.nav-link:hover,.nav-link.active{background:linear-gradient(135deg,#b48731,#ead188)!important;color:#14110d!important}.btn-gold{background:linear-gradient(135deg,#a77a24,#ead188)!important;color:#14110d!important}
       #bookingForm{background:#fff!important;border:1px solid rgba(183,131,42,.24)!important;border-radius:30px!important;box-shadow:0 28px 70px rgba(18,16,11,.13)!important;overflow:hidden!important;padding:0!important;gap:0!important}.booking-live-head{background:#0a0907;color:#fff;padding:24px 26px;border-bottom:4px solid #c69b49;display:flex;justify-content:space-between;gap:16px;align-items:center}.booking-live-head h3{color:#fff;margin:0;font-size:30px}.booking-live-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-live-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-live-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-live-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}
-      .dog-entry,.dog-card{border:1px solid rgba(183,131,42,.30)!important;background:linear-gradient(180deg,#fffdf8,#fff8ed)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(18,16,11,.07)!important}.dog-entry-head,.dog-panel-head{background:#17140f!important;color:#fff!important;padding:13px 16px!important}.dog-entry-title{color:#fff!important}.dog-entry-fields,.dog-list{padding:16px!important}.dog-enquiry-panel{border:1px solid rgba(183,131,42,.30);border-radius:24px;background:#fff8ed;overflow:hidden}.dog-panel-title strong{color:#fff}.dog-panel-title span{display:block;color:#e6d9c3;font-weight:650;margin-top:4px}.dog-card{padding:14px!important;display:grid;gap:12px}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24}.add-dog-btn.full{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.sms-open-card .hero-actions{margin:12px 0 0}
+      .dog-entry,.dog-card{border:1px solid rgba(183,131,42,.30)!important;background:linear-gradient(180deg,#fffdf8,#fff8ed)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(18,16,11,.07)!important}.dog-entry-head,.dog-panel-head{background:#17140f!important;color:#fff!important;padding:13px 16px!important}.dog-entry-title{color:#fff!important}.dog-entry-fields,.dog-list{padding:16px!important}.dog-enquiry-panel{border:1px solid rgba(183,131,42,.30);border-radius:24px;background:#fff8ed;overflow:hidden}.dog-panel-title strong{color:#fff}.dog-panel-title span{display:block;color:#e6d9c3;font-weight:650;margin-top:4px}.dog-card{padding:14px!important;display:grid;gap:12px}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24}.add-dog-btn.full{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.sms-open-card .hero-actions{margin:12px 0 0}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a;flex:0 0 auto;box-shadow:none}
       @media(max-width:980px){.booking-live-layout{grid-template-columns:1fr}.nav-inner{border-radius:28px!important}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}.brand-title,.brand-sub{display:none!important}.brand{min-width:auto!important}.brand img{width:68px!important}.booking-live-head{display:block}.booking-live-body{padding:18px}.sms-notice{padding:18px}}
     `;
     document.head.appendChild(style);
@@ -39,16 +38,25 @@
     const side = form.nextElementSibling;
     if (side) {
       side.classList.add('booking-live-side');
+      side.querySelectorAll('.sms-notice').forEach(node => node.remove());
       const notice = document.createElement('div');
       notice.className = 'sms-notice';
-      notice.innerHTML = '<h3>Texting works best</h3><p>We may be hands-on with a groom, so texting is the easiest way to reach us. If a call is easier, send a quick text and we will call back as soon as we can.</p><a class="btn btn-dark" href="sms:0272472493">Text to Book</a>';
+      notice.innerHTML = '<h3>Texting works best</h3><p>Booking requests open your text app with the message ready to send. Please check the message, then send it through.</p><a class="btn btn-dark" href="sms:0272472493">Text to Book</a>';
       side.prepend(notice);
     }
   }
 
+  function ensureConsent(form) {
+    if (form.querySelector('[name="booking_sms_consent"]')) return;
+    const submit = form.querySelector('[type="submit"]');
+    const consent = document.createElement('label');
+    consent.className = 'sms-consent';
+    consent.innerHTML = '<input name="booking_sms_consent" type="checkbox" required><span>I understand this enquiry will open as a text message to Barking Mad Barbers.</span>';
+    submit?.before(consent);
+  }
+
   function dogSummary(dog) { return `${[dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'}${dog.name ? ` (${dog.name})` : ''}${dog.service ? ` - ${dog.service}` : ''}`; }
   function dogSmsLine(dog, index) { return `${index + 1} - ${dog.name || 'Dog'} - ${[dog.size, dog.breed].filter(Boolean).join(' ')}`.trim(); }
-
   function ensureFirstBreedField(form) {
     if (form.querySelector('[name="breed"]')) return;
     const sizeField = form.dog_size?.closest('.field');
@@ -95,31 +103,11 @@
     return `sms:0272472493?body=${encodeURIComponent(message)}`;
   }
 
-  function openSmsFallback(data) {
+  function openSms(data) {
     const url = bookingSmsUrl(data);
     const el = document.getElementById('bookingStatus');
     if (el) el.innerHTML = `<div class="status good sms-open-card">Your text message is ready. If Messages does not open automatically, tap below.<div class="hero-actions"><a class="btn btn-gold" href="${url}">Open text message</a></div></div>`;
     window.location.assign(url);
-  }
-
-  async function submitBookingWithSmsFallback(form) {
-    const payload = buildBookingPayload(form);
-    const apiPayload = { ...payload };
-    delete apiPayload._dogs;
-    const el = document.getElementById('bookingStatus');
-    status(el, 'Sending booking request...');
-    try {
-      const headers = { 'Content-Type': 'application/json' };
-      const token = localStorage.getItem('bmb_user_token') || '';
-      if (token) headers.Authorization = 'Bearer ' + token;
-      const response = await nativeFetch(apiUrl('/api/bookings'), { method: 'POST', headers, body: JSON.stringify(apiPayload) });
-      if (!response.ok) throw new Error('Booking server unavailable.');
-      form.reset();
-      form.querySelectorAll('[data-extra-dog]').forEach(card => card.remove());
-      status(el, 'Booking request sent. Barking Mad Barbers can confirm the details with you soon.', 'good');
-    } catch (error) {
-      openSmsFallback(payload);
-    }
   }
 
   function refreshDogLabels(form) { form.querySelectorAll('[data-extra-dog]').forEach((card, index) => { const label = card.querySelector('[data-dog-label]'); if (label) label.textContent = `Dog ${index + 2}`; }); }
@@ -138,6 +126,7 @@
 
   function installMultiDogUi(form) {
     ensureFirstBreedField(form);
+    ensureConsent(form);
     if (form.querySelector('#dogsList')) { form.querySelector('#addDogBtn')?.classList.add('add-dog-btn', 'full'); return; }
     if (form.querySelector('.dog-enquiry-panel')) return;
     const serviceField = form.service?.closest('.form-grid') || form.service?.closest('.field');
@@ -155,7 +144,12 @@
     if (!form) return;
     wrapBookingForm(form);
     installMultiDogUi(form);
-    form.onsubmit = event => { event.preventDefault(); submitBookingWithSmsFallback(form); };
+    form.onsubmit = event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      status(document.getElementById('bookingStatus'), 'Opening your text message...', 'good');
+      openSms(buildBookingPayload(form));
+    };
   }
 
   window.fetch = (input, init) => {
