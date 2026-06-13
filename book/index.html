@@ -10,32 +10,48 @@
   function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
   function apiUrl(path) { return apiBase && path.startsWith('/api/') ? apiBase + path : path; }
 
-  function installBookingPolishStyles() {
-    if (document.getElementById('booking-polish-styles')) return;
+  function installReferenceStyle() {
+    if (document.getElementById('bmb-reference-style')) return;
     const style = document.createElement('style');
-    style.id = 'booking-polish-styles';
+    style.id = 'bmb-reference-style';
     style.textContent = `
-      #bookingForm { gap: 18px; }
-      .dog-enquiry-panel{border:1px solid rgba(183,131,42,.22);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,250,242,.76));padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 12px 28px rgba(18,16,11,.07);display:grid;gap:14px}
-      .dog-panel-head,.dog-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.dog-panel-title{display:grid;gap:4px}.dog-panel-title strong{font-size:18px;color:#17140f}.dog-panel-title span{color:#6a5f54;font-weight:650;line-height:1.45}
-      .dog-list{display:grid;gap:12px}.dog-card{border:1px solid rgba(183,131,42,.18);border-radius:20px;background:#fff;padding:14px;display:grid;gap:12px}.dog-card-head strong{color:#17140f;font-size:15px;letter-spacing:.02em;text-transform:uppercase}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-      .add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff;box-shadow:0 12px 22px rgba(18,16,11,.16)}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24;box-shadow:inset 0 0 0 1px rgba(150,39,39,.18)}
-      .sms-note{color:#5f574c;background:#fffaf2;border:1px solid rgba(183,131,42,.18);border-radius:18px;padding:12px 14px;font-weight:650;line-height:1.5}
-      @media(max-width:900px){.dog-card-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}}
+      body{background:linear-gradient(180deg,#fff 0%,#fffdf8 30%,#f7efe1 100%)!important}
+      .nav{background:transparent!important;border:0!important;padding:12px 14px 0!important}.nav-inner{background:#080806!important;border:1px solid rgba(216,179,106,.42)!important;border-radius:999px!important;box-shadow:0 18px 44px rgba(18,16,11,.24),inset 0 1px 0 rgba(255,255,255,.06)!important}.brand{color:#fff!important}.brand img{width:74px!important;height:46px!important;object-fit:contain!important;background:#fff!important;padding:3px!important}.brand-title{color:#fff!important;font-size:15px!important;letter-spacing:.08em!important}.brand-sub{color:#d8b36a!important}.nav-link{color:#f5efe5!important}.nav-link:hover,.nav-link.active{background:linear-gradient(135deg,#b48731,#ead188)!important;color:#14110d!important;box-shadow:0 12px 28px rgba(183,131,42,.26)!important}.btn-gold{background:linear-gradient(135deg,#a77a24,#ead188)!important;color:#14110d!important}.hamburger{background:#17140f!important;color:#fff!important}
+      #bookingForm{background:#fff!important;border:1px solid rgba(183,131,42,.24)!important;border-radius:30px!important;box-shadow:0 28px 70px rgba(18,16,11,.13)!important;overflow:hidden!important;padding:0!important;gap:0!important}.booking-live-head{background:#0a0907;color:#fff;padding:24px 26px;border-bottom:4px solid #c69b49;display:flex;justify-content:space-between;gap:16px;align-items:center}.booking-live-head h3{color:#fff;margin:0;font-size:30px}.booking-live-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-live-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-live-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-live-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}
+      .dog-enquiry-panel{border:1px solid rgba(183,131,42,.30);border-radius:24px;background:linear-gradient(180deg,#fffdf8,#fff8ed);box-shadow:0 14px 30px rgba(18,16,11,.07);display:grid;gap:0;overflow:hidden}.dog-panel-head,.dog-card-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}.dog-panel-head{background:#17140f;color:#fff;padding:13px 16px}.dog-panel-title strong{color:#fff;font-size:18px}.dog-panel-title span{display:block;color:#e6d9c3;font-weight:650;line-height:1.45;margin-top:4px}.dog-list{display:grid;gap:12px;padding:16px}.dog-card{border:1px solid rgba(183,131,42,.20);border-radius:20px;background:#fff;padding:14px;display:grid;gap:12px}.dog-card-head strong{color:#17140f;font-size:15px;letter-spacing:.02em;text-transform:uppercase}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff;box-shadow:0 12px 22px rgba(18,16,11,.16)}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24;box-shadow:inset 0 0 0 1px rgba(150,39,39,.18)}.sms-note{color:#5f574c;background:#fffaf2;border:1px solid rgba(183,131,42,.18);border-radius:18px;padding:12px 14px;font-weight:650;line-height:1.5;margin:0 16px 16px}.add-dog-btn.full{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.dog-entry{border:1px solid rgba(183,131,42,.30)!important;background:linear-gradient(180deg,#fffdf8,#fff8ed)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(18,16,11,.07)!important}.dog-entry-head{background:#17140f!important;color:#fff!important;padding:13px 16px!important}.dog-entry-title{color:#fff!important}.dog-entry-fields{padding:16px!important}
+      @media(max-width:980px){.booking-live-layout{grid-template-columns:1fr}.nav{padding:8px 8px 0!important}.nav-inner{border-radius:28px!important}.mobile-drawer.open{background:#080806!important;border:1px solid rgba(216,179,106,.34)!important;border-top:0!important;border-radius:0 0 28px 28px!important;margin:0 8px!important}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}.brand-title,.brand-sub{display:none!important}.brand{min-width:auto!important}.brand img{width:68px!important}.booking-live-head{display:block}.booking-live-body{padding:18px}.sms-notice{padding:18px}}
     `;
     document.head.appendChild(style);
   }
 
-  function dogLabel(dog) { return [dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'; }
-  function dogSummary(dog, index) {
-    const label = dogLabel(dog);
-    const name = dog.name ? ` (${dog.name})` : '';
-    const service = dog.service ? ` - ${dog.service}` : '';
-    return `${label}${name}${service}`;
+  function wrapBookingForm(form) {
+    if (form.dataset.referenceWrapped) return;
+    form.dataset.referenceWrapped = 'true';
+    const children = [...form.childNodes];
+    const head = document.createElement('div');
+    head.className = 'booking-live-head';
+    head.innerHTML = '<div><h3>Booking request</h3><p>Add every dog so the team can plan the right appointment time.</p></div><span class="tag goldtag">Text friendly</span>';
+    const body = document.createElement('div');
+    body.className = 'booking-live-body';
+    children.forEach(child => body.appendChild(child));
+    form.append(head, body);
+    const split = form.closest('.split');
+    if (split) split.className = 'booking-live-layout';
+    const side = form.nextElementSibling;
+    if (side) {
+      side.classList.add('booking-live-side');
+      const notice = document.createElement('div');
+      notice.className = 'sms-notice';
+      notice.innerHTML = '<h3>Texting works best</h3><p>We may be hands-on with a groom, so texting is the easiest way to reach us. If a call is easier, send a quick text and we will call back as soon as we can.</p><a class="btn btn-dark" href="sms:0272472493">Text to Book</a>';
+      side.prepend(notice);
+    }
   }
 
+  function dogLabel(dog) { return [dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'; }
+  function dogSummary(dog) { return `${dogLabel(dog)}${dog.name ? ` (${dog.name})` : ''}${dog.service ? ` - ${dog.service}` : ''}`; }
+
   function ensureFirstBreedField(form) {
-    if (form.querySelector('[data-first-breed]')) return;
+    if (form.querySelector('[data-first-breed]') || form.querySelector('[name="breed"]')) return;
     const sizeField = form.dog_size?.closest('.field');
     if (!sizeField) return;
     const breedField = document.createElement('div');
@@ -45,12 +61,15 @@
   }
 
   function collectDogs(form) {
-    const firstDog = {
-      name: form.dog_name?.value.trim() || '',
-      size: form.dog_size?.value.trim() || '',
-      breed: form.breed?.value.trim() || '',
-      service: form.service?.value.trim() || ''
-    };
+    if (form.querySelectorAll('.dog-entry').length) {
+      return [...form.querySelectorAll('.dog-entry')].map(card => ({
+        name: card.querySelector('[name="dog_name"]')?.value.trim() || '',
+        size: card.querySelector('[name="dog_size"]')?.value.trim() || '',
+        breed: card.querySelector('[name="breed"]')?.value.trim() || '',
+        service: card.querySelector('[name="service"]')?.value.trim() || ''
+      })).filter(dog => dog.name || dog.size || dog.breed || dog.service);
+    }
+    const firstDog = { name: form.dog_name?.value.trim() || '', size: form.dog_size?.value.trim() || '', breed: form.breed?.value.trim() || '', service: form.service?.value.trim() || '' };
     const extraDogs = [...form.querySelectorAll('[data-extra-dog]')].map(card => ({
       name: card.querySelector('[data-dog-name]')?.value.trim() || '',
       size: card.querySelector('[data-dog-size]')?.value.trim() || '',
@@ -63,13 +82,8 @@
   function buildBookingPayload(form) {
     const payload = formData(form);
     const dogs = collectDogs(form);
-    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog, index)}`);
-    if (dogs[0]) {
-      payload.dog_name = dogs[0].name;
-      payload.dog_size = dogs[0].size;
-      payload.breed = dogs[0].breed;
-      payload.service = dogs[0].service;
-    }
+    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog)}`);
+    if (dogs[0]) { payload.dog_name = dogs[0].name; payload.dog_size = dogs[0].size; payload.breed = dogs[0].breed; payload.service = dogs[0].service; }
     payload.dogs = dogs.map(dog => ({ dog_name: dog.name, dog_size: dog.size, breed: dog.breed, service: dog.service }));
     payload.notes = [payload.notes || '', 'Dogs:', ...dogLines].filter(Boolean).join('\n');
     payload._dogs = dogs;
@@ -78,18 +92,13 @@
 
   function bookingSmsUrl(data) {
     const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, breed: data.breed, service: data.service }];
-    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog, index)}`);
+    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog)}`);
     const message = [
       'Hi Barking Mad Barbers, I would like to enquire about booking a groom.',
       'Please text when you can, as you may be with a dog and unable to answer calls.',
       'If a phone call is easier, please text and let me know. I understand you will call back when you are able.',
-      `Name: ${data.owner_name || ''}`,
-      `Phone: ${data.phone || ''}`,
-      `Email: ${data.email || ''}`,
-      ...dogLines,
-      `Preferred date: ${data.preferred_date || ''}`,
-      `Preferred time: ${data.preferred_time || ''}`,
-      `Notes: ${data.notes || ''}`
+      `Name: ${data.owner_name || ''}`, `Phone: ${data.phone || ''}`, `Email: ${data.email || ''}`,
+      ...dogLines, `Preferred date: ${data.preferred_date || ''}`, `Preferred time: ${data.preferred_time || ''}`, `Notes: ${data.notes || ''}`
     ].filter(line => !line.endsWith(': ')).join('\n');
     return `sms:0272472493?&body=${encodeURIComponent(message)}`;
   }
@@ -129,14 +138,7 @@
     const card = document.createElement('div');
     card.className = 'dog-card';
     card.dataset.extraDog = 'true';
-    card.innerHTML = `
-      <div class="dog-card-head"><strong data-dog-label>Dog</strong><button class="remove-dog-btn" type="button">Remove</button></div>
-      <div class="dog-card-grid">
-        <div class="field"><label>Dog name</label><input data-dog-name autocomplete="off"></div>
-        <div class="field"><label>Dog size</label><select data-dog-size><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div>
-        <div class="field"><label>Breed</label><input data-dog-breed placeholder="Staffie, Pitbull, Cavoodle..."></div>
-        <div class="field"><label>Service</label><select data-dog-service><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div>
-      </div>`;
+    card.innerHTML = `<div class="dog-card-head"><strong data-dog-label>Dog</strong><button class="remove-dog-btn" type="button">Remove</button></div><div class="dog-card-grid"><div class="field"><label>Dog name</label><input data-dog-name autocomplete="off"></div><div class="field"><label>Dog size</label><select data-dog-size><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label>Breed</label><input data-dog-breed placeholder="Staffie, Pitbull, Cavoodle..."></div><div class="field"><label>Service</label><select data-dog-service><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div></div>`;
     card.querySelector('.remove-dog-btn').onclick = () => { card.remove(); refreshDogLabels(form); };
     list.appendChild(card);
     refreshDogLabels(form);
@@ -144,27 +146,27 @@
   }
 
   function installMultiDogUi(form) {
-    if (form.querySelector('.dog-enquiry-panel')) return;
-    installBookingPolishStyles();
     ensureFirstBreedField(form);
-    const serviceField = form.service?.closest('.form-grid');
+    if (form.querySelector('#dogsList')) {
+      const add = form.querySelector('#addDogBtn');
+      if (add) add.classList.add('add-dog-btn', 'full');
+      return;
+    }
+    if (form.querySelector('.dog-enquiry-panel')) return;
+    const serviceField = form.service?.closest('.form-grid') || form.service?.closest('.field');
     if (!serviceField) return;
     const panel = document.createElement('section');
     panel.className = 'dog-enquiry-panel';
-    panel.innerHTML = `
-      <div class="dog-panel-head">
-        <div class="dog-panel-title"><strong>Dogs for this enquiry</strong><span>Breed matters. Please add size and breed for every dog, for example Tiny Staffie or Large Pitbull.</span></div>
-        <button class="add-dog-btn" type="button">+ Add dog</button>
-      </div>
-      <div class="dog-list" aria-live="polite"></div>
-      <div class="sms-note">If online booking is unavailable, your enquiry opens as a ready-to-send text to 027 247 2493.</div>`;
+    panel.innerHTML = `<div class="dog-panel-head"><div class="dog-panel-title"><strong>Dogs for this enquiry</strong><span>Breed matters. Please add size and breed for every dog, for example Tiny Staffie or Large Pitbull.</span></div><button class="add-dog-btn" type="button">+ Add dog</button></div><div class="dog-list" aria-live="polite"></div><div class="sms-note">If online booking is unavailable, your enquiry opens as a ready-to-send text to 027 247 2493.</div>`;
     serviceField.after(panel);
     panel.querySelector('.add-dog-btn').onclick = () => addDogCard(form);
   }
 
   function installBookingFallback() {
+    installReferenceStyle();
     const form = document.getElementById('bookingForm');
     if (!form) return;
+    wrapBookingForm(form);
     installMultiDogUi(form);
     form.onsubmit = event => { event.preventDefault(); submitBookingWithSmsFallback(form); };
   }
