@@ -5,11 +5,12 @@
 <meta http-equiv="Expires" content="0">
 <title>Barking Mad Barbers</title>
 <script>
+(() => {
   const routePath = '/book';
   const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
   const nativeFetch = window.fetch.bind(window);
-  const status = (el, msg, kind = '') => { if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`; };
-  const formData = form => Object.fromEntries(new FormData(form).entries());
+  const setStatus = (el, msg, kind = '') => { if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`; };
+  const readFormData = form => Object.fromEntries(new FormData(form).entries());
 
   function installStyle() {
     if (document.getElementById('bmb-book-fallback-style')) return;
@@ -73,7 +74,7 @@
   function dogSummary(dog) { return `${[dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'}${dog.name ? ` (${dog.name})` : ''}${dog.service ? ` - ${dog.service}` : ''}`; }
   function dogSmsLine(dog, index) { return `${index + 1} - ${dog.name || 'Dog'} - ${[dog.size, dog.breed].filter(Boolean).join(' ')}`.trim(); }
   function buildBookingPayload(form) {
-    const payload = formData(form);
+    const payload = readFormData(form);
     const dogs = collectDogs(form);
     if (dogs[0]) { payload.dog_name = dogs[0].name; payload.dog_size = dogs[0].size; payload.breed = dogs[0].breed; payload.service = dogs[0].service; }
     payload.dogs = dogs.map(dog => ({ dog_name: dog.name, dog_size: dog.size, breed: dog.breed, service: dog.service }));
@@ -129,11 +130,12 @@
     if (!form) return;
     wrapBookingForm(form);
     installMultiDogUi(form);
-    form.onsubmit = event => { event.preventDefault(); status(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(form); };
-    document.getElementById('textToBookBtn')?.addEventListener('click', event => { event.preventDefault(); status(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(form); });
+    form.onsubmit = event => { event.preventDefault(); setStatus(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(form); };
+    document.getElementById('textToBookBtn')?.addEventListener('click', event => { event.preventDefault(); setStatus(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(form); });
   }
 
   window.fetch = (input, init) => { if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input; return nativeFetch(input, init); };
   history.replaceState(null, '', routePath);
   nativeFetch('/index.html?bmb_v=' + Date.now(), { cache: 'reload' }).then(response => response.text()).then(html => { document.open(); document.write(html); document.close(); setTimeout(installBookingFallback, 0); });
+})();
 </script>
