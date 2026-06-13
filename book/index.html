@@ -49,6 +49,7 @@
 
   function dogLabel(dog) { return [dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'; }
   function dogSummary(dog) { return `${dogLabel(dog)}${dog.name ? ` (${dog.name})` : ''}${dog.service ? ` - ${dog.service}` : ''}`; }
+  function dogSmsLine(dog, index) { return `${index + 1} - ${dog.name || 'Dog'} - ${[dog.size, dog.breed].filter(Boolean).join(' ')}`.trim(); }
 
   function ensureFirstBreedField(form) {
     if (form.querySelector('[data-first-breed]') || form.querySelector('[name="breed"]')) return;
@@ -92,14 +93,19 @@
 
   function bookingSmsUrl(data) {
     const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, breed: data.breed, service: data.service }];
-    const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog)}`);
+    const appointment = (data.preferred_time || '').trim()
+      ? `I would like my appointment at ${data.preferred_time.trim()}`
+      : 'I would like my appointment whenever';
     const message = [
-      'Hi Barking Mad Barbers, I would like to enquire about booking a groom.',
-      'Please text when you can, as you may be with a dog and unable to answer calls.',
-      'If a phone call is easier, please text and let me know. I understand you will call back when you are able.',
-      `Name: ${data.owner_name || ''}`, `Phone: ${data.phone || ''}`, `Email: ${data.email || ''}`,
-      ...dogLines, `Preferred date: ${data.preferred_date || ''}`, `Preferred time: ${data.preferred_time || ''}`, `Notes: ${data.notes || ''}`
-    ].filter(line => !line.endsWith(': ')).join('\n');
+      "Hi Barking Mad Barbers I'd like to enquire about a dog.",
+      '',
+      ...dogs.map(dogSmsLine),
+      '',
+      appointment,
+      '',
+      'Cheers',
+      [data.owner_name || '', data.phone || ''].filter(Boolean).join(' ')
+    ].filter((line, index, lines) => line || lines[index - 1] !== '').join('\n');
     return `sms:0272472493?&body=${encodeURIComponent(message)}`;
   }
 
