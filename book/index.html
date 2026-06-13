@@ -6,96 +6,82 @@
 <title>Barking Mad Barbers</title>
 <script>
 (() => {
-  const routePath = '/book';
-  const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
   const nativeFetch = window.fetch.bind(window);
-  const setStatus = (el, msg, kind = '') => { if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`; };
-  const readFormData = form => Object.fromEntries(new FormData(form).entries());
-
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  }
+  const services = ['Full Groom', 'Wash & Dry', 'Face Tidy', 'Nail Trim', 'Teeth Brush', 'Flea Shampoo'];
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+  const formData = form => Object.fromEntries(new FormData(form).entries());
 
   function installStyle() {
-    if (document.getElementById('bmb-book-fallback-style')) return;
+    if (document.getElementById('bmb-book-live-style')) return;
     const style = document.createElement('style');
-    style.id = 'bmb-book-fallback-style';
-    style.textContent = `body{background:linear-gradient(180deg,#fff 0%,#fffdf8 30%,#f7efe1 100%)!important}.nav{background:transparent!important;border:0!important;padding:12px 14px 0!important}.nav-inner{background:#080806!important;border:1px solid rgba(216,179,106,.42)!important;border-radius:999px!important;box-shadow:0 18px 44px rgba(18,16,11,.24)!important}.brand,.brand-title,.nav-link{color:#fff!important}.brand-sub{color:#d8b36a!important}.brand img{width:74px!important;height:46px!important;object-fit:contain!important;background:#fff!important;padding:3px!important}.nav-link:hover,.nav-link.active{background:linear-gradient(135deg,#b48731,#ead188)!important;color:#14110d!important}.btn-gold{background:linear-gradient(135deg,#a77a24,#ead188)!important;color:#14110d!important}#bookingForm{background:#fff!important;border:1px solid rgba(183,131,42,.24)!important;border-radius:30px!important;box-shadow:0 28px 70px rgba(18,16,11,.13)!important;overflow:hidden!important;padding:0!important;gap:0!important}.booking-live-head{background:#0a0907;color:#fff;padding:24px 26px;border-bottom:4px solid #c69b49;display:flex;justify-content:space-between;gap:16px;align-items:center}.booking-live-head h3{color:#fff;margin:0;font-size:30px}.booking-live-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-live-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-live-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-live-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}.dog-entry,.dog-card{border:1px solid rgba(183,131,42,.30)!important;background:linear-gradient(180deg,#fffdf8,#fff8ed)!important;border-radius:24px!important;overflow:hidden!important;box-shadow:0 14px 30px rgba(18,16,11,.07)!important}.dog-entry-head,.dog-panel-head{background:#17140f!important;color:#fff!important;padding:13px 16px!important}.dog-entry-title{color:#fff!important}.dog-entry-fields,.dog-list{padding:16px!important}.dog-enquiry-panel{border:1px solid rgba(183,131,42,.30);border-radius:24px;background:#fff8ed;overflow:hidden}.dog-panel-title strong{color:#fff}.dog-panel-title span{display:block;color:#e6d9c3;font-weight:650;margin-top:4px}.dog-card{padding:14px!important;display:grid;gap:12px}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24}.add-dog-btn.full{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.sms-open-card .hero-actions{margin:12px 0 0}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a;flex:0 0 auto;box-shadow:none}.sms-preview{width:100%;min-height:180px;margin-top:12px;border-radius:16px;background:#fff;border:1px solid rgba(183,131,42,.28);color:#17140f;font-weight:700;line-height:1.5}@media(max-width:980px){.booking-live-layout{grid-template-columns:1fr}.nav-inner{border-radius:28px!important}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}.brand-title,.brand-sub{display:none!important}.brand{min-width:auto!important}.brand img{width:68px!important}.booking-live-head{display:block}.booking-live-body{padding:18px}.sms-notice{padding:18px}}`;
+    style.id = 'bmb-book-live-style';
+    style.textContent = `.booking-shell{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-form-card{background:#fff;border:1px solid rgba(183,131,42,.24);border-radius:30px;padding:0;box-shadow:0 28px 70px rgba(18,16,11,.13);overflow:hidden}.booking-form-head{background:#0a0907;color:#fff;padding:24px 26px;display:flex;justify-content:space-between;gap:16px;align-items:center;border-bottom:4px solid #c69b49}.booking-form-head h3{color:#fff;font-size:30px;margin:0}.booking-form-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-form-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}.dog-list{display:grid;gap:14px}.dog-entry{border:1px solid rgba(183,131,42,.30);background:linear-gradient(180deg,#fffdf8,#fff8ed);border-radius:24px;overflow:hidden;box-shadow:0 14px 30px rgba(18,16,11,.07)}.dog-entry-head{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#17140f;color:#fff;padding:13px 16px}.dog-entry-title{font-weight:950;color:#fff}.dog-entry-fields{display:grid;gap:14px;padding:16px}.service-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.service-stack label{display:flex;align-items:center;gap:10px;border:1px solid rgba(183,131,42,.22);background:#fff;border-radius:16px;padding:11px 12px;font-size:14px}.service-stack input{width:18px;height:18px;margin:0;accent-color:#b7832a;box-shadow:none}.add-dog-btn{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.remove-dog{padding:9px 12px;background:rgba(255,255,255,.10);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a;flex:0 0 auto;box-shadow:none}.sms-preview{width:100%;min-height:180px;margin-top:12px;border-radius:16px;background:#fff;border:1px solid rgba(183,131,42,.28);color:#17140f;font-weight:700;line-height:1.5}.main-time-muted{opacity:.48;filter:grayscale(.35)}@media(max-width:980px){.booking-shell{grid-template-columns:1fr}}@media(max-width:620px){.booking-form-head{display:block}.booking-form-body{padding:18px}.sms-notice{padding:18px}.service-stack{grid-template-columns:1fr}}`;
     document.head.appendChild(style);
   }
 
-  function wrapBookingForm(form) {
-    if (form.dataset.referenceWrapped) return;
-    form.dataset.referenceWrapped = 'true';
-    const children = [...form.childNodes];
-    const head = document.createElement('div');
-    head.className = 'booking-live-head';
-    head.innerHTML = '<div><h3>Booking request</h3><p>Add every dog so the team can plan the right appointment time.</p></div><span class="tag goldtag">Text friendly</span>';
-    const body = document.createElement('div');
-    body.className = 'booking-live-body';
-    children.forEach(child => body.appendChild(child));
-    form.append(head, body);
-    const split = form.closest('.split');
-    if (split) split.className = 'booking-live-layout';
-    const side = form.nextElementSibling;
-    if (side) {
-      side.classList.add('booking-live-side');
-      side.querySelectorAll('.sms-notice').forEach(node => node.remove());
-      const notice = document.createElement('div');
-      notice.className = 'sms-notice';
-      notice.innerHTML = '<h3>Texting works best</h3><p>Booking requests open your text app with the message ready to send. Please check the message, then send it through.</p><a class="btn btn-dark" id="textToBookBtn" href="sms:+64272472493">Text to Book</a>';
-      side.prepend(notice);
-    }
+  function dogEntry(index = 1) {
+    const serviceHtml = services.map(service => `<label><input type="checkbox" name="services" value="${esc(service)}">${esc(service)}</label>`).join('');
+    return `<div class="dog-entry"><div class="dog-entry-head"><div class="dog-entry-title">Dog ${index}</div><button class="btn btn-soft remove-dog" type="button">Remove</button></div><div class="dog-entry-fields"><div class="form-grid row"><div class="field"><label>Dog name</label><input name="dog_name" required placeholder="Buddy"></div><div class="field"><label>Dog size</label><select name="dog_size" required><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div></div><div class="form-grid row"><div class="field"><label>Breed</label><input name="breed" required placeholder="Staffie, Pitbull, Cavoodle..."></div><div class="field"><label>Preferred time for this dog</label><input name="dog_preferred_time" placeholder="Leave blank to use the main preferred time"></div></div><div class="field"><label>Services</label><div class="service-stack">${serviceHtml}</div></div></div></div>`;
   }
 
-  function ensureConsent(form) {
-    if (form.querySelector('[name="booking_sms_consent"]')) return;
-    const submit = form.querySelector('[type="submit"]');
-    const consent = document.createElement('label');
-    consent.className = 'sms-consent';
-    consent.innerHTML = '<input name="booking_sms_consent" type="checkbox" required><span>I understand this enquiry will open as a text message to Barking Mad Barbers.</span>';
-    submit?.before(consent);
+  function renderBookingPage() {
+    installStyle();
+    const app = document.getElementById('app') || document.querySelector('main');
+    if (!app) return;
+    app.innerHTML = `<section class="wrap"><div class="eyebrow kicker">Bookings only</div><h1 class="title page-title">Book a <span class="goldtext gold">Groom</span></h1><p class="lead">Send a booking request. Add every dog with size, breed, stacked services and optional dog-specific times.</p><div class="booking-shell"><form class="booking-form-card form" id="bookingForm"><div class="booking-form-head"><div><h3>Booking request</h3><p>Leave dog-specific times blank when every dog can use the main preferred time.</p></div><span class="tag goldtag">Text friendly</span></div><div class="booking-form-body"><div class="form-grid row"><div class="field"><label>Your name</label><input name="owner_name" required autocomplete="name"></div><div class="field"><label>Phone</label><input name="phone" required autocomplete="tel"></div></div><div class="form-grid row"><div class="field"><label>Email</label><input name="email" type="email" autocomplete="email"></div><div class="field"><label>Preferred date</label><input name="preferred_date" type="date"></div></div><div class="field" id="mainPreferredTimeField"><label>Main preferred time</label><input name="preferred_time" placeholder="Morning / afternoon / exact time"></div><div class="dog-list" id="dogsList">${dogEntry(1)}</div><button class="btn btn-soft add-dog-btn" type="button" id="addDogBtn">+ Add dog</button><div class="field"><label>Notes</label><textarea name="notes" placeholder="Coat condition, matting, fleas, nerves, anything we should know"></textarea></div><label class="sms-consent"><input name="booking_sms_consent" type="checkbox" required><span>I understand this enquiry will open as a text message to Barking Mad Barbers.</span></label><button class="btn btn-gold" type="submit">Send Booking Request</button><div id="bookingStatus"></div></div></form><aside class="booking-side"><div class="sms-notice"><h3>Texting works best</h3><p>Booking requests open your text app with the message ready to send. Please check the message, then send it through.</p><a class="btn btn-dark" id="textToBookBtn" href="sms:+64272472493">Text to Book</a></div><div class="card clean-card"><h3>Before you book</h3><p>Services can be stacked for each dog. Use the individual time only when one dog needs a different time from the others.</p></div></aside></div></section>`;
+    bindBooking();
   }
 
-  function ensureFirstBreedField(form) {
-    if (form.querySelector('[name="breed"]')) return;
-    const sizeField = form.dog_size?.closest('.field');
-    if (!sizeField) return;
-    const breedField = document.createElement('div');
-    breedField.className = 'field';
-    breedField.innerHTML = '<label>Breed</label><input name="breed" required placeholder="Staffie, Pitbull, Cavoodle...">';
-    sizeField.after(breedField);
+  function collectDogs() {
+    return [...document.querySelectorAll('.dog-entry')].map(entry => {
+      const get = name => entry.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+      const stacked = [...entry.querySelectorAll('[name="services"]:checked')].map(input => input.value);
+      return { dog_name: get('dog_name'), dog_size: get('dog_size'), breed: get('breed'), dog_preferred_time: get('dog_preferred_time'), services: stacked, service: stacked.join(', ') };
+    });
   }
 
-  function collectDogs(form) {
-    const cards = [...form.querySelectorAll('.dog-entry')];
-    if (cards.length) return cards.map(card => ({name: card.querySelector('[name="dog_name"]')?.value.trim() || '', size: card.querySelector('[name="dog_size"]')?.value.trim() || '', breed: card.querySelector('[name="breed"]')?.value.trim() || '', service: card.querySelector('[name="service"]')?.value.trim() || ''})).filter(dog => dog.name || dog.size || dog.breed || dog.service);
-    const firstDog = { name: form.dog_name?.value.trim() || '', size: form.dog_size?.value.trim() || '', breed: form.breed?.value.trim() || '', service: form.service?.value.trim() || '' };
-    const extras = [...form.querySelectorAll('[data-extra-dog]')].map(card => ({name: card.querySelector('[data-dog-name]')?.value.trim() || '', size: card.querySelector('[data-dog-size]')?.value.trim() || '', breed: card.querySelector('[data-dog-breed]')?.value.trim() || '', service: card.querySelector('[data-dog-service]')?.value.trim() || ''})).filter(dog => dog.name || dog.size || dog.breed || dog.service);
-    return [firstDog, ...extras].filter(dog => dog.name || dog.size || dog.breed || dog.service);
+  function refreshDogEntries() {
+    const entries = [...document.querySelectorAll('.dog-entry')];
+    entries.forEach((entry, index) => {
+      entry.querySelector('.dog-entry-title').textContent = `Dog ${index + 1}`;
+      const remove = entry.querySelector('.remove-dog');
+      remove.classList.toggle('hidden', entries.length === 1);
+      remove.onclick = () => { entry.remove(); refreshDogEntries(); };
+      entry.querySelector('[name="dog_preferred_time"]').oninput = updateMainPreferredTimeState;
+    });
+    updateMainPreferredTimeState();
   }
 
-  function dogSummary(dog) { return `${[dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'}${dog.name ? ` (${dog.name})` : ''}${dog.service ? ` - ${dog.service}` : ''}`; }
-  function dogSmsLine(dog, index) { return `${index + 1} - ${dog.name || 'Dog'} - ${[dog.size, dog.breed].filter(Boolean).join(' ')}`.trim(); }
-  function buildBookingPayload(form) {
-    const payload = readFormData(form);
-    const dogs = collectDogs(form);
-    if (dogs[0]) { payload.dog_name = dogs[0].name; payload.dog_size = dogs[0].size; payload.breed = dogs[0].breed; payload.service = dogs[0].service; }
-    payload.dogs = dogs.map(dog => ({ dog_name: dog.name, dog_size: dog.size, breed: dog.breed, service: dog.service }));
-    payload.notes = [payload.notes || '', 'Dogs:', ...dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog)}`)].filter(Boolean).join('\n');
-    payload._dogs = dogs;
-    return payload;
+  function updateMainPreferredTimeState() {
+    const main = document.querySelector('#bookingForm [name="preferred_time"]');
+    if (!main) return;
+    const dogs = collectDogs();
+    const allTimed = dogs.length > 0 && dogs.every(dog => dog.dog_preferred_time);
+    const field = document.getElementById('mainPreferredTimeField') || main.closest('.field');
+    main.disabled = allTimed;
+    main.placeholder = allTimed ? 'Using each dog time below' : 'Morning / afternoon / exact time';
+    if (allTimed) main.value = '';
+    field?.classList.toggle('main-time-muted', allTimed);
+  }
+
+  function dogSmsLine(dog, index) {
+    return `${index + 1} - ${dog.dog_name || 'Dog'} - ${[dog.dog_size, dog.breed].filter(Boolean).join(' ')}`.trim();
   }
 
   function bookingSmsBody(data) {
-    const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, breed: data.breed, service: data.service }];
+    const dogs = collectDogs();
     const preferred = (data.preferred_time || '').trim();
     const date = (data.preferred_date || '').trim();
-    const appointment = preferred && !/^whenever$/i.test(preferred)
+    const dogTimes = dogs.map((dog, index) => ({ label: `Dog ${index + 1}`, time: (dog.dog_preferred_time || preferred || '').trim() }));
+    const hasDogTimes = dogTimes.some(item => item.time);
+    const appointment = hasDogTimes
+      ? ['Preferred times:', ...dogTimes.map(item => `${item.label} ${item.time ? `(${item.time})` : '(use the main preferred time)'}`)].join('\n')
+      : preferred && !/^whenever$/i.test(preferred)
       ? `I would like my appointment at ${[preferred, date].filter(Boolean).join(' ')}`
       : `I would like my appointment ${['whenever', date].filter(Boolean).join(' ')}`;
+    const serviceLines = dogs.flatMap((dog, index) => dog.services.length ? [`Dog ${index + 1} services: ${dog.services.join(', ')}`] : []);
     const signoff = ['Cheers', data.owner_name || '', data.phone || ''].filter(Boolean).join(' ');
-    return ["Hi Barking Mad Barbers I'd like to enquire about a dog.", '', ...dogs.map(dogSmsLine), '', appointment, '', signoff].filter((line, index, lines) => line || lines[index - 1] !== '').join('\n');
+    return ["Hi Barking Mad Barbers I'd like to enquire about a dog.", '', ...dogs.map(dogSmsLine), ...(serviceLines.length ? ['', ...serviceLines] : []), '', hasDogTimes && date ? `${appointment}\nPreferred date ${date}` : appointment, '', signoff].filter((line, index, lines) => line || lines[index - 1] !== '').join('\n');
   }
 
   function bookingSmsUrl(data) {
@@ -106,65 +92,38 @@
   }
 
   function canAutoOpenSms() { return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent); }
-  async function copyBookingSmsText(text) { try { await navigator.clipboard.writeText(text); return true; } catch { return false; } }
+  async function copySms(text) { try { await navigator.clipboard.writeText(text); return true; } catch { return false; } }
 
-  function showBookingSmsFallback(data) {
+  function openSms(form) {
+    if (!form.reportValidity()) return;
+    const data = formData(form);
     const url = bookingSmsUrl(data);
     const body = bookingSmsBody(data);
     const el = document.getElementById('bookingStatus');
     if (el) {
-      el.innerHTML = `<div class="status good sms-open-card"><strong>Your text message is ready.</strong><p>If Messages does not open on this device, copy the text below and send it to 027 247 2493.</p><textarea class="sms-preview" readonly>${escapeHtml(body)}</textarea><div class="hero-actions"><button class="btn btn-gold" type="button" id="copySmsBtn">Copy text</button><a class="btn btn-soft" href="${url}">Open text message</a></div></div>`;
+      el.innerHTML = `<div class="status good sms-open-card"><strong>Your text message is ready.</strong><p>If Messages does not open on this device, copy the text below and send it to 027 247 2493.</p><textarea class="sms-preview" readonly>${esc(body)}</textarea><div class="actions hero-actions"><button class="btn btn-gold" type="button" id="copySmsBtn">Copy text</button><a class="btn btn-soft" href="${url}">Open text message</a></div></div>`;
       const copyBtn = document.getElementById('copySmsBtn');
-      if (copyBtn) copyBtn.onclick = async () => { copyBtn.textContent = await copyBookingSmsText(body) ? 'Copied' : 'Select and copy the text'; };
+      if (copyBtn) copyBtn.onclick = async () => { copyBtn.textContent = await copySms(body) ? 'Copied' : 'Select and copy the text'; };
     }
-    return url;
-  }
-
-  function openSms(form) {
-    if (!form.reportValidity()) return;
-    const data = buildBookingPayload(form);
-    const url = showBookingSmsFallback(data);
     if (canAutoOpenSms()) window.location.href = url;
   }
 
-  function refreshDogLabels(form) { form.querySelectorAll('[data-extra-dog]').forEach((card, index) => { const label = card.querySelector('[data-dog-label]'); if (label) label.textContent = `Dog ${index + 2}`; }); }
-  function addDogCard(form) {
-    const list = form.querySelector('.dog-list');
-    if (!list) return;
-    const card = document.createElement('div');
-    card.className = 'dog-card';
-    card.dataset.extraDog = 'true';
-    card.innerHTML = `<div class="dog-card-head"><strong data-dog-label>Dog</strong><button class="remove-dog-btn" type="button">Remove</button></div><div class="dog-card-grid"><div class="field"><label>Dog name</label><input data-dog-name autocomplete="off"></div><div class="field"><label>Dog size</label><select data-dog-size><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label>Breed</label><input data-dog-breed placeholder="Staffie, Pitbull, Cavoodle..."></div><div class="field"><label>Service</label><select data-dog-service><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div></div>`;
-    card.querySelector('.remove-dog-btn').onclick = () => { card.remove(); refreshDogLabels(form); };
-    list.appendChild(card);
-    refreshDogLabels(form);
-    card.querySelector('[data-dog-breed]')?.focus();
-  }
-  function installMultiDogUi(form) {
-    ensureFirstBreedField(form);
-    ensureConsent(form);
-    if (form.querySelector('#dogsList')) { form.querySelector('#addDogBtn')?.classList.add('add-dog-btn', 'full'); return; }
-    if (form.querySelector('.dog-enquiry-panel')) return;
-    const serviceField = form.service?.closest('.form-grid') || form.service?.closest('.field');
-    if (!serviceField) return;
-    const panel = document.createElement('section');
-    panel.className = 'dog-enquiry-panel';
-    panel.innerHTML = `<div class="dog-panel-head"><div class="dog-panel-title"><strong>Dogs for this enquiry</strong><span>Breed matters. Please add size and breed for every dog.</span></div><button class="add-dog-btn" type="button">+ Add dog</button></div><div class="dog-list" aria-live="polite"></div>`;
-    serviceField.after(panel);
-    panel.querySelector('.add-dog-btn').onclick = () => addDogCard(form);
-  }
-  function installBookingFallback() {
-    installStyle();
+  function bindBooking() {
     const form = document.getElementById('bookingForm');
     if (!form) return;
-    wrapBookingForm(form);
-    installMultiDogUi(form);
-    form.onsubmit = event => { event.preventDefault(); setStatus(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(form); };
-    document.getElementById('textToBookBtn')?.addEventListener('click', event => { event.preventDefault(); setStatus(document.getElementById('bookingStatus'), 'Opening your text message...', 'good'); openSms(form); });
+    refreshDogEntries();
+    document.getElementById('addDogBtn').onclick = () => { document.getElementById('dogsList').insertAdjacentHTML('beforeend', dogEntry(document.querySelectorAll('.dog-entry').length + 1)); refreshDogEntries(); };
+    document.getElementById('textToBookBtn').onclick = event => { event.preventDefault(); openSms(form); };
+    form.onsubmit = event => { event.preventDefault(); openSms(form); };
   }
 
-  window.fetch = (input, init) => { if (apiBase && typeof input === 'string' && input.startsWith('/api/')) input = apiBase + input; return nativeFetch(input, init); };
-  history.replaceState(null, '', routePath);
-  nativeFetch('/index.html?bmb_v=' + Date.now(), { cache: 'reload' }).then(response => response.text()).then(html => { document.open(); document.write(html); document.close(); setTimeout(installBookingFallback, 0); });
+  window.fetch = (input, init) => nativeFetch(input, init);
+  history.replaceState(null, '', '/book');
+  nativeFetch('/index.html?bmb_v=' + Date.now(), { cache: 'reload' }).then(response => response.text()).then(html => {
+    document.open();
+    document.write(html);
+    document.close();
+    setTimeout(renderBookingPage, 0);
+  });
 })();
 </script>
