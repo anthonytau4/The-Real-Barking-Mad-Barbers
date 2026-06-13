@@ -6,13 +6,9 @@
   const apiBase = (localStorage.getItem('bmb_api_base_url') || '').replace(/\/+$/, '');
   const nativeFetch = window.fetch.bind(window);
 
-  function status(el, msg, kind = '') {
-    if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`;
-  }
-
-  function formData(form) {
-    return Object.fromEntries(new FormData(form).entries());
-  }
+  function status(el, msg, kind = '') { if (el) el.innerHTML = `<div class="status ${kind}">${msg}</div>`; }
+  function formData(form) { return Object.fromEntries(new FormData(form).entries()); }
+  function apiUrl(path) { return apiBase && path.startsWith('/api/') ? apiBase + path : path; }
 
   function installBookingPolishStyles() {
     if (document.getElementById('booking-polish-styles')) return;
@@ -20,74 +16,48 @@
     style.id = 'booking-polish-styles';
     style.textContent = `
       #bookingForm { gap: 18px; }
-      .dog-enquiry-panel {
-        border: 1px solid rgba(183,131,42,.22);
-        border-radius: 24px;
-        background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,250,242,.76));
-        padding: 18px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 12px 28px rgba(18,16,11,.07);
-        display: grid;
-        gap: 14px;
-      }
-      .dog-panel-head { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; }
-      .dog-panel-title { display:grid; gap:4px; }
-      .dog-panel-title strong { font-size:18px; color:#17140f; }
-      .dog-panel-title span { color:#6a5f54; font-weight:650; line-height:1.45; }
-      .dog-list { display:grid; gap:12px; }
-      .dog-card {
-        border: 1px solid rgba(183,131,42,.18);
-        border-radius: 20px;
-        background: #fff;
-        padding: 14px;
-        display: grid;
-        gap: 12px;
-      }
-      .dog-card-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-      .dog-card-head strong { color:#17140f; font-size:15px; letter-spacing:.02em; text-transform:uppercase; }
-      .dog-card-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; }
-      .add-dog-btn, .remove-dog-btn {
-        border: 0;
-        cursor: pointer;
-        border-radius: 999px;
-        font-weight: 950;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        gap:8px;
-      }
-      .add-dog-btn { padding: 12px 16px; background:#17140f; color:#fff; box-shadow:0 12px 22px rgba(18,16,11,.16); }
-      .remove-dog-btn { padding: 8px 12px; background:#fff5f3; color:#8d2a24; box-shadow: inset 0 0 0 1px rgba(150,39,39,.18); }
-      .sms-note {
-        color:#5f574c;
-        background:#fffaf2;
-        border:1px solid rgba(183,131,42,.18);
-        border-radius:18px;
-        padding:12px 14px;
-        font-weight:650;
-        line-height:1.5;
-      }
-      @media (max-width: 760px) { .dog-card-grid { grid-template-columns: 1fr; } }
+      .dog-enquiry-panel{border:1px solid rgba(183,131,42,.22);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.88),rgba(255,250,242,.76));padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 12px 28px rgba(18,16,11,.07);display:grid;gap:14px}
+      .dog-panel-head,.dog-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.dog-panel-title{display:grid;gap:4px}.dog-panel-title strong{font-size:18px;color:#17140f}.dog-panel-title span{color:#6a5f54;font-weight:650;line-height:1.45}
+      .dog-list{display:grid;gap:12px}.dog-card{border:1px solid rgba(183,131,42,.18);border-radius:20px;background:#fff;padding:14px;display:grid;gap:12px}.dog-card-head strong{color:#17140f;font-size:15px;letter-spacing:.02em;text-transform:uppercase}.dog-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+      .add-dog-btn,.remove-dog-btn{border:0;cursor:pointer;border-radius:999px;font-weight:950;display:inline-flex;align-items:center;justify-content:center;gap:8px}.add-dog-btn{padding:12px 16px;background:#17140f;color:#fff;box-shadow:0 12px 22px rgba(18,16,11,.16)}.remove-dog-btn{padding:8px 12px;background:#fff5f3;color:#8d2a24;box-shadow:inset 0 0 0 1px rgba(150,39,39,.18)}
+      .sms-note{color:#5f574c;background:#fffaf2;border:1px solid rgba(183,131,42,.18);border-radius:18px;padding:12px 14px;font-weight:650;line-height:1.5}
+      @media(max-width:900px){.dog-card-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.dog-card-grid{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);
   }
 
+  function dogLabel(dog) { return [dog.size, dog.breed].filter(Boolean).join(' ') || dog.name || 'Dog'; }
   function dogSummary(dog, index) {
-    const parts = [dog.name || `Dog ${index + 1}`, dog.size, dog.service].filter(Boolean);
-    return parts.join(' - ');
+    const label = dogLabel(dog);
+    const name = dog.name ? ` (${dog.name})` : '';
+    const service = dog.service ? ` - ${dog.service}` : '';
+    return `${label}${name}${service}`;
+  }
+
+  function ensureFirstBreedField(form) {
+    if (form.querySelector('[data-first-breed]')) return;
+    const sizeField = form.dog_size?.closest('.field');
+    if (!sizeField) return;
+    const breedField = document.createElement('div');
+    breedField.className = 'field';
+    breedField.innerHTML = '<label>Breed</label><input name="breed" data-first-breed required placeholder="Staffie, Pitbull, Cavoodle...">';
+    sizeField.after(breedField);
   }
 
   function collectDogs(form) {
     const firstDog = {
       name: form.dog_name?.value.trim() || '',
       size: form.dog_size?.value.trim() || '',
+      breed: form.breed?.value.trim() || '',
       service: form.service?.value.trim() || ''
     };
     const extraDogs = [...form.querySelectorAll('[data-extra-dog]')].map(card => ({
       name: card.querySelector('[data-dog-name]')?.value.trim() || '',
       size: card.querySelector('[data-dog-size]')?.value.trim() || '',
+      breed: card.querySelector('[data-dog-breed]')?.value.trim() || '',
       service: card.querySelector('[data-dog-service]')?.value.trim() || ''
-    })).filter(dog => dog.name || dog.size || dog.service);
-    return [firstDog, ...extraDogs].filter(dog => dog.name || dog.size || dog.service);
+    })).filter(dog => dog.name || dog.size || dog.breed || dog.service);
+    return [firstDog, ...extraDogs].filter(dog => dog.name || dog.size || dog.breed || dog.service);
   }
 
   function buildBookingPayload(form) {
@@ -97,17 +67,17 @@
     if (dogs[0]) {
       payload.dog_name = dogs[0].name;
       payload.dog_size = dogs[0].size;
+      payload.breed = dogs[0].breed;
       payload.service = dogs[0].service;
     }
-    if (dogLines.length > 1) {
-      payload.notes = [payload.notes || '', 'Multiple dogs:', ...dogLines].filter(Boolean).join('\n');
-    }
+    payload.dogs = dogs.map(dog => ({ dog_name: dog.name, dog_size: dog.size, breed: dog.breed, service: dog.service }));
+    payload.notes = [payload.notes || '', 'Dogs:', ...dogLines].filter(Boolean).join('\n');
     payload._dogs = dogs;
     return payload;
   }
 
   function bookingSmsUrl(data) {
-    const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, service: data.service }];
+    const dogs = data._dogs && data._dogs.length ? data._dogs : [{ name: data.dog_name, size: data.dog_size, breed: data.breed, service: data.service }];
     const dogLines = dogs.map((dog, index) => `Dog ${index + 1}: ${dogSummary(dog, index)}`);
     const message = [
       'Hi Barking Mad Barbers, I would like to enquire about booking a groom.',
@@ -124,10 +94,6 @@
     return `sms:0272472493?&body=${encodeURIComponent(message)}`;
   }
 
-  function apiUrl(path) {
-    return apiBase && path.startsWith('/api/') ? apiBase + path : path;
-  }
-
   async function submitBookingWithSmsFallback(form) {
     const payload = buildBookingPayload(form);
     const apiPayload = { ...payload };
@@ -138,11 +104,7 @@
       const headers = { 'Content-Type': 'application/json' };
       const token = localStorage.getItem('bmb_user_token') || '';
       if (token) headers.Authorization = 'Bearer ' + token;
-      const response = await nativeFetch(apiUrl('/api/bookings'), {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(apiPayload)
-      });
+      const response = await nativeFetch(apiUrl('/api/bookings'), { method: 'POST', headers, body: JSON.stringify(apiPayload) });
       if (!response.ok) throw new Error('Booking server unavailable.');
       form.reset();
       form.querySelectorAll('[data-extra-dog]').forEach(card => card.remove());
@@ -172,24 +134,26 @@
       <div class="dog-card-grid">
         <div class="field"><label>Dog name</label><input data-dog-name autocomplete="off"></div>
         <div class="field"><label>Dog size</label><select data-dog-size><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div>
+        <div class="field"><label>Breed</label><input data-dog-breed placeholder="Staffie, Pitbull, Cavoodle..."></div>
         <div class="field"><label>Service</label><select data-dog-service><option value="">Choose service</option><option>Full Groom</option><option>Wash & Dry</option><option>Face Tidy</option><option>Nail Trim</option><option>Teeth Brush</option><option>Flea Shampoo</option></select></div>
       </div>`;
     card.querySelector('.remove-dog-btn').onclick = () => { card.remove(); refreshDogLabels(form); };
     list.appendChild(card);
     refreshDogLabels(form);
-    card.querySelector('[data-dog-name]')?.focus();
+    card.querySelector('[data-dog-breed]')?.focus();
   }
 
   function installMultiDogUi(form) {
     if (form.querySelector('.dog-enquiry-panel')) return;
     installBookingPolishStyles();
+    ensureFirstBreedField(form);
     const serviceField = form.service?.closest('.form-grid');
     if (!serviceField) return;
     const panel = document.createElement('section');
     panel.className = 'dog-enquiry-panel';
     panel.innerHTML = `
       <div class="dog-panel-head">
-        <div class="dog-panel-title"><strong>Dogs for this enquiry</strong><span>Add each dog so the team can plan the right time, service and coat care.</span></div>
+        <div class="dog-panel-title"><strong>Dogs for this enquiry</strong><span>Breed matters. Please add size and breed for every dog, for example Tiny Staffie or Large Pitbull.</span></div>
         <button class="add-dog-btn" type="button">+ Add dog</button>
       </div>
       <div class="dog-list" aria-live="polite"></div>
@@ -202,10 +166,7 @@
     const form = document.getElementById('bookingForm');
     if (!form) return;
     installMultiDogUi(form);
-    form.onsubmit = event => {
-      event.preventDefault();
-      submitBookingWithSmsFallback(form);
-    };
+    form.onsubmit = event => { event.preventDefault(); submitBookingWithSmsFallback(form); };
   }
 
   window.fetch = (input, init) => {
