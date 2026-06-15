@@ -1,85 +1,43 @@
-# Barking Mad Barbers - Python Render build
+# Barking Mad Barbers Static Website
 
-This is the GitHub-ready version for the current Render Python setup.
+This version is fully static. It does not need Python, FastAPI, env vars, API keys, JWTs, Google auth, Gemini, OpenAI, a database, or any backend service.
 
-## Render settings
+## How enquiries work
 
-- Root directory: `backend`
-- Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn server:app --host 0.0.0.0 --port $PORT`
-- Runtime: Python 3
+- Booking requests open a ready-made SMS to `027 247 2493`.
+- Contact messages open a ready-made SMS to `027 247 2493`.
+- Family/gallery photo submissions open an email to `barkingmadbarbers@gmail.com`.
+- The helper page is a local FAQ-style helper, not AI.
+- Saved customer details are stored only in the visitor's browser.
+- The admin page is only a local browser inbox for testing messages created on that same device.
 
-## Env variables to add in Render
+Because there is no backend, there is no shared admin database, login system, Google sign-in verification, AI chat logging, user blocking, persistent upload storage, or server-side email notifications. Real customer enquiries arrive by text or email.
 
-```text
-ADMIN_EMAILS
-ADMIN_PASSWORD
-ALLOWED_ORIGIN
-APP_URL
-CORS_ORIGINS
-GEMINI_API_KEY
-GEMINI_MODEL
-GOOGLE_CLIENT_ID
-JWT-SECRET
-JWT_SECRET
-OPENAI_API_KEY
-REACT_APP_BACKEND_URL
-SERVE_FRONTEND
-DATA_DIR
-```
+## Hosting
 
-`JWT_SECRET` should be set even if `JWT-SECRET` already exists. The backend accepts both names, but `JWT_SECRET` is the safest Render env name.
+Any static host can serve this site:
 
-Admin/customer records are stored in SQLite at `DATA_DIR/barking_mad.sqlite3`. On Render, add a persistent disk and set `DATA_DIR` to the mounted path, for example `/var/data`. Without a persistent disk, Render can still clear local files during rebuilds.
+- GitHub Pages
+- Netlify
+- Vercel static hosting
+- Cloudflare Pages
+- A normal static web server
 
-Optional email notifications for bookings, contact messages, gallery submissions, and requests use these env vars when configured:
+The root files are:
 
 ```text
-SMTP_HOST
-SMTP_PORT
-SMTP_USER
-SMTP_PASSWORD
-SMTP_FROM
-SMTP_TLS
-ADMIN_NOTIFICATION_EMAILS
+index.html
+static-site.js
+CNAME
+assets/
 ```
 
-## Admin security
+For path routes like `/book`, `/services`, `/helper`, and `/admin`, configure your static host to fall back to `index.html`.
 
-- Public registration is blocked for emails listed in `ADMIN_EMAILS`.
-- Admin routes require a JWT with `is_admin: true`.
-- Admin tokens are only issued when the email is in `ADMIN_EMAILS` and the admin password is correct, or when Google returns a verified email that is in `ADMIN_EMAILS`.
-- Google sign-in must use the same `GOOGLE_CLIENT_ID` configured in Render and Google Cloud.
+## Local preview
 
-## Site paths
+Open `index.html` in a browser, or serve the folder with any static server.
 
-```text
-/
-/services
-/Sanctuary
-/sanctuary
-/our-family
-/team
-/book
-/helper
-/contact
-/sign-in
-/admin
-```
-
-## File structure
-
-```text
-backend/
-  server.py
-  requirements.txt
-  static/
-    index.html
-    assets/
-      brand-logo.png
-      favicon.png
-      hero-advert.png
-      team-beach.webp
-      team-dog.webp
-README.md
-```
+No build command is required.
+No start command is required.
+No environment variables are required.
