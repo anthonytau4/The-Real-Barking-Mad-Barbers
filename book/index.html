@@ -1,129 +1,33 @@
 <!doctype html>
-<meta charset="utf-8">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Barking Mad Barbers</title>
-<script>
-(() => {
-  const nativeFetch = window.fetch.bind(window);
-  const services = ['Full Groom', 'Wash & Dry', 'Face Tidy', 'Nail Trim', 'Teeth Brush', 'Flea Shampoo'];
-  const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const formData = form => Object.fromEntries(new FormData(form).entries());
-
-  function installStyle() {
-    if (document.getElementById('bmb-book-live-style')) return;
-    const style = document.createElement('style');
-    style.id = 'bmb-book-live-style';
-    style.textContent = `.booking-shell{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-form-card{background:#fff;border:1px solid rgba(183,131,42,.24);border-radius:30px;padding:0;box-shadow:0 28px 70px rgba(18,16,11,.13);overflow:hidden}.booking-form-head{background:#0a0907;color:#fff;padding:24px 26px;display:flex;justify-content:space-between;gap:16px;align-items:center;border-bottom:4px solid #c69b49}.booking-form-head h3{color:#fff;font-size:30px;margin:0}.booking-form-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-form-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.sms-notice h3{font-size:28px;margin:0 0 10px}.sms-notice p{color:#18140c;font-weight:760;line-height:1.6}.dog-list{display:grid;gap:14px}.dog-entry{border:1px solid rgba(183,131,42,.30);background:linear-gradient(180deg,#fffdf8,#fff8ed);border-radius:24px;overflow:hidden;box-shadow:0 14px 30px rgba(18,16,11,.07)}.dog-entry-head{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#17140f;color:#fff;padding:13px 16px}.dog-entry-title{font-weight:950;color:#fff}.dog-entry-fields{display:grid;gap:14px;padding:16px}.service-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.service-stack label{display:flex;align-items:center;gap:10px;border:1px solid rgba(183,131,42,.22);background:#fff;border-radius:16px;padding:11px 12px;font-size:14px}.service-stack input{width:18px;height:18px;margin:0;accent-color:#b7832a;box-shadow:none}.add-dog-btn{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.remove-dog{padding:9px 12px;background:rgba(255,255,255,.10);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a;flex:0 0 auto;box-shadow:none}.sms-preview{width:100%;min-height:180px;margin-top:12px;border-radius:16px;background:#fff;border:1px solid rgba(183,131,42,.28);color:#17140f;font-weight:700;line-height:1.5}.main-time-muted{opacity:.48;filter:grayscale(.35)}@media(max-width:980px){.booking-shell{grid-template-columns:1fr}}@media(max-width:620px){.booking-form-head{display:block}.booking-form-body{padding:18px}.sms-notice{padding:18px}.service-stack{grid-template-columns:1fr}}`;
-    document.head.appendChild(style);
-  }
-
-  function dogEntry(index = 1) {
-    const serviceHtml = services.map(service => `<label><input type="checkbox" name="services" value="${esc(service)}">${esc(service)}</label>`).join('');
-    return `<div class="dog-entry"><div class="dog-entry-head"><div class="dog-entry-title">Dog ${index}</div><button class="btn btn-soft remove-dog" type="button">Remove</button></div><div class="dog-entry-fields"><div class="form-grid row"><div class="field"><label>Dog name</label><input name="dog_name" required placeholder="Buddy"></div><div class="field"><label>Dog size</label><select name="dog_size" required><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div></div><div class="form-grid row"><div class="field"><label>Breed</label><input name="breed" required placeholder="Staffie, Pitbull, Cavoodle..."></div><div class="field"><label>Preferred time for this dog</label><input name="dog_preferred_time" placeholder="Leave blank to use the main preferred time"></div></div><div class="field"><label>Services</label><div class="service-stack">${serviceHtml}</div></div></div></div>`;
-  }
-
-  function renderBookingPage() {
-    installStyle();
-    const app = document.getElementById('app') || document.querySelector('main');
-    if (!app) return;
-    app.innerHTML = `<section class="wrap"><div class="eyebrow kicker">Bookings only</div><h1 class="title page-title">Book a <span class="goldtext gold">Groom</span></h1><p class="lead">Send a booking request. Add every dog with size, breed, stacked services and optional dog-specific times.</p><div class="booking-shell"><form class="booking-form-card form" id="bookingForm"><div class="booking-form-head"><div><h3>Booking request</h3><p>Leave dog-specific times blank when every dog can use the main preferred time.</p></div><span class="tag goldtag">Text friendly</span></div><div class="booking-form-body"><div class="form-grid row"><div class="field"><label>Your name</label><input name="owner_name" required autocomplete="name"></div><div class="field"><label>Phone</label><input name="phone" required autocomplete="tel"></div></div><div class="form-grid row"><div class="field"><label>Email</label><input name="email" type="email" autocomplete="email"></div><div class="field"><label>Preferred date</label><input name="preferred_date" type="date"></div></div><div class="field" id="mainPreferredTimeField"><label>Main preferred time</label><input name="preferred_time" placeholder="Morning / afternoon / exact time"></div><div class="dog-list" id="dogsList">${dogEntry(1)}</div><button class="btn btn-soft add-dog-btn" type="button" id="addDogBtn">+ Add dog</button><div class="field"><label>Notes</label><textarea name="notes" placeholder="Coat condition, matting, fleas, nerves, anything we should know"></textarea></div><label class="sms-consent"><input name="booking_sms_consent" type="checkbox" required><span>I understand this enquiry will open as a text message to Barking Mad Barbers.</span></label><button class="btn btn-gold" type="submit">Send Booking Request</button><div id="bookingStatus"></div></div></form><aside class="booking-side"><div class="sms-notice"><h3>Texting works best</h3><p>Booking requests open your text app with the message ready to send. Please check the message, then send it through.</p><a class="btn btn-dark" id="textToBookBtn" href="sms:+64272472493">Text to Book</a></div><div class="card clean-card"><h3>Before you book</h3><p>Services can be stacked for each dog. Use the individual time only when one dog needs a different time from the others.</p></div></aside></div></section>`;
-    bindBooking();
-  }
-
-  function collectDogs() {
-    return [...document.querySelectorAll('.dog-entry')].map(entry => {
-      const get = name => entry.querySelector(`[name="${name}"]`)?.value?.trim() || '';
-      const stacked = [...entry.querySelectorAll('[name="services"]:checked')].map(input => input.value);
-      return { dog_name: get('dog_name'), dog_size: get('dog_size'), breed: get('breed'), dog_preferred_time: get('dog_preferred_time'), services: stacked, service: stacked.join(', ') };
-    });
-  }
-
-  function refreshDogEntries() {
-    const entries = [...document.querySelectorAll('.dog-entry')];
-    entries.forEach((entry, index) => {
-      entry.querySelector('.dog-entry-title').textContent = `Dog ${index + 1}`;
-      const remove = entry.querySelector('.remove-dog');
-      remove.classList.toggle('hidden', entries.length === 1);
-      remove.onclick = () => { entry.remove(); refreshDogEntries(); };
-      entry.querySelector('[name="dog_preferred_time"]').oninput = updateMainPreferredTimeState;
-    });
-    updateMainPreferredTimeState();
-  }
-
-  function updateMainPreferredTimeState() {
-    const main = document.querySelector('#bookingForm [name="preferred_time"]');
-    if (!main) return;
-    const dogs = collectDogs();
-    const allTimed = dogs.length > 0 && dogs.every(dog => dog.dog_preferred_time);
-    const field = document.getElementById('mainPreferredTimeField') || main.closest('.field');
-    main.disabled = allTimed;
-    main.placeholder = allTimed ? 'Using each dog time below' : 'Morning / afternoon / exact time';
-    if (allTimed) main.value = '';
-    field?.classList.toggle('main-time-muted', allTimed);
-  }
-
-  function dogSmsLine(dog, index) {
-    return `${index + 1} - ${dog.dog_name || 'Dog'} - ${[dog.dog_size, dog.breed].filter(Boolean).join(' ')}`.trim();
-  }
-
-  function bookingSmsBody(data) {
-    const dogs = collectDogs();
-    const preferred = (data.preferred_time || '').trim();
-    const date = (data.preferred_date || '').trim();
-    const dogTimes = dogs.map((dog, index) => ({ label: `Dog ${index + 1}`, time: (dog.dog_preferred_time || preferred || '').trim() }));
-    const hasDogTimes = dogTimes.some(item => item.time);
-    const appointment = hasDogTimes
-      ? ['Preferred times:', ...dogTimes.map(item => `${item.label} ${item.time ? `(${item.time})` : '(use the main preferred time)'}`)].join('\n')
-      : preferred && !/^whenever$/i.test(preferred)
-      ? `I would like my appointment at ${[preferred, date].filter(Boolean).join(' ')}`
-      : `I would like my appointment ${['whenever', date].filter(Boolean).join(' ')}`;
-    const serviceLines = dogs.flatMap((dog, index) => dog.services.length ? [`Dog ${index + 1} services: ${dog.services.join(', ')}`] : []);
-    const signoff = ['Cheers', data.owner_name || '', data.phone || ''].filter(Boolean).join(' ');
-    return ["Hi Barking Mad Barbers I'd like to enquire about a dog.", '', ...dogs.map(dogSmsLine), ...(serviceLines.length ? ['', ...serviceLines] : []), '', hasDogTimes && date ? `${appointment}\nPreferred date ${date}` : appointment, '', signoff].filter((line, index, lines) => line || lines[index - 1] !== '').join('\n');
-  }
-
-  function bookingSmsUrl(data) {
-    const encoded = encodeURIComponent(bookingSmsBody(data));
-    const number = '+64272472493';
-    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) return `sms:${number}&body=${encoded}`;
-    return `sms:${number}?body=${encoded}`;
-  }
-
-  function canAutoOpenSms() { return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent); }
-  async function copySms(text) { try { await navigator.clipboard.writeText(text); return true; } catch { return false; } }
-
-  function openSms(form) {
-    if (!form.reportValidity()) return;
-    const data = formData(form);
-    const url = bookingSmsUrl(data);
-    const body = bookingSmsBody(data);
-    const el = document.getElementById('bookingStatus');
-    if (el) {
-      el.innerHTML = `<div class="status good sms-open-card"><strong>Your text message is ready.</strong><p>If Messages does not open on this device, copy the text below and send it to 027 247 2493.</p><textarea class="sms-preview" readonly>${esc(body)}</textarea><div class="actions hero-actions"><button class="btn btn-gold" type="button" id="copySmsBtn">Copy text</button><a class="btn btn-soft" href="${url}">Open text message</a></div></div>`;
-      const copyBtn = document.getElementById('copySmsBtn');
-      if (copyBtn) copyBtn.onclick = async () => { copyBtn.textContent = await copySms(body) ? 'Copied' : 'Select and copy the text'; };
-    }
-    if (canAutoOpenSms()) window.location.href = url;
-  }
-
-  function bindBooking() {
-    const form = document.getElementById('bookingForm');
-    if (!form) return;
-    refreshDogEntries();
-    document.getElementById('addDogBtn').onclick = () => { document.getElementById('dogsList').insertAdjacentHTML('beforeend', dogEntry(document.querySelectorAll('.dog-entry').length + 1)); refreshDogEntries(); };
-    document.getElementById('textToBookBtn').onclick = event => { event.preventDefault(); openSms(form); };
-    form.onsubmit = event => { event.preventDefault(); openSms(form); };
-  }
-
-  window.fetch = (input, init) => nativeFetch(input, init);
-  history.replaceState(null, '', '/book');
-  nativeFetch('/index.html?bmb_v=' + Date.now(), { cache: 'reload' }).then(response => response.text()).then(html => {
-    document.open();
-    document.write(html);
-    document.close();
-    setTimeout(renderBookingPage, 0);
-  });
-})();
-</script>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Barking Mad Barbers | Premium Dog Grooming Tawa</title>
+  <meta name="description" content="Barking Mad Barbers dog grooming in Tawa, Wellington. Static SMS booking site with no backend dependency." />
+  <meta name="theme-color" content="#12100b" />
+  <link rel="icon" type="image/png" href="/assets/favicon.png" />
+  <style>
+    :root{--ink:#12100b;--muted:#62594f;--gold:#b7832a;--gold2:#e7c778;--cream:#fffaf2;--line:rgba(183,131,42,.24);--shadow:0 24px 70px rgba(18,16,11,.13);--max:1180px}
+    *{box-sizing:border-box}body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(180deg,#fff 0%,#fffdf8 34%,#f7efe1 100%);min-height:100vh}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}img{max-width:100%;display:block}.top-gold{height:5px;background:linear-gradient(90deg,#8f6116,#e7c778,#8f6116)}
+    .nav{position:sticky;top:0;z-index:20;padding:12px 14px 0}.nav-inner{max-width:var(--max);margin:auto;padding:14px 18px;display:flex;align-items:center;gap:18px;justify-content:space-between;background:#080806;border:1px solid rgba(216,179,106,.42);border-radius:999px;box-shadow:0 18px 44px rgba(18,16,11,.24)}.brand{display:flex;align-items:center;gap:14px;color:#fff;min-width:220px}.brand img{width:74px;height:46px;object-fit:contain;background:#fff;padding:3px}.brand-title{font-weight:950;letter-spacing:.08em;text-transform:uppercase;font-size:15px}.brand-sub{color:var(--gold2);font-weight:850;margin-top:6px}.nav-links{display:flex;align-items:center;gap:7px;justify-content:center;flex:1;flex-wrap:wrap}.nav-link{padding:12px 14px;border-radius:999px;color:#f5efe5;font-weight:850;white-space:nowrap}.nav-link:hover,.nav-link.active{background:linear-gradient(135deg,#b48731,#ead188);color:#14110d}.nav-actions{display:flex;gap:10px;align-items:center}.hamburger{display:none;border:0;background:#17140f;color:#fff;border-radius:18px;width:48px;height:48px;font-size:24px}
+    .btn{border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:14px 20px;font-weight:950;text-align:center}.btn-gold{background:linear-gradient(135deg,#a77a24,#ead188);color:#14110d;box-shadow:0 15px 28px rgba(183,131,42,.25)}.btn-dark{background:#17140f;color:white}.btn-soft{background:white;color:#17140f;box-shadow:inset 0 0 0 1px var(--line),0 12px 26px rgba(18,16,11,.08)}
+    .wrap{max-width:var(--max);margin:auto;padding:42px 20px}.hero{padding:34px 0}.hero-grid,.page-hero-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:34px;align-items:center}.eyebrow,.kicker{color:var(--gold);font-size:12px;letter-spacing:.2em;font-weight:950;text-transform:uppercase;margin-bottom:14px}.display,.page-title,.section-title{font-family:Georgia,"Times New Roman",serif;line-height:.94;letter-spacing:-.045em}.display{font-size:clamp(54px,7vw,94px);margin:0}.page-title{font-size:clamp(50px,7vw,84px);margin:0}.section-title{font-size:clamp(36px,4.5vw,62px);margin:0}.gold{color:var(--gold)}.lead{font-size:clamp(18px,2vw,23px);line-height:1.65;color:#4e463d;font-weight:620;margin:24px 0;max-width:620px}.hero-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.poster-card,.page-poster{border-radius:34px;padding:10px;background:linear-gradient(145deg,#fff,#f7ead5);box-shadow:var(--shadow)}.poster-card img,.page-poster img{border-radius:25px;background:#fff}.section{padding:36px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:24px}.section-copy{color:#665d52;line-height:1.7;font-weight:650;max-width:680px}.grid{display:grid;gap:18px}.grid-4{grid-template-columns:repeat(4,1fr)}.grid-3{grid-template-columns:repeat(3,1fr)}.grid-2,.split{grid-template-columns:repeat(2,1fr)}.card,.clean-card{background:rgba(255,255,255,.78);border:1px solid rgba(183,131,42,.16);border-radius:28px;padding:24px;box-shadow:0 12px 28px rgba(18,16,11,.09)}.card h3,.clean-card h3{font-family:Georgia,"Times New Roman",serif;font-size:28px;margin:0 0 10px}.card p,.clean-card p{color:#61584e;line-height:1.65;font-weight:610}.price-top{background:#17140f;color:white;padding:22px 24px;border-radius:24px 24px 0 0;display:flex;justify-content:space-between}.price-top h3{color:white}.from{color:var(--gold2);font-weight:950;font-size:22px}.price-card{padding:0;overflow:hidden}.price-list{padding:22px 24px;display:grid;gap:12px}.price-row{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(183,131,42,.28);padding-bottom:10px;font-weight:780}.icon-sq{width:56px;height:56px;border-radius:20px;background:linear-gradient(145deg,#fff6df,#fff);display:grid;place-items:center;color:var(--gold);font-size:28px;margin-bottom:16px}
+    .form{display:grid;gap:14px}.field{display:grid;gap:8px}label{font-weight:900;color:#2f2a24}input,select,textarea{width:100%;border:1px solid rgba(183,131,42,.25);background:rgba(255,255,255,.94);border-radius:18px;padding:14px 16px;color:#17140f;outline:none}textarea{min-height:122px;resize:vertical}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.status{border-radius:18px;padding:14px 16px;background:#fff;color:#3e362e;border:1px solid var(--line);font-weight:760;line-height:1.55}.status.good{border-color:rgba(49,128,66,.25);background:#f4fff7;color:#1f6430}.status.bad{border-color:rgba(150,39,39,.25);background:#fff5f3;color:#8d2a24}
+    .booking-shell{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start}.booking-form-card{background:#fff;border:1px solid rgba(183,131,42,.24);border-radius:30px;box-shadow:var(--shadow);overflow:hidden}.booking-form-head{background:#0a0907;color:#fff;padding:24px 26px;display:flex;justify-content:space-between;gap:16px;align-items:center;border-bottom:4px solid #c69b49}.booking-form-head h3{color:#fff;font-size:30px;margin:0}.booking-form-head p{margin:6px 0 0;color:#e6d9c3;font-weight:700}.booking-form-body{display:grid;gap:15px;padding:24px 26px 26px}.booking-side{display:grid;gap:16px}.sms-notice{background:linear-gradient(135deg,#d5b464,#9c782e);border-radius:26px;padding:22px;color:#100f0b;box-shadow:0 18px 38px rgba(156,120,46,.24)}.dog-list{display:grid;gap:14px}.dog-entry{border:1px solid rgba(183,131,42,.30);background:linear-gradient(180deg,#fffdf8,#fff8ed);border-radius:24px;overflow:hidden;box-shadow:0 14px 30px rgba(18,16,11,.07)}.dog-entry-head{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#17140f;color:#fff;padding:13px 16px}.dog-entry-title{font-weight:950;color:#fff}.dog-entry-fields{display:grid;gap:14px;padding:16px}.service-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.service-stack label{display:flex;align-items:center;gap:10px;border:1px solid rgba(183,131,42,.22);background:#fff;border-radius:16px;padding:11px 12px;font-size:14px}.service-stack input{width:18px;height:18px;margin:0;accent-color:#b7832a}.add-dog-btn{width:100%;padding:16px;border-radius:22px;border:1px dashed rgba(183,131,42,.5);background:#fffaf2;color:#17140f}.remove-dog{padding:9px 12px;background:rgba(255,255,255,.10);color:#fff}.sms-consent{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(183,131,42,.25);background:#fffaf2;border-radius:18px;padding:14px 16px;color:#40372d;font-weight:800;line-height:1.45}.sms-consent input{width:20px;height:20px;margin:1px 0 0;accent-color:#b7832a}.sms-preview{width:100%;min-height:180px;margin-top:12px;border-radius:16px;background:#fff;border:1px solid rgba(183,131,42,.28);color:#17140f;font-weight:700;line-height:1.5}.main-time-muted{opacity:.48;filter:grayscale(.35)}
+    .chat-shell{max-width:760px;margin:0 auto}.chat-phone{background:#fff;border:1px solid rgba(183,131,42,.24);border-radius:30px;overflow:hidden;box-shadow:var(--shadow);min-height:610px;display:grid;grid-template-rows:auto 1fr auto}.chat-head{display:flex;align-items:center;gap:12px;padding:16px 18px;background:linear-gradient(135deg,#17140f,#342715);color:#fff}.avatar{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f4e5c8,#c89136);color:#17140f;font-weight:950}.chat-feed{padding:18px;display:flex;flex-direction:column;gap:12px;overflow:auto;min-height:390px;background:linear-gradient(180deg,#fffaf2,#fbf3e7)}.msg-row{display:flex;gap:8px;align-items:flex-end}.msg-row.me{justify-content:flex-end}.bubble{max-width:76%;padding:12px 14px;border-radius:20px;font-weight:720;line-height:1.5;box-shadow:0 8px 18px rgba(18,16,11,.07);white-space:pre-wrap}.msg-row.bot .bubble{background:#fff;color:#272018;border-bottom-left-radius:7px}.msg-row.me .bubble{background:#11100d;color:#fff;border-bottom-right-radius:7px}.chat-composer{padding:14px;background:#fff;border-top:1px solid rgba(183,131,42,.18);display:grid;gap:12px}.quick-grid{display:flex;gap:8px;flex-wrap:wrap}.quick-grid button{border:1px solid rgba(183,131,42,.23);background:#fffaf2;border-radius:999px;padding:8px 11px;font-weight:850;color:#55483a;cursor:pointer}.chat-send{display:flex;gap:10px;align-items:end}.chat-send textarea{min-height:48px;border-radius:24px}.send-btn{width:50px;height:50px;border-radius:50%;border:0;background:linear-gradient(135deg,#9e6a18,#d5a84a);color:#fff;font-weight:950;cursor:pointer}.admin-list{display:grid;gap:14px;margin-top:18px}.booking-item{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 28px rgba(18,16,11,.09)}.booking-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}.tag{display:inline-flex;align-items:center;border-radius:999px;background:#17140f;color:#fff;padding:6px 11px;font-weight:900;font-size:12px}.tag.goldtag{background:#f4e5c8;color:#81560f}.note-list{display:grid;gap:12px}.note{display:flex;gap:12px;align-items:flex-start;color:#574f45;font-weight:680;line-height:1.55}.dot{width:9px;height:9px;border-radius:50%;background:var(--gold);margin-top:8px;flex:0 0 auto}.footer{margin-top:60px;background:#14110d;color:#fff;padding:42px 20px;border-top:4px solid var(--gold)}.footer-inner{max-width:var(--max);margin:auto;display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:28px}.footer h3{color:#fff}.footer p,.footer a{color:#e9ded0;line-height:1.7}.hidden{display:none!important}.mobile-drawer{display:none}
+    @media(max-width:980px){.nav-links,.nav-actions{display:none}.hamburger{display:block}.mobile-drawer.open{display:grid;gap:8px;padding:0 16px 16px;background:#080806;border:1px solid rgba(216,179,106,.34);border-top:0;border-radius:0 0 28px 28px;margin:0 8px}.mobile-drawer .nav-link,.mobile-drawer .btn{width:100%;justify-content:center}.hero-grid,.page-hero-grid,.booking-shell{grid-template-columns:1fr}.grid-4,.grid-3,.grid-2,.split{grid-template-columns:1fr 1fr}.footer-inner{grid-template-columns:1fr}.nav-inner{border-radius:28px}}
+    @media(max-width:620px){.wrap{padding:28px 14px}.grid-4,.grid-3,.grid-2,.split,.form-grid,.service-stack{grid-template-columns:1fr}.brand-title,.brand-sub{display:none}.brand{min-width:auto}.brand img{width:68px}.hero-actions .btn{width:100%}.page-title{font-size:52px}.booking-form-head{display:block}.booking-form-body{padding:18px}.bubble{max-width:86%}}
+  </style>
+</head>
+<body>
+  <div class="top-gold"></div>
+  <header class="nav"><div class="nav-inner"><a class="brand" href="/" data-link><img src="/assets/brand-logo.png" alt="Barking Mad Barbers logo"><div><div class="brand-title">Barking Mad Barbers</div><div class="brand-sub">Dog grooming - Tawa</div></div></a><nav class="nav-links"></nav><div class="nav-actions"><a href="/sign-in" class="nav-link" data-link>Saved details</a><a href="/book" class="btn btn-gold" data-link>Book Now</a></div><button class="hamburger" onclick="toggleMenu()" aria-label="Open menu">Menu</button></div><div class="mobile-drawer" id="mobileDrawer"></div></header>
+  <main id="app"></main>
+  <footer class="footer"><div class="footer-inner"><div><h3>Barking Mad <span class="gold">Barbers</span></h3><p>Premium dog grooming in Tawa, Wellington. This website runs fully static with text and email enquiries.</p></div><div><h3>Visit</h3><p>5A Tawa Street<br>Tawa, Wellington<br>Bookings only - no walk-ins</p></div><div><h3>Contact</h3><p><a href="sms:+64272472493">027 247 2493</a><br><a href="mailto:barkingmadbarbers@gmail.com">barkingmadbarbers@gmail.com</a><br>Mon-Sat 8:30-3:00</p></div></div></footer>
+  <script src="/static-site.js?v=20260616"></script>
+</body>
+</html>
