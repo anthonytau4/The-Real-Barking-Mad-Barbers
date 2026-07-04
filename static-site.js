@@ -1,12 +1,24 @@
 const AS="/assets/",PHONE="027 247 2493",SMS="+64272472493",EMAIL="barkingmadbarbers@gmail.com";
 const STORE="bmb_static_enquiries_v1",PROFILE="bmb_static_profile_v1";
-const nav=[["Services","/services"],["Boarding","/boarding"],["Sanctuary","/Sanctuary"],["Our Family","/our-family"],["Team","/team"],["Helper","/helper"],["Contact","/contact"]];
+const nav=[["Services","/services"],["Boarding","/boarding"]],aboutNav=[["Calm Sanctuary","/Sanctuary"],["Our Family","/our-family"],["Meet the Team","/team"],["Dog Care Helper","/helper"]],navEnd=[["Contact","/contact"]];
 const prices={full:[["Tiny","$80"],["Small","$90"],["Medium","$110"],["Large","$130"]],wash:[["Tiny","$45"],["Small","$50"],["Medium","$55"],["Large","$60"]],boarding:[["Overnight stays","by arrangement"],["Comfortable routine","meals, rest and attention"],["Family-style care","treated like one of our own"]],extras:[["Flea Shampoo","$20"],["Nail Trim","$20"],["Teeth Brush","$10"],["Face Tidy","$10"],["Anal Gland Expression","$20"]]};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const icon=t=>`<span class="icon-sq">${t}</span>`;
 const poster=c=>" <div class='"+(c||"poster-card")+"'><img src='"+AS+"hero-advert.png' alt='Barking Mad Barbers advert'></div>";
-function setNav(){const h=nav.map(([n,u])=>`<a href="${u}" data-link class="nav-link">${n}</a>`).join("");$(".nav-links").innerHTML=h;$("#mobileDrawer").innerHTML=h+`<a href="/sign-in" data-link class="nav-link">Saved details</a><a href="/book" data-link class="btn btn-gold">Book Now</a>`}
+const navLink=([n,u])=>`<a href="${u}" data-link class="nav-link">${n}</a>`;
+function setNav(){
+  $(".nav-links").innerHTML=nav.map(navLink).join("")+
+    `<div class="nav-drop"><button class="nav-link drop-btn" type="button" aria-haspopup="true" aria-expanded="false">About<span class="drop-caret">&#9662;</span></button><div class="drop-menu">${aboutNav.map(navLink).join("")}<div class="drop-divider"></div><a href="/sign-in" data-link class="nav-link">Saved details</a></div></div>`+
+    navEnd.map(navLink).join("");
+  $("#mobileDrawer").innerHTML=[...nav,...navEnd].map(navLink).join("")+
+    `<div class="drawer-label">More</div>`+aboutNav.map(navLink).join("")+
+    `<a href="/sign-in" data-link class="nav-link">Saved details</a><a href="/book" data-link class="btn btn-gold">Book Now</a>`;
+  const drop=$(".nav-drop"),btn=$(".drop-btn");
+  btn.onclick=e=>{e.stopPropagation();drop.classList.toggle("open");btn.setAttribute("aria-expanded",drop.classList.contains("open"))};
+  document.addEventListener("click",e=>{if(!drop.contains(e.target)){drop.classList.remove("open");btn.setAttribute("aria-expanded","false")}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){drop.classList.remove("open");btn.setAttribute("aria-expanded","false")}});
+}
 function key(p=location.pathname){p=decodeURIComponent(p).replace(/\/+$/,"").toLowerCase()||"/";return p==="/"?"home":p.includes("family")?"our-family":p.includes("board")?"boarding":p.includes("sanctuary")?"sanctuary":p.includes("service")?"services":p.includes("team")?"team":p.includes("book")?"book":p.includes("helper")||p.includes("help")?"helper":p.includes("contact")?"contact":p.includes("sign")||p.includes("login")?"sign-in":p.includes("admin")?"admin":"home"}
 function shell(title,kicker,copy,body){return `<div class="wrap page-hero"><div class="page-hero-grid"><div><div class="kicker">${kicker}</div><h1 class="page-title">${title}</h1><p class="lead">${copy}</p></div>${poster("page-poster")}</div></div><div class="wrap">${body}</div>`}
 function card(i,t,c){return `<article class="card">${icon(i)}<h3>${t}</h3><p>${c}</p></article>`}
@@ -27,8 +39,8 @@ function contact(){return shell('Contact <span class="gold">Us</span>',"Tawa, We
 function signIn(){return shell('Saved <span class="gold">Details</span>',"No backend account","Save your name, email and phone on this device only.",`<div class="split"><form class="card form" id="profileForm"><div class="field"><label>Name</label><input name="name"></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Phone</label><input name="phone"></div><button class="btn btn-gold" type="submit">Save Details</button><div id="signinStatus"></div></form><div class="clean-card" id="profileBox"></div></div>`)}
 function admin(){return shell('Static <span class="gold">Enquiries</span>',"No backend dashboard","This page shows enquiries saved on this browser only. Live customer enquiries arrive by text or email.",`<div class="clean-card"><h3>Server removed</h3><p>There is no server login, database, AI log, or shared admin dashboard now. To receive enquiries from customers, use the ready-made SMS and email flows on the public pages.</p><div class="hero-actions"><button class="btn btn-soft" onclick="renderInbox()">Refresh local inbox</button><button class="btn btn-soft" onclick="clearInbox()">Clear local inbox</button></div></div><section class="section"><div id="adminStatus"></div><div id="staticInbox" class="admin-list"></div></section>`)}
 function cta(){return `<section class="section"><div class="wrap"><div class="clean-card" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Ready?</div><h2 class="section-title">Make their next groom or stay feel premium.</h2><p class="section-copy">Book calm care at 5A Tawa Street, Tawa Wellington.</p></div><a href="/book" data-link class="btn btn-gold">Message to book</a></div></div></section>`}
-function render(){const views={home,services,boarding,sanctuary,"our-family":family,team,book,helper,contact,"sign-in":signIn,admin};$("#app").innerHTML=(views[key()]||home)();$$(".nav-link").forEach(a=>a.classList.toggle("active",key(new URL(a.href).pathname)===key()));bindLinks();bindForms();scrollTo(0,0);if(key()==="sign-in")renderProfile();if(key()==="admin")renderInbox()}
-function bindLinks(){$$("[data-link]").forEach(a=>a.onclick=e=>{let u=new URL(a.href);if(u.origin===location.origin){e.preventDefault();$("#mobileDrawer").classList.remove("open");history.pushState({},"",u.pathname);render()}})}
+function render(){const views={home,services,boarding,sanctuary,"our-family":family,team,book,helper,contact,"sign-in":signIn,admin};$("#app").innerHTML=(views[key()]||home)();$$("a.nav-link").forEach(a=>a.classList.toggle("active",key(new URL(a.href).pathname)===key()));const db=$(".drop-btn");if(db)db.classList.toggle("active",$$(".drop-menu a.nav-link").some(a=>key(new URL(a.href).pathname)===key()));bindLinks();bindForms();scrollTo(0,0);if(key()==="sign-in")renderProfile();if(key()==="admin")renderInbox()}
+function bindLinks(){$$("[data-link]").forEach(a=>a.onclick=e=>{let u=new URL(a.href);if(u.origin===location.origin){e.preventDefault();$("#mobileDrawer").classList.remove("open");$(".nav-drop")?.classList.remove("open");history.pushState({},"",u.pathname);render()}})}
 function toggleMenu(){$("#mobileDrawer").classList.toggle("open")}
 addEventListener("popstate",render);
 function fd(f){return Object.fromEntries(new FormData(f).entries())}
@@ -48,4 +60,35 @@ function reply(t){let q=t.toLowerCase();if(q.includes("board")||q.includes("stay
 function renderProfile(){let p=profile(),box=$("#profileBox");box.innerHTML=p?`<h3>Saved details</h3><p><strong>${esc(p.name||"")}</strong><br>${esc(p.email||"")}<br>${esc(p.phone||"")}</p><button class="btn btn-soft" onclick="localStorage.removeItem(PROFILE);render()">Clear saved details</button>`:"<h3>Your saved details</h3><p>Nothing saved on this browser yet.</p>"}
 function renderInbox(){let el=$("#staticInbox");if(!el)return;let a=JSON.parse(localStorage.getItem(STORE)||"[]");$("#adminStatus").innerHTML='<div class="status">Static mode: this only shows messages created on this browser. Customer messages arrive by text or email.</div>';el.innerHTML=a.length?a.map(x=>`<article class="booking-item"><div class="booking-top"><strong>${esc(x.type)}</strong><span class="tag">${esc(x.created_at)}</span></div><pre style="white-space:pre-wrap;font:inherit">${esc(JSON.stringify(x.data,null,2))}</pre></article>`).join(""):'<div class="status">No local enquiries saved on this browser.</div>'}
 function clearInbox(){localStorage.removeItem(STORE);renderInbox()}
-setNav();render();
+function dotField(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const c=document.createElement("canvas");c.id="dotField";c.setAttribute("aria-hidden","true");document.body.prepend(c);
+  const ctx=c.getContext("2d");let W=0,H=0,dots=[],mx=-9999,my=-9999;
+  const REPEL=140,PUSH=2.4,SPRING=.012,FRICTION=.88;
+  function seed(){
+    W=c.width=innerWidth;H=c.height=innerHeight;
+    const n=Math.max(40,Math.min(140,Math.round(W*H/15000)));
+    dots=Array.from({length:n},()=>{const hx=Math.random()*W,hy=Math.random()*H;
+      return{hx,hy,x:hx,y:hy,vx:0,vy:0,r:1+Math.random()*1.9,a:.2+Math.random()*.45,gold:Math.random()<.72,ph:Math.random()*6.283,sp:.002+Math.random()*.004}});
+  }
+  seed();addEventListener("resize",seed);
+  addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});
+  addEventListener("pointerdown",e=>{mx=e.clientX;my=e.clientY});
+  document.addEventListener("mouseleave",()=>{mx=my=-9999});
+  (function tick(t){
+    ctx.clearRect(0,0,W,H);
+    for(const d of dots){
+      const dx=d.x-mx,dy=d.y-my,dist=Math.hypot(dx,dy)||1;
+      if(dist<REPEL){const f=(REPEL-dist)/REPEL*PUSH;d.vx+=dx/dist*f;d.vy+=dy/dist*f}
+      const wob=Math.sin(t*d.sp+d.ph)*10;
+      d.vx+=(d.hx+wob-d.x)*SPRING;d.vy+=(d.hy-wob*.6-d.y)*SPRING;
+      d.vx*=FRICTION;d.vy*=FRICTION;d.x+=d.vx;d.y+=d.vy;
+      const agitated=Math.min(1,Math.hypot(d.vx,d.vy)/3);
+      ctx.beginPath();ctx.arc(d.x,d.y,d.r+agitated*.9,0,6.2832);
+      ctx.fillStyle=d.gold?`rgba(183,131,42,${Math.min(.85,d.a+agitated*.4)})`:`rgba(11,10,7,${d.a*.4+agitated*.2})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  })(0);
+}
+setNav();render();dotField();
