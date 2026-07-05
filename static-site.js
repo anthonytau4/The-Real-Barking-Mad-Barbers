@@ -5,7 +5,7 @@ const prices={full:[["Tiny","$80"],["Small","$90"],["Medium","$110"],["Large","$
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const icon=t=>`<span class="icon-sq">${t}</span>`;
-const poster=c=>" <div class='"+(c||"poster-card")+"'><img src='"+AS+"hero-advert.png' alt='Barking Mad Barbers advert'></div>";
+const poster=c=>" <div class='"+(c||"poster-card")+"'><img class='unveil' src='"+AS+"hero-advert.png' alt='Barking Mad Barbers advert'></div>";
 const navLink=([n,u])=>`<a href="${u}" data-link class="nav-link">${n}</a>`;
 function setNav(){
   $(".nav-links").innerHTML=nav.map(navLink).join("")+
@@ -20,15 +20,16 @@ function setNav(){
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){drop.classList.remove("open");btn.setAttribute("aria-expanded","false")}});
 }
 function key(p=location.pathname){p=decodeURIComponent(p).replace(/\/+$/,"").toLowerCase()||"/";return p==="/"?"home":p.includes("family")?"our-family":p.includes("board")?"boarding":p.includes("sanctuary")?"sanctuary":p.includes("service")?"services":p.includes("team")?"team":p.includes("book")?"book":p.includes("helper")||p.includes("help")?"helper":p.includes("contact")?"contact":p.includes("sign")||p.includes("login")?"sign-in":p.includes("admin")?"admin":"home"}
-function shell(title,kicker,copy,body){return `<div class="wrap page-hero"><div class="page-hero-grid"><div><div class="kicker">${kicker}</div><h1 class="page-title">${title}</h1><p class="lead">${copy}</p></div>${poster("page-poster")}</div></div><div class="wrap">${body}</div>`}
+function shell(title,kicker,copy,body){return `<div class="wrap page-hero"><div class="page-hero-grid"><div><div class="kicker">${kicker}</div><h1 class="page-title"><span class="rl"><span>${title}</span></span></h1><p class="lead fade-up">${copy}</p></div>${poster("page-poster")}</div></div><div class="wrap">${body}</div>`}
 function card(i,t,c){return `<article class="card">${icon(i)}<h3>${t}</h3><p>${c}</p></article>`}
 function price(t,from,rows,copy){return `<article class="card price-card"><div class="price-top"><h3>${t}</h3><div class="from">${from}</div></div><div class="price-list"><p>${copy}</p>${rows.map(r=>`<div class="price-row"><span>${r[0]}</span><strong>${r[1]}</strong></div>`).join("")}</div></article>`}
 function serviceBlock(){return `<section class="section"><div class="wrap"><div class="section-head"><div><div class="kicker">Services</div><h2 class="section-title">Grooms, stays and genuine care.</h2></div><a href="/book" data-link class="btn btn-dark">Book Now</a></div><div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Warm bath, blow dry, brush out, full body clip, face and feet finish, nail trim, ear cleaning and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Warm bath, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Home-style dog boarding for dogs who need a safe place to stay, with comfort, routine and plenty of human attention.")}</div></div></section>`}
-function home(){return `<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow">Tawa dog grooming & boarding</div><h1 class="display">Groomed with <span class="gold">Love.</span><br>Treated like <span class="gold">Family.</span></h1><p class="lead">We do more than beautiful grooms. We also offer dog boarding where your dog is cared for in a calm, homely setting, with comfort, routine and attention while you are away.</p><div class="hero-actions"><a href="/book" data-link class="btn btn-gold">Book Dog Care</a><a href="/services" data-link class="btn btn-soft">View Services</a></div><div class="lead"><strong>Bookings only - Mon-Sat 8:30-3:00</strong></div></div>${poster()}</div></section><section class="section"><div class="wrap"><div class="section-head"><div><div class="kicker">Why Barking Mad</div><h2 class="section-title">A premium groom or stay without the stress.</h2></div><p class="section-copy">Boarding should feel personal: your dog stays somewhere safe, follows their normal routine, gets individual attention and is treated like part of the family.</p></div><div class="grid grid-4">${card("Love","Calm Sanctuary","A peaceful, low-stress space where dogs feel safe and loved.")}${card("Home","Dog Boarding","A homely stay with care, company and routine while you are away.")}${card("Pro","Experienced Team","Skilled grooming with patient one-on-one attention.")}${card("Text","Text Bookings","Booking requests open your text app so enquiries are simple.")}</div></div></section>${serviceBlock()}${cta()}`}
+function brandTitle(){return `<section class="brand-hero"><span class="float-tool ft-a" aria-hidden="true"><span class="tool-glyph">&#9986;</span></span><span class="float-tool ft-b" aria-hidden="true"><span class="tool-glyph">&#9986;</span></span><h1 class="brand-display brand-static">Barking Mad <span class="gold">Barbers</span></h1><canvas id="brandCanvas" class="hidden" aria-hidden="true"></canvas><div class="brand-rule"></div></section>`}
+function home(){return `${brandTitle()}<section class="hero"><div class="wrap hero-grid"><div><div class="eyebrow">Tawa dog grooming & boarding</div><h1 class="display"><span class="rl"><span>Groomed with <span class="gold">Love.</span></span></span><span class="rl"><span>Treated like <span class="gold">Family.</span></span></span></h1><p class="lead fade-up">We do more than beautiful grooms. We also offer dog boarding where your dog is cared for in a calm, homely setting, with comfort, routine and attention while you are away.</p><div class="hero-actions fade-up"><a href="/book" data-link class="btn btn-gold">Book Dog Care</a><a href="/services" data-link class="btn btn-soft">View Services</a></div><div class="lead"><strong>Bookings only - Mon-Sat 8:30-3:00</strong></div></div>${poster()}</div></section><section class="section"><div class="wrap"><div class="section-head"><div><div class="kicker">Why Barking Mad</div><h2 class="section-title">A premium groom or stay without the stress.</h2></div><p class="section-copy">Boarding should feel personal: your dog stays somewhere safe, follows their normal routine, gets individual attention and is treated like part of the family.</p></div><div class="grid grid-4">${card("Love","Calm Sanctuary","A peaceful, low-stress space where dogs feel safe and loved.")}${card("Home","Dog Boarding","A homely stay with care, company and routine while you are away.")}${card("Pro","Experienced Team","Skilled grooming with patient one-on-one attention.")}${card("Text","Text Bookings","Booking requests open your text app so enquiries are simple.")}</div></div></section>${serviceBlock()}${cta()}`}
 function services(){return shell('Services & <span class="gold">Prices</span>',"Premium grooming & boarding","Choose the service that fits your dog. Grooming prices can change if the coat is badly matted or needs extra time; boarding is arranged by enquiry so we can match your dog's needs.",`<div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Warm bath, shampoo and condition, blow dry, brush out, full body clip, face and feet finish, nail trim, ear cleaning and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Warm bath, shampoo and condition, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Safe, comfortable boarding that feels less like a kennel and more like staying with people who know and care for dogs.")}</div><section class="section"><div class="section-head"><div><div class="kicker">Extras</div><h2 class="section-title">Add-on care.</h2></div></div><div class="grid grid-3">${prices.extras.map(r=>`<article class="clean-card">${icon("Care")}<h3>${r[0]}</h3><p><strong class="gold">${r[1]}</strong> added to your groom when needed.</p></article>`).join("")}</div></section>`)}
 function boarding(){return shell('Dog <span class="gold">Boarding</span>',"Loved like family","When your dog boards with Barking Mad Barbers, the goal is simple: a safe, comfortable stay with familiar routines, real attention and the kind of care you would want from someone looking after your own dog.",`<div class="grid grid-3">${card("Home","A homely stay","Boarding is arranged to feel personal and settled, with comfort, company and calm care.")}${card("Care","Routine matters","Tell us about meals, medication, sleep habits and little quirks so we can keep things familiar.")}${card("Love","Family-style attention","We do not just watch dogs. We get to know them, reassure them and treat them like part of the family.")}</div><section class="section"><div class="clean-card" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Boarding enquiries</div><h2 class="section-title">Tell us about your dog.</h2><p class="section-copy">Send dates, breed, size, temperament, feeding needs and anything that helps us understand the stay.</p></div><a href="/book" data-link class="btn btn-gold">Ask about boarding</a></div></section>`)}
 function sanctuary(){return shell('Calm <span class="gold">Sanctuary</span>',"Low-stress care","A clean, quiet, appointment-only space made for dogs who need patience, routine and kindness.",`<div class="grid grid-3">${card("Love","Calm first","We work around comfort, coat condition and confidence.")}${card("Paw","One-on-one attention","Less rush, less chaos, more care for each dog.")}${card("Care","Clean products","Gentle grooming products and tidy finish standards.")}</div>`)}
-function team(){return shell('Meet the <span class="gold">Team</span>',"Our team","The team page keeps your supplied images and the premium poster style.",`<div class="grid grid-2"><article class="clean-card"><img src="${AS}team-dog.webp" alt="Team member with dog" style="border-radius:24px;aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Dog-loving care</h3><p>Friendly, calm and focused on a finish that suits your dog.</p></article><article class="clean-card"><img src="${AS}team-beach.webp" alt="Barking Mad family photo" style="border-radius:24px;aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Local Tawa family</h3><p>A Wellington grooming and boarding business with a warm, personal feel.</p></article></div>`)}
+function team(){return shell('Meet the <span class="gold">Team</span>',"Our team","The team page keeps your supplied images and the premium poster style.",`<div class="grid grid-2"><article class="clean-card"><img class="unveil" src="${AS}team-dog.webp" alt="Team member with dog" style="border-radius:24px;aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Dog-loving care</h3><p>Friendly, calm and focused on a finish that suits your dog.</p></article><article class="clean-card"><img class="unveil" src="${AS}team-beach.webp" alt="Barking Mad family photo" style="border-radius:24px;aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Local Tawa family</h3><p>A Wellington grooming and boarding business with a warm, personal feel.</p></article></div>`)}
 function family(){return shell('Our <span class="gold">Family</span>',"Loved like our own","Send photo links or family page requests directly by email.",`<div class="split"><form class="card form" id="galleryForm"><h3>Share your dog</h3><div class="form-grid"><div class="field"><label>Your name</label><input name="owner_name"></div><div class="field"><label>Email</label><input name="email" type="email"></div></div><div class="field"><label>Dog name</label><input name="dog_name" required></div><div class="field"><label>Photo URL</label><input name="image_url" placeholder="Paste a photo link"></div><div class="field"><label>Caption</label><textarea name="caption"></textarea></div><button class="btn btn-gold" type="submit">Email Photo Details</button><div id="galleryStatus"></div></form><form class="card form" id="requestForm"><h3>Send a request</h3><div class="form-grid"><div class="field"><label>Your name</label><input name="name" required></div><div class="field"><label>Email</label><input name="email" type="email"></div></div><div class="form-grid"><div class="field"><label>Phone</label><input name="phone"></div><div class="field"><label>Request type</label><input name="request_type"></div></div><div class="field"><label>Message</label><textarea name="message" required></textarea></div><button class="btn btn-dark" type="submit">Text Request</button><div id="requestStatus"></div></form></div>`)}
 function serviceOptions(){return["Full Groom","Wash & Dry","Face Tidy","Nail Trim","Teeth Brush","Flea Shampoo"].map(s=>`<label><input type="checkbox" name="services" value="${s}">${s}</label>`).join("")}
 function dogEntry(i=1){return `<div class="dog-entry"><div class="dog-entry-head"><div class="dog-entry-title">Dog ${i}</div><button class="btn btn-soft remove-dog" type="button">Remove</button></div><div class="dog-entry-fields"><div class="form-grid"><div class="field"><label>Dog name</label><input name="dog_name" required></div><div class="field"><label>Dog size</label><select name="dog_size" required><option value="">Choose size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div></div><div class="form-grid"><div class="field"><label>Breed</label><input name="breed" required></div><div class="field"><label>Preferred time for this dog</label><input name="dog_preferred_time" placeholder="Leave blank for main time"></div></div><div class="field"><label>Grooming services</label><div class="service-stack">${serviceOptions()}</div></div></div></div>`}
@@ -39,8 +40,18 @@ function contact(){return shell('Contact <span class="gold">Us</span>',"Tawa, We
 function signIn(){return shell('Saved <span class="gold">Details</span>',"No backend account","Save your name, email and phone on this device only.",`<div class="split"><form class="card form" id="profileForm"><div class="field"><label>Name</label><input name="name"></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Phone</label><input name="phone"></div><button class="btn btn-gold" type="submit">Save Details</button><div id="signinStatus"></div></form><div class="clean-card" id="profileBox"></div></div>`)}
 function admin(){return shell('Static <span class="gold">Enquiries</span>',"No backend dashboard","This page shows enquiries saved on this browser only. Live customer enquiries arrive by text or email.",`<div class="clean-card"><h3>Server removed</h3><p>There is no server login, database, AI log, or shared admin dashboard now. To receive enquiries from customers, use the ready-made SMS and email flows on the public pages.</p><div class="hero-actions"><button class="btn btn-soft" onclick="renderInbox()">Refresh local inbox</button><button class="btn btn-soft" onclick="clearInbox()">Clear local inbox</button></div></div><section class="section"><div id="adminStatus"></div><div id="staticInbox" class="admin-list"></div></section>`)}
 function cta(){return `<section class="section"><div class="wrap"><div class="clean-card" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Ready?</div><h2 class="section-title">Make their next groom or stay feel premium.</h2><p class="section-copy">Book calm care at 5A Tawa Street, Tawa Wellington.</p></div><a href="/book" data-link class="btn btn-gold">Message to book</a></div></div></section>`}
-function render(){const views={home,services,boarding,sanctuary,"our-family":family,team,book,helper,contact,"sign-in":signIn,admin};$("#app").innerHTML=(views[key()]||home)();$$("a.nav-link").forEach(a=>a.classList.toggle("active",key(new URL(a.href).pathname)===key()));const db=$(".drop-btn");if(db)db.classList.toggle("active",$$(".drop-menu a.nav-link").some(a=>key(new URL(a.href).pathname)===key()));bindLinks();bindForms();scrollTo(0,0);if(key()==="sign-in")renderProfile();if(key()==="admin")renderInbox()}
-function bindLinks(){$$("[data-link]").forEach(a=>a.onclick=e=>{let u=new URL(a.href);if(u.origin===location.origin){e.preventDefault();$("#mobileDrawer").classList.remove("open");$(".nav-drop")?.classList.remove("open");history.pushState({},"",u.pathname);render()}})}
+function render(){const views={home,services,boarding,sanctuary,"our-family":family,team,book,helper,contact,"sign-in":signIn,admin};const app=$("#app");app.classList.remove("page-enter","page-exit");void app.offsetWidth;app.innerHTML=(views[key()]||home)();app.classList.add("page-enter");$$("a.nav-link").forEach(a=>a.classList.toggle("active",key(new URL(a.href).pathname)===key()));const db=$(".drop-btn");if(db)db.classList.toggle("active",$$(".drop-menu a.nav-link").some(a=>key(new URL(a.href).pathname)===key()));bindLinks();bindForms();scrollTo(0,0);if(key()==="sign-in")renderProfile();if(key()==="admin")renderInbox();initBrand();collectUnveil();initCardSprings()}
+let navTimer=null;
+function navigate(path){
+  if(navTimer)return;
+  if(key(path)===key()){history.pushState({},"",path);scrollTo(0,0);return}
+  const app=$("#app");
+  if(REDUCED){history.pushState({},"",path);render();return}
+  app.classList.remove("page-enter");
+  app.classList.add("page-exit");
+  navTimer=setTimeout(()=>{navTimer=null;history.pushState({},"",path);render()},230);
+}
+function bindLinks(){$$("[data-link]").forEach(a=>a.onclick=e=>{let u=new URL(a.href);if(u.origin===location.origin){e.preventDefault();$("#mobileDrawer").classList.remove("open");$(".nav-drop")?.classList.remove("open");navigate(u.pathname)}})}
 function toggleMenu(){$("#mobileDrawer").classList.toggle("open")}
 addEventListener("popstate",render);
 function fd(f){return Object.fromEntries(new FormData(f).entries())}
@@ -64,7 +75,7 @@ function dotField(){
   if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
   const c=document.createElement("canvas");c.id="dotField";c.setAttribute("aria-hidden","true");document.body.prepend(c);
   const ctx=c.getContext("2d");let W=0,H=0,dots=[],mx=-9999,my=-9999;
-  const REPEL=140,PUSH=2.4,SPRING=.012,FRICTION=.88;
+  const REPEL=140,PUSH=1.5,SPRING=.012,FRICTION=.9;
   function seed(){
     W=c.width=innerWidth;H=c.height=innerHeight;
     const n=Math.max(40,Math.min(140,Math.round(W*H/15000)));
@@ -90,5 +101,114 @@ function dotField(){
     }
     requestAnimationFrame(tick);
   })(0);
+}
+const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MOUSE={x:-9999,y:-9999};
+addEventListener("pointermove",e=>{MOUSE.x=e.clientX;MOUSE.y=e.clientY});
+document.addEventListener("mouseleave",()=>{MOUSE.x=MOUSE.y=-9999});
+let brandState=null;
+function initBrand(){
+  brandState=null;
+  const cv=document.getElementById("brandCanvas");
+  if(!cv||REDUCED)return;
+  const hero=cv.closest(".brand-hero"),staticEl=hero.querySelector(".brand-static"),tools=[...hero.querySelectorAll(".float-tool")];
+  const dpr=Math.min(2,devicePixelRatio||1),ctx=cv.getContext("2d");
+  const state={cv,parts:[],w:0,h:0};
+  function build(){
+    const w=Math.max(280,Math.min(1140,hero.clientWidth-40)),narrow=w<560;
+    const lines=narrow?["BARKING MAD","BARBERS"]:["BARKING MAD BARBERS"];
+    const font=s=>`600 ${s}px Georgia, "Times New Roman", serif`;
+    const off=document.createElement("canvas"),oc=off.getContext("2d");
+    let fs=narrow?w/6.4:w/9.5;
+    oc.font=font(fs);
+    const widest=Math.max(...lines.map(ln=>oc.measureText(ln).width));
+    fs*=Math.min(1,(w*.96)/widest);
+    const h=Math.round(fs*1.3*lines.length+16);
+    state.w=w;state.h=h;
+    cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+    cv.style.width=w+"px";cv.style.height=h+"px";
+    off.width=w;off.height=h;
+    oc.fillStyle="#000";oc.textAlign="center";oc.textBaseline="middle";
+    oc.font=font(fs);
+    lines.forEach((ln,i)=>oc.fillText(ln,w/2,(i+.62)*fs*1.3+8));
+    const img=oc.getImageData(0,0,w,h).data;
+    state.amp=Math.max(1,Math.min(2.5,fs*.022));
+    let gap=Math.max(3,Math.round(w/230)),pts=[];
+    do{
+      pts=[];
+      for(let y=2;y<h;y+=gap)for(let x=2;x<w;x+=gap)if(img[(y*w+x)*4+3]>128)pts.push([x,y]);
+      if(pts.length>1700)gap++;
+    }while(pts.length>1700);
+    state.parts=pts.map(([x,y])=>{
+      const g=x/w,R=Math.round(143+(231-143)*g),G=Math.round(97+(199-97)*g),B=Math.round(22+(120-22)*g);
+      return{hx:x,hy:y,x:x+(Math.random()-.5)*w*.4,y:y+(Math.random()-.5)*120,vx:0,vy:0,
+        r:gap*.36+Math.random()*.65,ph:Math.random()*6.283,c:`rgba(${R},${G},${B},`,a:.7+Math.random()*.3};
+    });
+  }
+  build();
+  staticEl.classList.add("sr-only");
+  cv.classList.remove("hidden");
+  brandState=state;
+  let lastW=hero.clientWidth;
+  const onResize=()=>{if(brandState===state&&cv.isConnected&&Math.abs(hero.clientWidth-lastW)>40){lastW=hero.clientWidth;build()}};
+  addEventListener("resize",onResize);
+  (function loop(t){
+    if(!cv.isConnected||brandState!==state){removeEventListener("resize",onResize);return}
+    const r=cv.getBoundingClientRect(),mx=MOUSE.x-r.left,my=MOUSE.y-r.top;
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,state.w,state.h);
+    for(const p of state.parts){
+      const amp=state.amp||2.4,tx=p.hx+Math.sin(t*.0011+p.ph)*amp,ty=p.hy+Math.cos(t*.0009+p.ph)*amp*.9;
+      const dx=p.x-mx,dy=p.y-my,dist=Math.hypot(dx,dy)||1;
+      if(dist<95){const f=(95-dist)/95*1.3;p.vx+=dx/dist*f;p.vy+=dy/dist*f}
+      p.vx+=(tx-p.x)*.045;p.vy+=(ty-p.y)*.045;
+      p.vx*=.86;p.vy*=.86;p.x+=p.vx;p.y+=p.vy;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fillStyle=p.c+p.a+")";ctx.fill();
+    }
+    const px=(MOUSE.x/innerWidth-.5),py=(MOUSE.y/innerHeight-.5);
+    tools.forEach((tl,i)=>{if(MOUSE.x>-999)tl.style.transform=`translate(${px*(i?-16:24)}px,${py*(i?-12:18)}px)`});
+    requestAnimationFrame(loop);
+  })(0);
+}
+let unveilEls=[];
+function collectUnveil(){unveilEls=REDUCED?[]:$$(".unveil");applyUnveil()}
+function applyUnveil(){
+  const vh=innerHeight;
+  for(const el of unveilEls){
+    if(!el.isConnected)continue;
+    const r=el.getBoundingClientRect();
+    let p=(vh-r.top)/(vh*.55);p=Math.max(0,Math.min(1,p));
+    const e=1-Math.pow(1-p,2);
+    el.style.clipPath=`inset(${(1-e)*16}% ${(1-e)*26}% round 24px)`;
+    el.style.transform=`scale(${1.32-.32*e})`;
+    el.style.filter=`brightness(${.55+.45*e})`;
+  }
+}
+addEventListener("scroll",()=>requestAnimationFrame(applyUnveil),{passive:true});
+addEventListener("resize",()=>requestAnimationFrame(applyUnveil));
+function initCardSprings(){
+  if(REDUCED)return;
+  $$(".price-card").forEach(card=>{
+    let rx=0,ry=0,s=1,vrx=0,vry=0,vs=0,trx=0,tryy=0,ts=1,raf=null,hover=false;
+    const STIFF=.14,DAMP=.74;
+    function loop(){
+      vrx+=(trx-rx)*STIFF;vry+=(tryy-ry)*STIFF;vs+=(ts-s)*STIFF;
+      vrx*=DAMP;vry*=DAMP;vs*=DAMP;
+      rx+=vrx;ry+=vry;s+=vs;
+      card.style.transform=`perspective(900px) rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg) scale(${s.toFixed(4)})`;
+      const energy=Math.abs(vrx)+Math.abs(vry)+Math.abs(vs)+Math.abs(trx-rx)+Math.abs(tryy-ry)+Math.abs(ts-s);
+      if(hover||energy>.003)raf=requestAnimationFrame(loop);
+      else{raf=null;card.style.transform=""}
+    }
+    const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
+    card.addEventListener("pointermove",e=>{
+      if(e.pointerType&&e.pointerType!=="mouse")return;
+      const r=card.getBoundingClientRect();
+      hover=true;
+      tryy=((e.clientX-r.left)/r.width-.5)*9;
+      trx=(.5-(e.clientY-r.top)/r.height)*8;
+      ts=1.035;kick();
+    });
+    card.addEventListener("pointerleave",()=>{hover=false;trx=0;tryy=0;ts=1;kick()});
+  });
 }
 setNav();render();dotField();
