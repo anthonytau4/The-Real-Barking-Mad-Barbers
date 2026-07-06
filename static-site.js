@@ -111,7 +111,7 @@ function toggleMenu(){$("#mobileDrawer").classList.toggle("open")}
 addEventListener("popstate",render);
 function fd(f){return Object.fromEntries(new FormData(f).entries())}
 function dogs(){return $$(".dog-card-fun").map(e=>{let g=n=>e.querySelector(`[name="${n}"]`)?.value.trim()||"",services=[...e.querySelectorAll('[name="services"]:checked')].map(x=>x.value);return{dog_name:g("dog_name"),dog_size:g("dog_size"),breed:g("breed"),dog_preferred_time:g("dog_preferred_time"),service:services.join(", "),services}})}
-function refreshDogs(){$$(".dog-card-fun").forEach((e,i)=>{e.querySelector(".dog-label").textContent=`Dog ${i+1}`;let r=e.querySelector(".remove-dog");r.classList.toggle("hidden",$$(".dog-card-fun").length===1);r.onclick=()=>{e.remove();refreshDogs()}})}
+function refreshDogs(){$$(".dog-card-fun").forEach((e,i)=>{e.querySelector(".dog-label").textContent=`Dog ${i+1}`;let r=e.querySelector(".remove-dog");r.classList.toggle("hidden",$$(".dog-card-fun").length===1);r.onclick=()=>{e.remove();refreshDogs();updateWizard()}})}
 
 // === WIZARD LOGIC ===
 let currentStep=1;
@@ -129,7 +129,8 @@ function wizardNext(){
   const inputs=slide.querySelectorAll("input[required],select[required],textarea[required]");
   for(const inp of inputs){
     if(inp.closest(".hidden"))continue;
-    if(!inp.value.trim()){inp.focus();inp.reportValidity();return}
+    if(inp.type==="checkbox"){if(!inp.checked){inp.focus();inp.reportValidity();return}}
+    else if(!inp.value.trim()){inp.focus();inp.reportValidity();return}
   }
   currentStep++;
   updateWizard();
