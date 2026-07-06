@@ -238,7 +238,7 @@
     .wizard-connector.done{background:var(--gold)}
     .wizard-slide{display:none;padding:28px;animation:slideUp .5s cubic-bezier(.22,.8,.3,1) both}
     .wizard-slide.active{display:block}
-    .wizard-emoji{font-size:48px;text-align:center;margin-bottom:16px;animation:pawBounce 2s ease-in-out infinite}
+    .wizard-emoji{width:56px;height:56px;border-radius:18px;background:linear-gradient(145deg,#fdf3dc,#fff);box-shadow:inset 0 0 0 1px rgba(183,131,42,.28);display:grid;place-items:center;color:var(--gold3);font-size:13px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;margin:0 auto 16px;animation:pawBounce 2s ease-in-out infinite}
     .wizard-title{font-family:Georgia,"Times New Roman",serif;font-size:24px;text-align:center;margin:0 0 8px;letter-spacing:-.02em}
     .wizard-subtitle{text-align:center;color:var(--muted);font-weight:550;margin:0 0 22px}
     .wizard-nav{display:flex;gap:12px;justify-content:center;margin-top:22px}
@@ -246,13 +246,13 @@
     .service-pick-card{border:2px solid var(--hairline);border-radius:22px;padding:22px;text-align:center;cursor:pointer;transition:all .3s;background:#fff}
     .service-pick-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 12px 30px rgba(183,131,42,.15)}
     .service-pick-card.selected{border-color:var(--gold);background:linear-gradient(180deg,#fffdf8,#fef4e0);box-shadow:0 0 0 3px rgba(183,131,42,.2),0 12px 30px rgba(183,131,42,.15)}
-    .service-pick-card .pick-emoji{font-size:40px;margin-bottom:10px;display:block}
+    .service-pick-card .pick-emoji{width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#fdf3dc,#fff);box-shadow:inset 0 0 0 1px rgba(183,131,42,.28);display:grid;place-items:center;color:var(--gold3);font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;margin:0 auto 10px}
     .service-pick-card .pick-title{font-weight:850;font-size:16px;color:var(--ink)}
     .service-pick-card .pick-desc{font-size:13px;color:var(--muted);margin-top:6px;font-weight:500}
     .dog-card-fun{border:2px solid rgba(183,131,42,.25);background:linear-gradient(180deg,#fffdf8,#fff8ed);border-radius:24px;overflow:hidden;margin-bottom:14px;transition:all .3s}
     .dog-card-fun:hover{border-color:var(--gold);box-shadow:0 8px 24px rgba(183,131,42,.12)}
     .dog-card-header{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1a150d,#0b0a07);padding:14px 18px;color:#fff}
-    .dog-card-header .dog-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f4e5c8,#c89136);display:grid;place-items:center;font-size:20px;animation:wiggle 3s ease-in-out infinite}
+    .dog-card-header .dog-avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f4e5c8,#c89136);display:grid;place-items:center;font-size:11px;font-weight:850;letter-spacing:.06em;text-transform:uppercase;color:#fff;animation:wiggle 3s ease-in-out infinite}
     .dog-card-header .dog-label{font-weight:850;color:var(--gold2);letter-spacing:.06em;text-transform:uppercase;font-size:13px}
     .dog-card-body{padding:18px;display:grid;gap:14px}
     .checkbox-fun{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -262,7 +262,7 @@
     .checkbox-fun input{width:18px;height:18px;accent-color:#b7832a}
     .add-dog-fun{width:100%;padding:18px;border-radius:22px;border:2px dashed rgba(183,131,42,.4);background:#fffaf2;cursor:pointer;font-weight:800;font-size:15px;color:var(--gold3);transition:all .3s;display:flex;align-items:center;justify-content:center;gap:10px}
     .add-dog-fun:hover{border-color:var(--gold);background:#fef4e0;transform:scale(1.02)}
-    .add-dog-fun .add-icon{font-size:24px;animation:pawBounce 2s ease-in-out infinite}
+    .add-dog-fun .add-icon{width:32px;height:32px;border-radius:10px;background:linear-gradient(145deg,#fdf3dc,#fff);box-shadow:inset 0 0 0 1px rgba(183,131,42,.28);display:grid;place-items:center;font-size:16px;font-weight:850;color:var(--gold3);animation:pawBounce 2s ease-in-out infinite}
     .confetti-burst{position:fixed;inset:0;pointer-events:none;z-index:9999}
     @media(max-width:620px){
       .service-pick,.checkbox-fun{grid-template-columns:1fr}
