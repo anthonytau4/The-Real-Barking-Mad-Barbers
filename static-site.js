@@ -263,7 +263,12 @@ function dotField(){
 // === BRAND PARTICLE DOTS (kept intact) ===
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const MOUSE={x:-9999,y:-9999};
-addEventListener("pointermove",e=>{MOUSE.x=e.clientX;MOUSE.y=e.clientY});
+function setBrandPointer(e){MOUSE.x=e.clientX;MOUSE.y=e.clientY}
+function clearBrandTouch(e){if(e.pointerType&&e.pointerType!=="mouse")MOUSE.x=MOUSE.y=-9999}
+addEventListener("pointermove",setBrandPointer);
+addEventListener("pointerdown",setBrandPointer);
+addEventListener("pointerup",clearBrandTouch);
+addEventListener("pointercancel",clearBrandTouch);
 document.addEventListener("mouseleave",()=>{MOUSE.x=MOUSE.y=-9999});
 let brandState=null;
 function initBrand(){
