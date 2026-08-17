@@ -28,6 +28,7 @@
     .nav-contact{display:grid;place-items:center;gap:2px;min-width:154px;padding:5px 10px;color:var(--gold2);text-align:center;transition:filter .18s,transform .18s}
     .nav-phone{font-family:Georgia,"Times New Roman",serif;font-size:21px;font-weight:700;font-style:italic;line-height:1;letter-spacing:.055em;background:linear-gradient(120deg,#b7832a,#f2dfae 50%,#c99b3f);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
     .nav-contact-label{display:flex;align-items:center;gap:7px;color:#efe3ca;font-size:9px;font-weight:850;line-height:1;letter-spacing:.27em;text-transform:uppercase;white-space:nowrap}
+    .nav-contact-note{color:#cfc3ae;font-size:8px;font-weight:650;line-height:1.15;letter-spacing:.04em;white-space:nowrap}
     .nav-contact-label::before,.nav-contact-label::after{content:"";width:14px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
     .nav-contact-label::after{background:linear-gradient(90deg,var(--gold),transparent)}
     .nav-contact:hover,.nav-contact:focus-visible{filter:brightness(1.18);transform:translateY(-1px);outline:none}
@@ -302,7 +303,7 @@
 </head>
 <body>
   <div class="top-gold"></div>
-  <header class="nav"><div class="nav-inner"><a class="brand" href="/" data-link><img src="/assets/brand-logo.png" alt="Barking Mad Barbers logo"><div><div class="brand-title">Barking Mad Barbers</div><div class="brand-sub">Grooming & boarding - Tawa</div></div></a><a class="nav-contact" href="tel:+64272472493" aria-label="Call Barking Mad Barbers on 027 247 2493"><span class="nav-phone">027 247 2493</span><span class="nav-contact-label">Contact us</span></a><nav class="nav-links"></nav><div class="nav-actions"><a href="/book" class="btn btn-gold" data-link>Book Now</a></div><button class="hamburger" onclick="toggleMenu()" aria-label="Open menu">Menu</button></div><div class="mobile-drawer" id="mobileDrawer"></div></header>
+  <header class="nav"><div class="nav-inner"><a class="brand" href="/" data-link><img src="/assets/brand-logo.png" alt="Barking Mad Barbers logo"><div><div class="brand-title">Barking Mad Barbers</div><div class="brand-sub">Grooming & boarding - Tawa</div></div></a><a class="nav-contact" href="tel:+64272472493" aria-label="Call Barking Mad Barbers on 027 247 2493"><span class="nav-phone">027 247 2493</span><span class="nav-contact-label">Contact us</span><span class="nav-contact-note">We prefer text not call</span></a><nav class="nav-links"></nav><div class="nav-actions"><a href="/book" class="btn btn-gold" data-link>Book Now</a></div><button class="hamburger" onclick="toggleMenu()" aria-label="Open menu">Menu</button></div><div class="mobile-drawer" id="mobileDrawer"></div></header>
   <main id="app"></main>
   <footer class="footer"><div class="footer-inner"><div><h3>Barking Mad <span class="gold">Barbers</span></h3><p>Premium dog grooming and homely dog boarding in Tawa, Wellington. Enquiries run through simple text and email flows.</p></div><div><h3>Visit</h3><p>5A Tawa Street<br>Tawa, Wellington<br>Bookings only - no walk-ins</p></div><div><h3>Contact</h3><p><a href="sms:+64272472493">027 247 2493</a><br><a href="mailto:barkingmadbarbers@gmail.com">barkingmadbarbers@gmail.com</a><br>Mon-Sat 8:30-3:00</p></div></div></footer>
   <script src="/static-site.js?v=20260705-fluid-fx"></script>
