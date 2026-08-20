@@ -364,12 +364,14 @@ function initBrand(){
 
 // === SCROLL REVEAL ===
 function initReveal(){
-  if(REDUCED)return;
   const els=$$(".reveal,.reveal-left,.reveal-right,.reveal-scale");
+  if(REDUCED){els.forEach(el=>el.classList.add("visible"));return}
   const obs=new IntersectionObserver((entries)=>{
     entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target)}});
   },{threshold:0.12,rootMargin:"0px 0px -40px 0px"});
   els.forEach(el=>obs.observe(el));
+  // Never leave real content hidden if a browser skips an observer callback.
+  setTimeout(()=>els.forEach(el=>{el.classList.add("visible");obs.unobserve(el)}),1200);
 }
 
 // === UNVEIL (kept intact) ===

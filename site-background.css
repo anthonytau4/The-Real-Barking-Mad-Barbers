@@ -1,0 +1,38 @@
+:root {
+  --bmb-background: url("/assets/premium-white-gold-background.webp");
+}
+
+body {
+  background: #fffdf8;
+  isolation: isolate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #fffdf8;
+  background-image: var(--bmb-background);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#dotField {
+  opacity: .72;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 620px) {
+  body::before {
+    background-position: center top;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    position: absolute;
+  }
+}
