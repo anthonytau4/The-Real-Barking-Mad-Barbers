@@ -420,4 +420,41 @@ function initCardSprings(){
   });
 }
 
-setNav();render();dotField();
+// === TEMPORARY AUCKLAND CLOSURE NOTICE ===
+const AUCKLAND_NOTICE_KEY="bmb_auckland_notice_2026";
+function showAucklandNotice(){
+  const parts=new Intl.DateTimeFormat("en-NZ",{timeZone:"Pacific/Auckland",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const value=type=>Number(parts.find(part=>part.type===type)?.value||0);
+  const today=value("year")*10000+value("month")*100+value("day");
+  if(today<20260827||today>20260906)return;
+  try{if(sessionStorage.getItem(AUCKLAND_NOTICE_KEY))return}catch{}
+  if(!$("#aucklandNoticeStyles")){
+    const style=document.createElement("style");
+    style.id="aucklandNoticeStyles";
+    style.textContent=".auckland-notice{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:20px;background:rgba(7,6,4,.78);backdrop-filter:blur(6px);opacity:0;transition:opacity .2s ease}.auckland-notice.open{opacity:1}.auckland-notice-card{position:relative;width:min(100%,560px);padding:38px 34px 32px;background:linear-gradient(145deg,#fff,#fff8e9);color:#17140f;border:1px solid #b7832a;border-top:5px solid #c69b49;border-radius:0;box-shadow:0 28px 80px rgba(0,0,0,.42);text-align:center;transform:translateY(16px) scale(.98);transition:transform .2s ease}.auckland-notice.open .auckland-notice-card{transform:none}.auckland-notice-kicker{margin-bottom:10px;color:#8a5c16;font-size:11px;font-weight:900;letter-spacing:.2em;text-transform:uppercase}.auckland-notice-card h2{margin:0 34px 14px;font-family:Georgia,\"Times New Roman\",serif;font-size:clamp(30px,7vw,46px);line-height:1.02;letter-spacing:-.035em}.auckland-notice-card p{max-width:470px;margin:0 auto 24px;color:#4d4439;font-size:clamp(17px,4vw,20px);font-weight:600;line-height:1.55}.auckland-notice-close{min-width:150px}.auckland-notice-x{position:absolute;top:12px;right:12px;width:42px;height:42px;border:1px solid rgba(183,131,42,.42);border-radius:0;background:#fff;color:#17140f;font-size:28px;line-height:1;cursor:pointer}.auckland-notice-x:hover,.auckland-notice-x:focus-visible{background:#17140f;color:#fff;outline:2px solid #d8b36a;outline-offset:2px}@media(max-width:520px){.auckland-notice-card{padding:34px 20px 24px}.auckland-notice-card h2{margin-left:24px;margin-right:24px}}@media(prefers-reduced-motion:reduce){.auckland-notice,.auckland-notice-card{transition:none}}";
+    document.head.appendChild(style);
+  }
+  const overlay=document.createElement("div");
+  overlay.className="auckland-notice";
+  overlay.innerHTML=`<section class="auckland-notice-card" role="dialog" aria-modal="true" aria-labelledby="aucklandNoticeTitle" aria-describedby="aucklandNoticeCopy"><button class="auckland-notice-x" type="button" aria-label="Close notice">&times;</button><div class="auckland-notice-kicker">Temporary closure</div><h2 id="aucklandNoticeTitle">We’re away in Auckland</h2><p id="aucklandNoticeCopy">From the 27th of August to the 6th of September, we are out of action for a work week and a half in Auckland.</p><button class="btn btn-gold auckland-notice-close" type="button">Got it</button></section>`;
+  const previous=document.activeElement,oldOverflow=document.body.style.overflow;
+  let closed=false;
+  const onKey=e=>{if(e.key==="Escape")closeNotice()};
+  function closeNotice(){
+    if(closed)return;closed=true;
+    overlay.classList.remove("open");
+    document.body.style.overflow=oldOverflow;
+    removeEventListener("keydown",onKey);
+    try{sessionStorage.setItem(AUCKLAND_NOTICE_KEY,"closed")}catch{}
+    setTimeout(()=>overlay.remove(),220);
+    if(previous&&previous.focus)previous.focus();
+  }
+  overlay.addEventListener("click",e=>{if(e.target===overlay)closeNotice()});
+  overlay.querySelectorAll("button").forEach(button=>button.addEventListener("click",closeNotice));
+  addEventListener("keydown",onKey);
+  document.body.appendChild(overlay);
+  document.body.style.overflow="hidden";
+  requestAnimationFrame(()=>overlay.classList.add("open"));
+  setTimeout(()=>overlay.querySelector(".auckland-notice-x")?.focus(),80);
+}
+setNav();render();dotField();showAucklandNotice();
