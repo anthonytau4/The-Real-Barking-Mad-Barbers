@@ -1,0 +1,33 @@
+.booking-shell > *, .dog-card-body > *, .form-grid > .field { min-width: 0; }
+.booking-price-guide table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.booking-price-guide caption { text-align: left; color: var(--muted); margin-bottom: 12px; }
+.booking-price-guide th, .booking-price-guide td { padding: 12px 6px; border-bottom: 1px solid var(--line); text-align: right; }
+.booking-price-guide th:first-child { text-align: left; }
+.booking-price-guide tbody tr:last-child { background: var(--cream); }
+.booking-price-guide td { color: var(--gold3); font-weight: 750; font-variant-numeric: tabular-nums; }
+.booking-price-guide .estimate-note { margin: 16px 0 0; }
+.services-label { font-size: .875rem; font-weight: 750; }
+.service-option-label { display: grid; gap: 4px; min-width: 0; }
+.service-option-label strong { color: var(--gold3); font-weight: 750; }
+.checkbox-fun { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.checkbox-fun input { flex: 0 0 18px; }
+.checkbox-fun label:focus-within { outline: 2px solid var(--gold3); outline-offset: 2px; }
+.dog-estimate { margin: 0; padding-top: 14px; border-top: 1px solid var(--line); font-weight: 750; }
+.booking-estimate { margin: 20px 0; padding: 20px; border: 1px solid var(--line); border-top: 3px solid var(--gold); background: var(--cream); }
+.booking-estimate h3 { font: 700 1.5rem Georgia, "Times New Roman", serif; margin: 0 0 18px; }
+.estimate-dog + .estimate-dog { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 16px; }
+.estimate-dog h4 { font-size: 1rem; margin: 0 0 10px; overflow-wrap: anywhere; }
+.estimate-dog h4 span { color: var(--muted); font-size: .875rem; font-weight: 550; }
+.estimate-dog dl { display: grid; gap: 10px; margin: 0; }
+.estimate-line { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; font-size: .875rem; }
+.estimate-line dt { min-width: 0; }
+.estimate-line dd { margin: 0; text-align: right; flex-shrink: 0; font-weight: 750; }
+.estimate-total { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--gold); font-weight: 750; }
+.estimate-total strong { font-size: 1.75rem; color: var(--gold3); font-variant-numeric: tabular-nums; }
+.estimate-note { margin: 10px 0 0; color: var(--muted); font-size: .875rem; line-height: 1.55; }
+@media (max-width: 620px) {
+  .checkbox-fun { grid-template-columns: 1fr; }
+  .service-option-label { display: flex; flex: 1; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .service-option-label strong { flex-shrink: 0; }
+  .booking-estimate { padding: 16px; }
+}
