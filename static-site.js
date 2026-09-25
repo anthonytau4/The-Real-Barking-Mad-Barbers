@@ -1,7 +1,33 @@
 const AS="/assets/",PHONE="027 247 2493",SMS="+64272472493",EMAIL="barkingmadbarbers@gmail.com";
 const STORE="bmb_static_enquiries_v1",PROFILE="bmb_static_profile_v1";
 const nav=[["Services","/services"],["Boarding","/boarding"]],aboutNav=[["Calm Sanctuary","/Sanctuary"],["Our Family","/our-family"],["Meet the Team","/team"],["Dog Care Helper","/helper"]],navEnd=[["Contact","/contact"]];
-const prices={full:[["Tiny","$80"],["Small","$90"],["Medium","$110"],["Large","$130"]],wash:[["Tiny","$45"],["Small","$50"],["Medium","$55"],["Large","$60"]],boarding:[["Overnight stays","by arrangement"],["Comfortable routine","meals, rest and attention"],["Family-style care","treated like one of our own"]],extras:[["Flea Shampoo","$20","flea"],["Nail Trim","$20","nails"],["Teeth Brush","$10","teeth"],["Face Tidy","$10","face"],["Anal Gland Expression","$20","medical"]]};
+const prices={full:[["Tiny",80],["Small",90],["Medium",110],["Large",130],["Extra Large",150]],wash:[["Tiny",45],["Small",50],["Medium",55],["Large",60],["Extra Large",70]],boarding:[["Overnight stays","by arrangement"],["Comfortable routine","meals, rest and attention"],["Family-style care","treated like one of our own"]],extras:[["Flea Shampoo",20,"flea"],["Nail Trim",20,"nails"],["Teeth Brush",10,"teeth"],["Face Tidy",10,"face"],["Anal Gland Expression",20,"medical"]]};
+const money=amount=>`$${amount.toLocaleString("en-NZ")}`;
+const groomingServices={"Full Groom":"full","Wash & Dry":"wash"};
+const includedServices={"Full Groom":["Face Tidy","Nail Trim","Anal Gland Expression"],"Wash & Dry":["Nail Trim","Anal Gland Expression"]};
+function sizeOptions(){return '<option value="">Pick size</option>'+prices.full.map(([size])=>`<option>${size}</option>`).join("")}
+function serviceAmount(service,size,selected=[]){
+  const main=selected.find(s=>groomingServices[s]);
+  if(includedServices[main]?.includes(service))return 0;
+  if(groomingServices[service])return prices[groomingServices[service]].find(row=>row[0]===size)?.[1]??null;
+  return prices.extras.find(row=>row[0]===service)?.[1]??null;
+}
+function groomingEstimate(dogList){
+  const estimates=dogList.map((dog,i)=>{
+    const selected=[...new Set(dog.services||[])];
+    // A full groom already includes a wash; never bill for both packages.
+    const services=selected.filter(s=>s!=="Wash & Dry"||!selected.includes("Full Groom"));
+    const items=services.map(service=>({service,amount:serviceAmount(service,dog.dog_size,services)}));
+    return {name:dog.dog_name||`Dog ${i+1}`,size:dog.dog_size,items,total:items.reduce((sum,item)=>sum+(item.amount??0),0),complete:prices.full.some(row=>row[0]===dog.dog_size)&&items.length>0&&items.every(item=>item.amount!==null)};
+  });
+  return {dogs:estimates,total:estimates.reduce((sum,dog)=>sum+dog.total,0),complete:estimates.length>0&&estimates.every(dog=>dog.complete),hasPrices:estimates.some(dog=>dog.items.some(item=>item.amount!==null))};
+}
+function estimateMarkup(estimate){
+  return `<h3>Grooming estimate</h3>${estimate.dogs.map(dog=>`<div class="estimate-dog"><h4>${esc(dog.name)}${dog.size?` <span>· ${esc(dog.size)}</span>`:""}</h4>${dog.items.length?`<dl>${dog.items.map(item=>`<div class="estimate-line"><dt>${esc(item.service)}</dt><dd>${item.amount===null?"Choose size":item.amount===0?"Included":money(item.amount)}</dd></div>`).join("")}</dl>`:'<p class="estimate-note">Choose a service for this dog.</p>'}</div>`).join("")}<div class="estimate-total"><span>${estimate.complete?"Estimated total":"Subtotal so far"}</span><strong>${estimate.hasPrices?money(estimate.total):"—"}</strong></div>${estimate.complete?"":'<p class="estimate-note">Choose a size and at least one service for each dog to complete your estimate.</p>'}<p class="estimate-note">All prices are NZD. Final price depends on breed and coat condition.</p>`;
+}
+function bookingPriceGuide(){
+  return `<div class="clean-card booking-price-guide"><h3>Grooming prices</h3><table><caption>Base prices in NZD</caption><thead><tr><th scope="col">Size</th><th scope="col">Full Groom</th><th scope="col">Wash & Dry</th></tr></thead><tbody>${prices.full.map(([size,amount])=>`<tr><th scope="row">${size}</th><td>${money(amount)}</td><td>${money(serviceAmount("Wash & Dry",size))}</td></tr>`).join("")}</tbody></table><p class="estimate-note">Nail trim is included with both grooms. Face tidy is included with a Full Groom.</p></div>`;
+}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ICON_ART={
@@ -50,18 +76,24 @@ function setNav(){
 function key(p=location.pathname){p=decodeURIComponent(p).replace(/\/+$/,"").toLowerCase()||"/";return p==="/"?"home":p.includes("family")?"our-family":p.includes("board")?"boarding":p.includes("sanctuary")?"sanctuary":p.includes("service")?"services":p.includes("team")?"team":p.includes("book")?"book":p.includes("helper")||p.includes("help")?"helper":p.includes("contact")?"contact":p.includes("sign")||p.includes("login")?"sign-in":p.includes("admin")?"admin":"home"}
 function shell(title,kicker,copy,body){return `<div class="wrap page-hero"><div class="page-hero-grid"><div class="reveal-left"><div class="kicker">${kicker}</div><h1 class="page-title"><span class="rl"><span>${title}</span></span></h1><p class="lead fade-up">${copy}</p></div><div class="reveal-right">${poster("page-poster")}</div></div></div><div class="wrap">${body}</div>`}
 function card(i,t,c,delay){return `<article class="card reveal stagger-${delay||1}">${icon(i)}<h3>${t}</h3><p>${c}</p></article>`}
-function price(t,from,rows,copy){return `<article class="card price-card reveal-scale"><div class="price-top"><h3>${t}</h3><div class="from">${from}</div></div><div class="price-list"><p>${copy}</p>${rows.map(r=>`<div class="price-row"><span>${r[0]}</span><strong>${r[1]}</strong></div>`).join("")}</div></article>`}
+function price(t,from,rows,copy){return `<article class="card price-card reveal-scale"><div class="price-top"><h3>${t}</h3><div class="from">${from}</div></div><div class="price-list"><p>${copy}</p>${rows.map(r=>`<div class="price-row"><span>${r[0]}</span><strong>${typeof r[1]==="number"?money(r[1]):r[1]}</strong></div>`).join("")}</div></article>`}
 function serviceBlock(){return `<section class="section"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Services</div><h2 class="section-title">Grooms, stays & genuine care.</h2></div><a href="/book" data-link class="btn btn-gold">Book Now</a></div><div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Bath, blow dry, brush out, full body clip, face & feet finish, nail trim, ear clean and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Bath, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Home-style boarding. Your dog stays comfortable with routine, attention and real care.")}</div></div></section>`}
 function brandTitle(){return `<section class="brand-hero"><span class="float-tool ft-a" aria-hidden="true"><span class="tool-glyph">&#9986;</span></span><span class="float-tool ft-b" aria-hidden="true"><span class="tool-glyph">&#9986;</span></span><h1 class="brand-display brand-static">Barking Mad <span class="gold">Barbers</span></h1><canvas id="brandCanvas" class="hidden" aria-hidden="true"></canvas><div class="brand-rule"></div></section>`}
 function home(){return `${brandTitle()}<section class="hero"><div class="wrap hero-grid"><div class="reveal-left"><div class="eyebrow">Tawa dog grooming & boarding</div><h1 class="display"><span class="rl"><span>Groomed with <span class="gold">Love.</span></span></span><span class="rl"><span>Treated like <span class="gold">Family.</span></span></span></h1><p class="lead fade-up">Beautiful grooms and cozy boarding where your dog is genuinely cared for — calm space, familiar routines, and proper attention while you're away.</p><div class="hero-actions fade-up"><a href="/book" data-link class="btn btn-gold pulse-anim">Book Dog Care</a><a href="/services" data-link class="btn btn-soft">View Services</a></div><div class="lead"><strong>Mon–Sat 8:30am – 3:00pm • Bookings only</strong></div></div><div class="reveal-right">${poster()}</div></div></section><section class="section"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Why Barking Mad</div><h2 class="section-title">Premium groom or stay. Zero stress.</h2></div><p class="section-copy">Your dog stays somewhere safe, follows their routine, gets one-on-one attention, and is treated like part of the family.</p></div><div class="grid grid-4">${card("calm","Calm Sanctuary","Peaceful, low-stress space where dogs feel safe and loved.",1)}${card("boarding","Dog Boarding","A homely stay with care, company and routine.",2)}${card("experienced","Experienced Team","Skilled grooming with patient one-on-one attention.",3)}${card("text","Text to Book","Tap Book Now, and your text app opens with everything ready to send.",4)}</div></div></section>${serviceBlock()}${cta()}`}
-function services(){return shell('Services & <span class="gold">Prices</span>',"Premium grooming & boarding","Pick the service that suits your dog. Prices may vary for heavily matted coats. Boarding is arranged by enquiry.",`<div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Bath, shampoo & condition, blow dry, brush out, full body clip, face & feet finish, nail trim, ear clean and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Bath, shampoo & condition, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Comfortable boarding that feels like staying with people who actually love dogs — not a kennel.")}</div><section class="section"><div class="section-head reveal"><div><div class="kicker">Extras</div><h2 class="section-title">Add-on care.</h2></div></div><div class="grid grid-3">${prices.extras.map((r,i)=>`<article class="clean-card reveal stagger-${i+1}">${icon(r[2])}<h3>${r[0]}</h3><p><strong class="gold">${r[1]}</strong> added to your groom.</p></article>`).join("")}</div></section>`)}
+function services(){return shell('Services & <span class="gold">Prices</span>',"Premium grooming & boarding","Pick the service that suits your dog. Prices may vary for heavily matted coats. Boarding is arranged by enquiry.",`<div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Bath, shampoo & condition, blow dry, brush out, full body clip, face & feet finish, nail trim, ear clean and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Bath, shampoo & condition, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Comfortable boarding that feels like staying with people who actually love dogs — not a kennel.")}</div><section class="section"><div class="section-head reveal"><div><div class="kicker">Extras</div><h2 class="section-title">Add-on care.</h2></div></div><div class="grid grid-3">${prices.extras.map((r,i)=>`<article class="clean-card reveal stagger-${i+1}">${icon(r[2])}<h3>${r[0]}</h3><p><strong class="gold">${money(r[1])}</strong> added to your groom.</p></article>`).join("")}</div></section>`)}
 function boarding(){return shell('Dog <span class="gold">Boarding</span>',"Loved like family","Your dog stays in a calm, homely setting with familiar routines, real attention, and the kind of care you'd want from someone looking after your own pup.",`<div class="grid grid-3">${card("home","A real home stay","Comfortable, personal, settled — with company and calm care.",1)}${card("routine","Routine kept intact","Meals, medication, sleep habits, quirks — we follow your dog's routine.",2)}${card("love","Family-style love","We get to know your dog, reassure them, and treat them like ours.",3)}</div><section class="section"><div class="clean-card reveal" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Boarding enquiries</div><h2 class="section-title">Tell us about your dog.</h2><p class="section-copy">Send dates, breed, size, temperament, and feeding needs.</p></div><a href="/book" data-link class="btn btn-gold pulse-anim">Book boarding</a></div></section>`)}
 function sanctuary(){return shell('Calm <span class="gold">Sanctuary</span>',"Low-stress care","A quiet, appointment-only space for dogs who need patience, routine and kindness.",`<div class="grid grid-3">${card("calm","Calm first","We work around comfort, coat condition and confidence.",1)}${card("one","One-on-one","Less rush, less noise, more care for each dog.",2)}${card("clean","Clean & gentle","Gentle grooming products and a tidy finish every time.",3)}</div>`)}
 function team(){return shell('Meet the <span class="gold">Team</span>',"Our team","The people behind every happy groom and cozy stay.",`<div class="grid grid-2"><article class="clean-card reveal stagger-1"><img class="unveil" src="${AS}team-dog.webp" alt="Team member with dog" style="aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Dog-loving care</h3><p>Friendly, calm and focused on a finish that suits your dog.</p></article><article class="clean-card reveal stagger-2"><img class="unveil" src="${AS}team-beach.webp" alt="Barking Mad family photo" style="aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Local Tawa family</h3><p>A Wellington grooming & boarding business with a warm, personal feel.</p></article></div>`)}
 function family(){return shell('Our <span class="gold">Family</span>',"Loved like our own","Send photo links or family page requests by email.",`<div class="split"><form class="card form reveal stagger-1" id="galleryForm"><h3>Share your dog</h3><div class="form-grid"><div class="field"><label>Your name</label><input name="owner_name"></div><div class="field"><label>Email</label><input name="email" type="email"></div></div><div class="field"><label>Dog name</label><input name="dog_name" required></div><div class="field"><label>Photo URL</label><input name="image_url" placeholder="Paste a photo link"></div><div class="field"><label>Caption</label><textarea name="caption"></textarea></div><button class="btn btn-gold" type="submit">Email Photo Details</button><div id="galleryStatus"></div></form><form class="card form reveal stagger-2" id="requestForm"><h3>Send a request</h3><div class="form-grid"><div class="field"><label>Your name</label><input name="name" required></div><div class="field"><label>Email</label><input name="email" type="email"></div></div><div class="form-grid"><div class="field"><label>Phone</label><input name="phone"></div><div class="field"><label>Request type</label><input name="request_type"></div></div><div class="field"><label>Message</label><textarea name="message" required></textarea></div><button class="btn btn-dark" type="submit">Text Request</button><div id="requestStatus"></div></form></div>`)}
-function serviceOptions(){return["Full Groom","Wash & Dry","Face Tidy","Nail Trim","Teeth Brush","Flea Shampoo"].map(s=>`<label><input type="checkbox" name="services" value="${s}">${s}</label>`).join("")}
-function dogCardFun(i=1){return `<div class="dog-card-fun" data-dog="${i}"><div class="dog-card-header"><div class="dog-avatar" aria-hidden="true">${iconSvg("dog")}</div><div class="dog-label">Dog ${i}</div><button class="btn btn-soft remove-dog" type="button" style="margin-left:auto;padding:8px 12px;font-size:12px">✕ Remove</button></div><div class="dog-card-body"><div class="form-grid"><div class="field"><label>Dog's name</label><input name="dog_name" required placeholder="What's their name?"></div><div class="field"><label>Size</label><select name="dog_size" required><option value="">Pick size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div></div><div class="form-grid"><div class="field"><label>Breed</label><input name="breed" required placeholder="e.g. Poodle, Labrador"></div><div class="field"><label>Preferred time</label><input name="dog_preferred_time" placeholder="Morning / afternoon / any"></div></div><div class="field"><label>Pick their services</label><div class="checkbox-fun">${serviceOptions()}</div></div></div></div>`}
-function boardingFieldsWizard(){return `<div class="form-grid"><div class="field"><label>Dog's name</label><input name="boarding_dog_name" required placeholder="Your dog's name"></div><div class="field"><label>Breed</label><input name="boarding_breed" required placeholder="e.g. Golden Retriever"></div></div><div class="form-grid"><div class="field"><label>Size</label><select name="boarding_size" required><option value="">Pick size</option><option>Tiny</option><option>Small</option><option>Medium</option><option>Large</option></select></div><div class="field"><label>Meet & greet date</label><input name="meet_greet" placeholder="When works for a meet?"></div></div><div class="form-grid"><div class="field"><label>Drop off</label><input name="drop_off" type="date" required></div><div class="field"><label>Pick up</label><input name="pick_up" type="date" required></div></div><div class="field"><label>Anything we should know?</label><textarea name="boarding_notes" placeholder="Feeding routine, medication, sleep habits, temperament..."></textarea></div>`}
+function serviceOptions(){
+  return ["Full Groom","Wash & Dry","Face Tidy","Nail Trim","Teeth Brush","Flea Shampoo"].map(service=>`<label><input type="checkbox" name="services" value="${service}" aria-label="${service}"><span class="service-option-label"><span>${service}</span><strong data-service-price>${groomingServices[service]?`from ${money(prices[groomingServices[service]][0][1])}`:money(serviceAmount(service,""))}</strong></span></label>`).join("");
+}
+let dogFieldId=0;
+function dogCardFun(i=1){
+  const id=`dog-${++dogFieldId}`;
+  return `<div class="dog-card-fun" data-dog="${i}"><div class="dog-card-header"><div class="dog-avatar" aria-hidden="true">${iconSvg("dog")}</div><div class="dog-label">Dog ${i}</div><button class="btn btn-soft remove-dog" type="button" style="margin-left:auto;padding:8px 12px;font-size:12px">✕ Remove</button></div><div class="dog-card-body"><div class="form-grid"><div class="field"><label for="${id}-name">Dog's name</label><input id="${id}-name" name="dog_name" required placeholder="What's their name?"></div><div class="field"><label for="${id}-size">Size</label><select id="${id}-size" name="dog_size" required>${sizeOptions()}</select></div></div><div class="form-grid"><div class="field"><label for="${id}-breed">Breed</label><input id="${id}-breed" name="breed" required placeholder="e.g. Poodle, Labrador"></div><div class="field"><label for="${id}-time">Preferred time</label><input id="${id}-time" name="dog_preferred_time" placeholder="Morning / afternoon / any"></div></div><div class="field"><span id="${id}-services" class="services-label">Pick their services</span><div class="checkbox-fun" role="group" aria-labelledby="${id}-services">${serviceOptions()}</div><p class="estimate-note">Choose one groom, plus any extras, or book extras on their own.</p></div><p class="dog-estimate"></p></div></div>`;
+}
+function boardingFieldsWizard(){return `<div class="form-grid"><div class="field"><label>Dog's name</label><input name="boarding_dog_name" required placeholder="Your dog's name"></div><div class="field"><label>Breed</label><input name="boarding_breed" required placeholder="e.g. Golden Retriever"></div></div><div class="form-grid"><div class="field"><label for="boarding-size">Size</label><select id="boarding-size" name="boarding_size" required>${sizeOptions()}</select></div><div class="field"><label>Meet & greet date</label><input name="meet_greet" placeholder="When works for a meet?"></div></div><div class="form-grid"><div class="field"><label>Drop off</label><input name="drop_off" type="date" required></div><div class="field"><label>Pick up</label><input name="pick_up" type="date" required></div></div><div class="field"><label>Anything we should know?</label><textarea name="boarding_notes" placeholder="Feeding routine, medication, sleep habits, temperament..."></textarea></div>`}
 function book(){
   return shell('Book Dog <span class="gold">Care</span>',"Grooming & boarding","Pick your service, add your dog's details, and we'll have your text ready to send in seconds.",`
 <div class="booking-shell">
@@ -98,6 +130,7 @@ function book(){
       <div id="groomingPanel">
         <div id="dogsList">${dogCardFun(1)}</div>
         <button class="add-dog-fun" type="button" id="addDogBtn"><span class="add-icon" aria-hidden="true">${iconSvg("add")}</span> Add another dog</button>
+        <section class="booking-estimate" id="bookingEstimate" aria-label="Live grooming price estimate" aria-live="polite" aria-atomic="true"></section>
         <div class="field" style="margin-top:14px"><label>Extra notes</label><textarea name="notes" placeholder="Anything else we should know?"></textarea></div>
       </div>
       <div id="boardingPanel" class="hidden">${boardingFieldsWizard()}</div>
@@ -107,6 +140,7 @@ function book(){
       <div class="wizard-emoji" aria-hidden="true">${iconSvg("send")}</div>
       <h3 class="wizard-title">Ready to send!</h3>
       <p class="wizard-subtitle">Your text message is prepped. Hit send and you're done.</p>
+      <section class="booking-estimate" id="bookingReview" aria-label="Booking price estimate"></section>
       <label class="sms-consent"><input name="booking_sms_consent" type="checkbox" required><span>This will open your text app with the message ready to send to Barking Mad Barbers.</span></label>
       <div class="wizard-nav"><button type="button" class="btn btn-soft" onclick="wizardPrev()">← Back</button><button class="btn btn-gold" type="submit">Send Enquiry</button></div>
       <div id="bookingStatus" style="margin-top:16px"></div>
@@ -114,6 +148,7 @@ function book(){
   </form>
 </div>
 <aside class="booking-side">
+  ${bookingPriceGuide()}
   <div class="sms-notice reveal"><h3>Texting is best</h3><p>Your enquiry opens as a ready-to-send text. No apps, no accounts — just tap send.</p><a class="btn btn-dark" id="textToBookBtn" href="sms:${SMS}">Quick text</a></div>
   <div class="clean-card reveal stagger-2"><h3>Good to know</h3><div class="note-list"><div class="note"><span class="dot"></span><span>Pick Grooming for the groom form.</span></div><div class="note"><span class="dot"></span><span>Pick Boarding for stay dates & care info.</span></div><div class="note"><span class="dot"></span><span>Final price depends on size, breed & coat condition.</span></div><div class="note"><span class="dot"></span><span>Bring your own food and harness for boarding stays.</span></div></div></div>
 </aside>
@@ -141,6 +176,35 @@ function fd(f){return Object.fromEntries(new FormData(f).entries())}
 function dogs(){return $$(".dog-card-fun").map(e=>{let g=n=>e.querySelector(`[name="${n}"]`)?.value.trim()||"",services=[...e.querySelectorAll('[name="services"]:checked')].map(x=>x.value);return{dog_name:g("dog_name"),dog_size:g("dog_size"),breed:g("breed"),dog_preferred_time:g("dog_preferred_time"),service:services.join(", "),services}})}
 function refreshDogs(){$$(".dog-card-fun").forEach((e,i)=>{e.querySelector(".dog-label").textContent=`Dog ${i+1}`;let r=e.querySelector(".remove-dog");r.classList.toggle("hidden",$$(".dog-card-fun").length===1);r.onclick=()=>{e.remove();refreshDogs();updateWizard()}})}
 
+function updateBookingEstimate(){
+  const estimate=groomingEstimate(dogs());
+  $$(".dog-card-fun").forEach((card,i)=>{
+    const size=card.querySelector('[name="dog_size"]').value;
+    const selected=[...card.querySelectorAll('[name="services"]:checked')].map(input=>input.value);
+    card.querySelectorAll('[name="services"]').forEach(input=>{
+      const amount=serviceAmount(input.value,size,selected);
+      input.closest("label").querySelector('[data-service-price]').textContent=amount===null?`from ${money(prices[groomingServices[input.value]][0][1])}`:amount===0?"Included":money(amount);
+    });
+    const dog=estimate.dogs[i];
+    card.querySelector(".dog-estimate").textContent=dog.complete?`Estimated price: ${money(dog.total)} NZD`:"Choose a size and services to see this dog's estimate.";
+  });
+  const isBoarding=$("#serviceTypeHidden")?.value==="Dog Boarding";
+  $(".booking-price-guide")?.classList.toggle("hidden",isBoarding);
+  const summary=$("#bookingEstimate");
+  if(summary)summary.innerHTML=estimateMarkup(estimate);
+  const review=$("#bookingReview");
+  if(review)review.innerHTML=isBoarding?'<h3>Boarding price</h3><p>By arrangement. We’ll confirm the price for your dog’s stay when we reply.</p>':estimateMarkup(estimate);
+}
+function validateDogServices(){
+  for(const card of $$(".dog-card-fun")){
+    const input=card.querySelector('[name="services"]');
+    const valid=!!card.querySelector('[name="services"]:checked');
+    input.setCustomValidity(valid?"":"Choose at least one service for this dog.");
+    if(!valid){currentStep=2;updateWizard();input.focus();input.reportValidity();return false}
+  }
+  return true;
+}
+
 // === WIZARD LOGIC ===
 let currentStep=1;
 function pickService(el){
@@ -148,6 +212,7 @@ function pickService(el){
   el.classList.add("selected");
   const v=el.dataset.value;
   $("#serviceTypeHidden").value=v;
+  updateWizard();
 }
 function wizardNext(){
   if(currentStep>=3)return;
@@ -160,6 +225,7 @@ function wizardNext(){
     if(inp.type==="checkbox"){if(!inp.checked){inp.focus();inp.reportValidity();return}}
     else if(!inp.value.trim()){inp.focus();inp.reportValidity();return}
   }
+  if(currentStep===2&&$("#serviceTypeHidden").value!=="Dog Boarding"&&!validateDogServices())return;
   currentStep++;
   updateWizard();
 }
@@ -187,9 +253,10 @@ function updateWizard(){
     d.classList.toggle("done",s<currentStep);
   });
   $$(".wizard-connector").forEach((c,i)=>{c.classList.toggle("done",i<currentStep-1)});
+  updateBookingEstimate();
 }
 
-function bookingBody(d){if(d.service_type==="Dog Boarding"){return["Hi Barking Mad Barbers, I'd like to enquire about Dog Boarding.","",`Dog name: ${d.boarding_dog_name||""}`,`Breed: ${d.boarding_breed||""}`,`Size: ${d.boarding_size||""}`,`Meet & greet: ${d.meet_greet||""}`,`Drop off: ${d.drop_off||""}`,`Pick up: ${d.pick_up||""}`,"",`Notes: ${d.boarding_notes||""}`,"","I'll bring my own food and harness.","",[`Cheers`,d.owner_name||"",d.phone||""].filter(Boolean).join(" ")].filter((l,i,a)=>l||a[i-1]!=="").join("\n")}let ds=d.dogs||dogs(),pref=(d.preferred_time||"").trim(),date=(d.preferred_date||"").trim(),times=ds.map((x,i)=>`Dog ${i+1} (${x.dog_preferred_time||pref||"any time"})`),has=ds.some(x=>x.dog_preferred_time);let appt=has?["Preferred times:",...times,date?`Date: ${date}`:""].filter(Boolean).join("\n"):pref&&!/^whenever$/i.test(pref)?`Preferred time: ${[pref,date].filter(Boolean).join(" ")}`:`Preferred time: ${["any",date].filter(Boolean).join(" ")}`;let services=ds.flatMap((x,i)=>x.service?[`Dog ${i+1} services: ${x.service}`]:[]);return["Hi Barking Mad Barbers, I'd like to book grooming.","",`Service: ${d.service_type||"Grooming"}`,"",...ds.map((x,i)=>`${i+1}. ${x.dog_name||"Dog"} — ${[x.dog_size,x.breed].filter(Boolean).join(", ")}`),"",...services,"",appt,d.notes?`Notes: ${d.notes}`:"","",["Cheers,",d.owner_name||"",d.phone||""].filter(Boolean).join(" ")].filter((l,i,a)=>l||a[i-1]!=="").join("\n")}
+function bookingBody(d){if(d.service_type==="Dog Boarding"){return["Hi Barking Mad Barbers, I'd like to enquire about Dog Boarding.","",`Dog name: ${d.boarding_dog_name||""}`,`Breed: ${d.boarding_breed||""}`,`Size: ${d.boarding_size||""}`,`Meet & greet: ${d.meet_greet||""}`,`Drop off: ${d.drop_off||""}`,`Pick up: ${d.pick_up||""}`,"",`Notes: ${d.boarding_notes||""}`,"","I'll bring my own food and harness.","",[`Cheers`,d.owner_name||"",d.phone||""].filter(Boolean).join(" ")].filter((l,i,a)=>l||a[i-1]!=="").join("\n")}let ds=d.dogs||dogs(),pref=(d.preferred_time||"").trim(),date=(d.preferred_date||"").trim(),times=ds.map((x,i)=>`Dog ${i+1} (${x.dog_preferred_time||pref||"any time"})`),has=ds.some(x=>x.dog_preferred_time);let appt=has?["Preferred times:",...times,date?`Date: ${date}`:""].filter(Boolean).join("\n"):pref&&!/^whenever$/i.test(pref)?`Preferred time: ${[pref,date].filter(Boolean).join(" ")}`:`Preferred time: ${["any",date].filter(Boolean).join(" ")}`;let services=ds.flatMap((x,i)=>x.service?[`Dog ${i+1} services: ${x.service}`]:[]),estimate=groomingEstimate(ds);return["Hi Barking Mad Barbers, I'd like to book grooming.","",`Service: ${d.service_type||"Grooming"}`,"",...ds.map((x,i)=>`${i+1}. ${x.dog_name||"Dog"} — ${[x.dog_size,x.breed].filter(Boolean).join(", ")}`),"",...services,"",estimate.complete?`Estimated total: ${money(estimate.total)} NZD (final price subject to breed and coat condition).`:"","",appt,d.notes?`Notes: ${d.notes}`:"","",["Cheers,",d.owner_name||"",d.phone||""].filter(Boolean).join(" ")].filter((l,i,a)=>l||a[i-1]!=="").join("\n")}
 function sms(body){let b=encodeURIComponent(body);return /iPhone|iPad|iPod/i.test(navigator.userAgent)?`sms:${SMS}&body=${b}`:`sms:${SMS}?body=${b}`}
 function save(type,data){let a=JSON.parse(localStorage.getItem(STORE)||"[]");a.unshift({id:Date.now().toString(36),type,created_at:new Date().toLocaleString(),data});localStorage.setItem(STORE,JSON.stringify(a.slice(0,100)))}
 function fallback(el,body,url,label="Open text message"){el.innerHTML=`<div class="status good sms-open-card"><strong>&#10003; Your message is ready!</strong><p>If your text app didn't open, copy the message below and send it to ${PHONE}.</p><textarea class="sms-preview" readonly>${esc(body)}</textarea><div class="hero-actions"><button class="btn btn-gold" type="button" id="copyMsg">Copy text</button><a class="btn btn-soft" href="${url}">${label}</a></div></div>`;$("#copyMsg").onclick=async()=>{try{await navigator.clipboard.writeText(body);$("#copyMsg").textContent="Copied ✓"}catch{$("#copyMsg").textContent="Select and copy"}}}
@@ -201,9 +268,20 @@ function bindForms(){
     currentStep=1;
     updateWizard();
     refreshDogs();
+    b.addEventListener("input",event=>{if(event.target.name==="dog_name")updateBookingEstimate()});
+    b.addEventListener("change",event=>{
+      const input=event.target;
+      if(input.name==="services"){
+        const card=input.closest(".dog-card-fun");
+        if(input.checked&&groomingServices[input.value])card.querySelectorAll('[name="services"]').forEach(other=>{if(other!==input&&groomingServices[other.value])other.checked=false});
+        card.querySelector('[name="services"]').setCustomValidity("");
+      }
+      updateBookingEstimate();
+    });
     let p=profile();
     if(p)["owner_name","email","phone"].forEach(n=>{if(b[n])b[n].value=n==="owner_name"?p.name||"":p[n]||""});
     let open=()=>{
+      if($("#serviceTypeHidden").value!=="Dog Boarding"&&!validateDogServices())return;
       if(!b.reportValidity())return;
       let first=dogs()[0]||{},data={...fd(b),service_type:$("#serviceTypeHidden")?.value||"Grooming",dogs:dogs(),dog_name:first.dog_name||"",dog_size:first.dog_size||"",breed:first.breed||""},body=bookingBody(data);
       save("booking",data);openSms(body,$("#bookingStatus"));
@@ -250,7 +328,7 @@ function miniConfetti(){
   })();
 }
 function append(who,text){let f=$("#chatFeed"),row=document.createElement("div");row.className="msg-row "+(who==="me"?"me":"bot");row.innerHTML=who==="me"?`<div class="bubble">${esc(text)}</div>`:`<div class="avatar" aria-hidden="true">${iconSvg("chat")}</div><div class="bubble">${esc(text)}</div>`;f.appendChild(row);f.scrollTop=f.scrollHeight}
-function reply(t){let q=t.toLowerCase();if(q.includes("board")||q.includes("stay"))return"For boarding, tap Book Now → Dog Boarding → add dates, care info, and send. Easy!";if(q.includes("price")||q.includes("cost")||q.includes("full"))return"Full grooms: $80 tiny, $90 small, $110 medium, $130 large. Final price depends on coat & condition.";if(q.includes("wash"))return"Wash & Dry: $45 tiny, $50 small, $55 medium, $60 large.";if(q.includes("knot")||q.includes("matt"))return"For matting, book a Full Groom and mention the coat condition — extra charge may apply.";if(q.includes("flea"))return"Flea shampoo is $20 extra added to any groom.";if(q.includes("hour")||q.includes("open"))return"Mon–Sat 8:30am – 3:00pm, bookings only.";if(q.includes("book"))return"Tap Book Now — pick your service, add dog details, hit send. Your text app does the rest!";return"Great question! Text it to us at "+PHONE+" and we'll reply when we're free."}
+function reply(t){let q=t.toLowerCase();if(q.includes("board")||q.includes("stay"))return"For boarding, tap Book Now → Dog Boarding → add dates, care info, and send. Easy!";if(q.includes("price")||q.includes("cost")||q.includes("full"))return"Full grooms: "+prices.full.map(([size,amount])=>`${money(amount)} ${size.toLowerCase()}`).join(", ")+". Final price depends on coat & condition.";if(q.includes("wash"))return"Wash & Dry: "+prices.wash.map(([size,amount])=>`${money(amount)} ${size.toLowerCase()}`).join(", ")+".";if(q.includes("knot")||q.includes("matt"))return"For matting, book a Full Groom and mention the coat condition — extra charge may apply.";if(q.includes("flea"))return"Flea shampoo is $20 extra added to any groom.";if(q.includes("hour")||q.includes("open"))return"Mon–Sat 8:30am – 3:00pm, bookings only.";if(q.includes("book"))return"Tap Book Now — pick your service, add dog details, hit send. Your text app does the rest!";return"Great question! Text it to us at "+PHONE+" and we'll reply when we're free."}
 function renderProfile(){let p=profile(),box=$("#profileBox");box.innerHTML=p?`<h3>Saved details</h3><p><strong>${esc(p.name||"")}</strong><br>${esc(p.email||"")}<br>${esc(p.phone||"")}</p><button class="btn btn-soft" onclick="localStorage.removeItem(PROFILE);render()">Clear saved details</button>`:"<h3>Your saved details</h3><p>Nothing saved yet.</p>"}
 function renderInbox(){let el=$("#staticInbox");if(!el)return;let a=JSON.parse(localStorage.getItem(STORE)||"[]");$("#adminStatus").innerHTML='<div class="status">Local only — customer messages arrive by text or email.</div>';el.innerHTML=a.length?a.map(x=>`<article class="booking-item"><div class="booking-top"><strong>${esc(x.type)}</strong><span class="tag">${esc(x.created_at)}</span></div><pre style="white-space:pre-wrap;font:inherit">${esc(JSON.stringify(x.data,null,2))}</pre></article>`).join(""):'<div class="status">No local enquiries.</div>'}
 function clearInbox(){localStorage.removeItem(STORE);renderInbox()}
