@@ -1,0 +1,29 @@
+name: Check website
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check scripts
+        run: |
+          node --check static-site.js
+          node --check site-core.js
+          node --check site-views.js
+      - name: Check prices and enquiry rules
+        run: npm test
+      - name: Rebuild static pages
+        run: npm run build
+      - name: Check generated pages are committed
+        run: git diff --exit-code -- '*.html' sitemap.xml robots.txt
