@@ -12,3 +12,8 @@
 @media(max-width:380px){.container{width:calc(100% - 32px)}.header-actions .button{padding-inline:10px;font-size:10px}.brand>span{font-size:18px}.brand small{font-size:5px}.brand img{width:32px;height:40px}.hero h1{font-size:clamp(45px,13.8vw,52px)}.hero .actions .button{padding-inline:13px;font-size:11px;gap:9px}.care-strip span{font-size:9px}.care-strip .icon{width:17px}.form-grid{grid-template-columns:1fr}.care-options{gap:10px}.care-options label>span{padding:23px 14px}.care-options strong{font-size:24px}.service-checks{grid-template-columns:1fr}.footer-grid{gap:30px 18px}.footer-phone{font-size:21px}.booking-progress{gap:10px}.booking-progress li{font-size:9px;gap:5px}.contact-number{font-size:36px}.hero .eyebrow{font-size:8px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 @media print{.utility-bar,.site-header,.site-footer,.booking-banner,.booking-progress,.form-navigation,.copy-booking{display:none!important}.container{width:100%}.booking-layout{display:block}.booking-aside{position:static}body{background:white}.hero-visual{max-width:400px}.button{border:1px solid #999}}
+
+/* Keep the original branded poster fully visible, including its text. */
+.hero-visual.original-artwork,.feature-image.original-artwork{width:100%;max-width:460px;justify-self:end}
+.original-artwork .original-poster{width:100%;height:auto;aspect-ratio:1024/1535;object-fit:contain;background:#fff;border:1px solid var(--line)}
+@media(max-width:760px){.hero-visual.original-artwork,.feature-image.original-artwork{justify-self:center;margin:0}}

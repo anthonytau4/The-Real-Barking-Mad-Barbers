@@ -1,6 +1,6 @@
 # Barking Mad Barbers remaster
 
-The site has been rebuilt with cream, charcoal, sage and gold, clear square-edged panels, editorial typography, a new decorative dog portrait and the original family photographs. All public pages share the design system.
+The site has been rebuilt with cream, charcoal, sage and gold, clear square-edged panels, editorial typography, the original branded grooming advert, white-and-gold backdrop and family photographs. All public pages share the design system.
 
 ![Desktop homepage](remaster-desktop.webp)
 
@@ -24,10 +24,12 @@ The site has been rebuilt with cream, charcoal, sage and gold, clear square-edge
 - No uncaught browser errors were recorded. Desktop and mobile screenshots were visually reviewed.
 - `npm run build`, `npm test`, script syntax checks and `git diff --check` pass.
 
+After restoring the original artwork, the homepage, sanctuary, services and booking pages were checked at 1440, 390 and 320 pixels. The advert displays without cropping, the original background loads, and all 12 combinations passed with no horizontal overflow, browser errors or failed resources. The desktop and mobile previews above were refreshed.
+
 Browser verification used Chromium 133 on Linux with the viewport sizes above. SMS/email links and prepared messages were verified without sending a real customer message. Opening a native messaging app on a physical iPhone or Android device was not tested.
 
 ## Delivery
 
 The existing custom domain and GitHub Pages deployment are retained. Each route now has its own generated HTML, including the missing boarding route; no application-server fallback is needed. Page-specific metadata, a sitemap, a 404 and structured business data are included. Original assets remain in the repository.
 
-The new primary portrait is about 130 KB; its mobile version is about 42 KB. The previous 2.9 MB advert is retained as an asset but is no longer downloaded as the hero. Runtime dependencies and external font requests are not required.
+The original 2.9 MB grooming advert and white-and-gold background have been restored at the owner’s request. The advert displays in full on desktop and mobile. Runtime dependencies and external font requests are not required.

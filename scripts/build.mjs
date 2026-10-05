@@ -3,12 +3,12 @@ import { fileURLToPath } from 'node:url';
 import { BUSINESS as B, ROUTES, esc } from '../site-core.js';
 import { header, footer, renderPage } from '../site-views.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
-const version = '20261005-remaster';
+const version = '20261005-original-artwork';
 function page(route) {
   const [title, description] = ROUTES[route], privatePage = ['/admin/', '/sign-in/', '/404/'].includes(route);
   const structuredData = {
     '@context':'https://schema.org', '@type':'LocalBusiness', name:B.name, url:B.url, telephone:B.sms,
-    email:B.email, image:`${B.url}/assets/groomed-dog.webp`,
+    email:B.email, image:`${B.url}/assets/hero-advert.png`,
     address:{'@type':'PostalAddress',streetAddress:'5A Tawa Street',addressLocality:'Tawa, Wellington',addressCountry:'NZ'},
     openingHoursSpecification:{'@type':'OpeningHoursSpecification',dayOfWeek:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],opens:'08:30',closes:'15:00'}
   };
@@ -27,11 +27,12 @@ function page(route) {
   <meta property="og:title" content="${esc(title)} | ${B.name}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${B.url}${route}">
-  <meta property="og:image" content="${B.url}/assets/groomed-dog.webp">
+  <meta property="og:image" content="${B.url}/assets/hero-advert.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/assets/favicon.png" type="image/png">
   <link rel="stylesheet" href="/site.css?v=${version}">
-  ${route === '/' ? '<link rel="preload" as="image" href="/assets/groomed-dog.webp" imagesrcset="/assets/groomed-dog-small.webp 560w, /assets/groomed-dog.webp 1120w" imagesizes="(max-width: 760px) 92vw, 46vw">' : ''}
+  <link rel="stylesheet" href="/site-background.css?v=${version}">
+  ${route === '/' ? '<link rel="preload" as="image" href="/assets/hero-advert.png">' : ''}
   ${privatePage ? '' : `<script type="application/ld+json">${JSON.stringify(structuredData)}</script>`}
 </head>
 <body id="top" data-route="${route}">
