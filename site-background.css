@@ -36,3 +36,9 @@ body::before {
     position: absolute;
   }
 }
+
+/* Place the remastered page content above the original backdrop. */
+.utility-bar, #main, .site-footer, .noscript-notice {
+  position: relative;
+  z-index: 1;
+}

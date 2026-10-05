@@ -41,4 +41,4 @@ The existing GitHub Pages deployment and `CNAME` are retained. Every page has it
 
 The main content, contact links and FAQ remain readable without JavaScript. Forms and the live price selector require JavaScript; a direct text/email fallback is shown when scripting is disabled.
 
-Original brand and family assets are preserved. See `assets/ASSETS.md` for the new decorative portrait and its prompt.
+The original grooming advert and white-and-gold background are used throughout the remaster. Original brand and family photographs are preserved; see `assets/ASSETS.md`.
