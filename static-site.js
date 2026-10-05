@@ -1,501 +1,260 @@
-const AS="/assets/",PHONE="027 247 2493",SMS="+64272472493",EMAIL="barkingmadbarbers@gmail.com";
-const STORE="bmb_static_enquiries_v1",PROFILE="bmb_static_profile_v1";
-const nav=[["Services","/services"],["Boarding","/boarding"]],aboutNav=[["Calm Sanctuary","/Sanctuary"],["Our Family","/our-family"],["Meet the Team","/team"],["Dog Care Helper","/helper"]],navEnd=[["Contact","/contact"]];
-const prices={full:[["Tiny",80],["Small",90],["Medium",110],["Large",130],["Extra Large",150]],wash:[["Tiny",45],["Small",50],["Medium",55],["Large",60],["Extra Large",70]],boarding:[["Overnight stays","by arrangement"],["Comfortable routine","meals, rest and attention"],["Family-style care","treated like one of our own"]],extras:[["Flea Shampoo",20,"flea"],["Nail Trim",20,"nails"],["Teeth Brush",10,"teeth"],["Face Tidy",10,"face"],["Anal Gland Expression",20,"medical"]]};
-const money=amount=>`$${amount.toLocaleString("en-NZ")}`;
-const groomingServices={"Full Groom":"full","Wash & Dry":"wash"};
-const includedServices={"Full Groom":["Face Tidy","Nail Trim","Anal Gland Expression"],"Wash & Dry":["Nail Trim","Anal Gland Expression"]};
-function sizeOptions(){return '<option value="">Pick size</option>'+prices.full.map(([size])=>`<option>${size}</option>`).join("")}
-function serviceAmount(service,size,selected=[]){
-  const main=selected.find(s=>groomingServices[s]);
-  if(includedServices[main]?.includes(service))return 0;
-  if(groomingServices[service])return prices[groomingServices[service]].find(row=>row[0]===size)?.[1]??null;
-  return prices.extras.find(row=>row[0]===service)?.[1]??null;
-}
-function groomingEstimate(dogList){
-  const estimates=dogList.map((dog,i)=>{
-    const selected=[...new Set(dog.services||[])];
-    // A full groom already includes a wash; never bill for both packages.
-    const services=selected.filter(s=>s!=="Wash & Dry"||!selected.includes("Full Groom"));
-    const items=services.map(service=>({service,amount:serviceAmount(service,dog.dog_size,services)}));
-    return {name:dog.dog_name||`Dog ${i+1}`,size:dog.dog_size,items,total:items.reduce((sum,item)=>sum+(item.amount??0),0),complete:prices.full.some(row=>row[0]===dog.dog_size)&&items.length>0&&items.every(item=>item.amount!==null)};
-  });
-  return {dogs:estimates,total:estimates.reduce((sum,dog)=>sum+dog.total,0),complete:estimates.length>0&&estimates.every(dog=>dog.complete),hasPrices:estimates.some(dog=>dog.items.some(item=>item.amount!==null))};
-}
-function estimateMarkup(estimate){
-  return `<h3>Grooming estimate</h3>${estimate.dogs.map(dog=>`<div class="estimate-dog"><h4>${esc(dog.name)}${dog.size?` <span>· ${esc(dog.size)}</span>`:""}</h4>${dog.items.length?`<dl>${dog.items.map(item=>`<div class="estimate-line"><dt>${esc(item.service)}</dt><dd>${item.amount===null?"Choose size":item.amount===0?"Included":money(item.amount)}</dd></div>`).join("")}</dl>`:'<p class="estimate-note">Choose a service for this dog.</p>'}</div>`).join("")}<div class="estimate-total"><span>${estimate.complete?"Estimated total":"Subtotal so far"}</span><strong>${estimate.hasPrices?money(estimate.total):"—"}</strong></div>${estimate.complete?"":'<p class="estimate-note">Choose a size and at least one service for each dog to complete your estimate.</p>'}<p class="estimate-note">All prices are NZD. Final price depends on breed and coat condition.</p>`;
-}
-function bookingPriceGuide(){
-  return `<div class="clean-card booking-price-guide"><h3>Grooming prices</h3><table><caption>Base prices in NZD</caption><thead><tr><th scope="col">Size</th><th scope="col">Full Groom</th><th scope="col">Wash & Dry</th></tr></thead><tbody>${prices.full.map(([size,amount])=>`<tr><th scope="row">${size}</th><td>${money(amount)}</td><td>${money(serviceAmount("Wash & Dry",size))}</td></tr>`).join("")}</tbody></table><p class="estimate-note">Nail trim is included with both grooms. Face tidy is included with a Full Groom.</p></div>`;
-}
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const ICON_ART={
-  calm:`<path d="M45 16c-11 0-20 9-20 20 0 5 2 9 5 13-10-2-17-11-17-22 0-12 10-22 22-22 8 0 15 4 19 11-2 0-4 0-7 0Z"/><path d="m39 34 3 3 7-8"/>`,
-  boarding:`<path d="m10 29 22-18 22 18"/><path d="M16 27v25h32V27"/><path d="M26 52V38h12v14"/><path d="M43 21v-7h6v12"/><path d="M28 30c2-4 8-4 8 1 0 4-4 6-4 6s-4-2-4-7Z"/>`,
-  experienced:`<circle cx="19" cy="20" r="7"/><circle cx="19" cy="44" r="7"/><path d="m25 24 27 24M25 40l27-24"/><path d="M42 28h12M42 34h12"/>`,
-  text:`<path d="M10 13h44v31H29L17 53v-9h-7Z"/><circle class="icon-fill" cx="22" cy="29" r="2.5"/><circle class="icon-fill" cx="32" cy="29" r="2.5"/><circle class="icon-fill" cx="42" cy="29" r="2.5"/>`,
-  home:`<path d="m9 31 23-19 23 19"/><path d="M15 28v25h34V28"/><path d="M25 53V39h14v14"/><circle class="icon-fill" cx="28" cy="32" r="2.5"/><circle class="icon-fill" cx="36" cy="32" r="2.5"/><path d="M27 38c2-4 8-4 10 0-2 5-8 5-10 0Z"/>`,
-  routine:`<circle cx="32" cy="31" r="23"/><path d="M32 17v15l10 6"/><circle class="icon-fill" cx="32" cy="31" r="2.8"/><path d="m14 49-4 6M50 49l4 6"/>`,
-  love:`<path d="M32 53S10 41 10 24c0-11 14-15 22-5 8-10 22-6 22 5 0 17-22 29-22 29Z"/><circle class="icon-fill" cx="27" cy="30" r="2.5"/><circle class="icon-fill" cx="37" cy="30" r="2.5"/><path d="M27 38c2-6 8-6 10 0-2 5-8 5-10 0Z"/>`,
-  one:`<path d="M15 49c5-11 13-16 22-13l11 4c5 2 4 10-2 10H29"/><path d="m17 50-7-11 8-5 7 12"/><circle cx="38" cy="17" r="4"/><circle cx="49" cy="21" r="4"/><circle cx="31" cy="25" r="4"/><path d="M37 31c2-8 12-7 14 1-3 7-11 7-14-1Z"/>`,
-  clean:`<path d="M25 12C18 23 14 29 14 36c0 10 8 18 18 18s18-8 18-18c0-7-5-15-13-27"/><path d="M24 38c3 5 8 7 14 5"/><circle cx="47" cy="14" r="5"/><circle cx="53" cy="28" r="3"/><path d="m38 17 3 3 7-7"/>`,
-  phone:`<path d="M18 10h10l5 13-7 5c4 9 8 13 17 17l5-7 13 5v10c0 4-3 7-7 7C31 58 6 33 9 17c1-4 4-7 9-7Z"/>`,
-  hours:`<circle cx="32" cy="32" r="24"/><path d="M32 17v16l11 7"/><path d="M16 11 9 18M48 11l7 7"/>`,
-  location:`<path d="M52 26c0 16-20 29-20 29S12 42 12 26a20 20 0 1 1 40 0Z"/><circle cx="32" cy="25" r="7"/><path d="m28 24 3 3 6-7"/>`,
-  flea:`<path d="M20 14h24v8l5 7v25H15V29l5-7Z"/><path d="M24 14V8h16v6M15 34h34"/><circle cx="32" cy="42" r="6"/><path d="m28 38-6-5m14 5 6-5m-14 13-7 3m15-3 7 3"/>`,
-  nails:`<path d="M12 38c8-10 17-13 27-9l11 5c6 3 4 12-2 12H30"/><path d="M20 30 14 18m14 10-4-14m13 15V15m8 17 4-12"/><path d="M12 38 8 50l15 4 7-10"/>`,
-  teeth:`<path d="M22 9c-9 0-12 8-10 17 2 8 5 27 12 27 5 0 3-14 8-14s3 14 8 14c7 0 10-19 12-27 2-9-1-17-10-17-5 0-7 3-10 3s-5-3-10-3Z"/><path d="M8 45h26M10 40h24M13 35h21"/><path d="m34 32 13-13 6 6-13 13"/>`,
-  face:`<path d="M17 23 10 11c10-2 16 3 19 8M47 23l7-12c-10-2-16 3-19 8"/><path d="M14 31c0-12 8-19 18-19s18 7 18 19c0 14-8 23-18 23S14 45 14 31Z"/><circle class="icon-fill" cx="25" cy="31" r="2.5"/><circle class="icon-fill" cx="39" cy="31" r="2.5"/><path d="M28 41c3 3 5 3 8 0"/><path d="m43 47 12 8m-12 0 12-8"/>`,
-  medical:`<path d="M20 10h24v10h10v34H10V20h10Z"/><path d="M25 10V7h14v3M32 27v18M23 36h18"/><circle class="icon-fill" cx="18" cy="15" r="2"/><circle class="icon-fill" cx="46" cy="15" r="2"/>`,
-  start:`<path d="M9 14h29v36H9Z"/><path d="M17 23h13M17 32h13M17 41h9"/><path d="m39 32 7 7 10-15"/><circle class="icon-fill" cx="13" cy="23" r="1.8"/><circle class="icon-fill" cx="13" cy="32" r="1.8"/><circle class="icon-fill" cx="13" cy="41" r="1.8"/>`,
-  groom:`<circle cx="17" cy="18" r="7"/><circle cx="17" cy="46" r="7"/><path d="m23 22 29 27M23 42l29-27"/><path d="M41 25h14M41 31h14M41 37h14"/>`,
-  stay:`<path d="m8 31 24-20 24 20"/><path d="M15 28v25h34V28"/><path d="M26 53V39h12v14"/><path d="M42 17a8 8 0 0 0 8 8 8 8 0 0 1-11-11 8 8 0 0 0 3 3Z"/>`,
-  dog:`<path d="M17 23 10 11c10-2 16 3 19 8M47 23l7-12c-10-2-16 3-19 8"/><path d="M14 31c0-12 8-19 18-19s18 7 18 19c0 14-8 23-18 23S14 45 14 31Z"/><circle class="icon-fill" cx="25" cy="31" r="2.5"/><circle class="icon-fill" cx="39" cy="31" r="2.5"/><path class="icon-fill" d="M27 40c3-4 7-4 10 0-2 5-8 5-10 0Z"/>`,
-  send:`<path d="M8 29 56 9 39 55l-9-18Z"/><path d="m30 37 26-28"/><path d="M30 37 18 49v-17"/>`,
-  add:`<circle cx="17" cy="19" r="4"/><circle cx="29" cy="15" r="4"/><circle cx="12" cy="31" r="4"/><path d="M17 42c2-9 12-11 18-4 5 7-2 13-10 12-6 0-10-3-8-8Z"/><circle cx="48" cy="43" r="10"/><path d="M48 37v12M42 43h12"/>`,
-  chat:`<path d="M9 12h46v32H31L18 54V44H9Z"/><circle cx="27" cy="27" r="3"/><circle cx="37" cy="27" r="3"/><path d="M27 35c3 3 7 3 10 0"/>`,
-  paw:`<circle cx="20" cy="23" r="5"/><circle cx="32" cy="17" r="5"/><circle cx="44" cy="23" r="5"/><circle cx="15" cy="36" r="5"/><circle cx="49" cy="36" r="5"/><path d="M21 47c2-10 17-15 23-3 5 10-5 14-12 11-7 3-13 0-11-8Z"/>`
-};
-const iconSvg=k=>`<svg class="icon-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false">${ICON_ART[k]||ICON_ART.paw}</svg>`;
-const icon=k=>`<span class="icon-sq icon-${k}" aria-hidden="true">${iconSvg(k)}</span>`;
-const poster=c=>" <div class='"+(c||"poster-card")+"'><img class='unveil' src='"+AS+"hero-advert.png' alt='Barking Mad Barbers advert'></div>";
-const navLink=([n,u])=>`<a href="${u}" data-link class="nav-link">${n}</a>`;
-function setNav(){
-  $(".nav-links").innerHTML=nav.map(navLink).join("")+
-    `<div class="nav-drop"><button class="nav-link drop-btn" type="button" aria-haspopup="true" aria-expanded="false">About<span class="drop-caret">&#9662;</span></button><div class="drop-menu">${aboutNav.map(navLink).join("")}<div class="drop-divider"></div><a href="/sign-in" data-link class="nav-link">Saved details</a></div></div>`+
-    navEnd.map(navLink).join("");
-  $("#mobileDrawer").innerHTML=[...nav,...navEnd].map(navLink).join("")+
-    `<div class="drawer-label">More</div>`+aboutNav.map(navLink).join("")+
-    `<a href="/sign-in" data-link class="nav-link">Saved details</a><a href="/book" data-link class="btn btn-gold">Book Now</a>`;
-  const drop=$(".nav-drop"),btn=$(".drop-btn");
-  btn.onclick=e=>{e.stopPropagation();drop.classList.toggle("open");btn.setAttribute("aria-expanded",drop.classList.contains("open"))};
-  document.addEventListener("click",e=>{if(!drop.contains(e.target)){drop.classList.remove("open");btn.setAttribute("aria-expanded","false")}});
-  document.addEventListener("keydown",e=>{if(e.key==="Escape"){drop.classList.remove("open");btn.setAttribute("aria-expanded","false")}});
-}
-function key(p=location.pathname){p=decodeURIComponent(p).replace(/\/+$/,"").toLowerCase()||"/";return p==="/"?"home":p.includes("family")?"our-family":p.includes("board")?"boarding":p.includes("sanctuary")?"sanctuary":p.includes("service")?"services":p.includes("team")?"team":p.includes("book")?"book":p.includes("helper")||p.includes("help")?"helper":p.includes("contact")?"contact":p.includes("sign")||p.includes("login")?"sign-in":p.includes("admin")?"admin":"home"}
-function shell(title,kicker,copy,body){return `<div class="wrap page-hero"><div class="page-hero-grid"><div class="reveal-left"><div class="kicker">${kicker}</div><h1 class="page-title"><span class="rl"><span>${title}</span></span></h1><p class="lead fade-up">${copy}</p></div><div class="reveal-right">${poster("page-poster")}</div></div></div><div class="wrap">${body}</div>`}
-function card(i,t,c,delay){return `<article class="card reveal stagger-${delay||1}">${icon(i)}<h3>${t}</h3><p>${c}</p></article>`}
-function price(t,from,rows,copy){return `<article class="card price-card reveal-scale"><div class="price-top"><h3>${t}</h3><div class="from">${from}</div></div><div class="price-list"><p>${copy}</p>${rows.map(r=>`<div class="price-row"><span>${r[0]}</span><strong>${typeof r[1]==="number"?money(r[1]):r[1]}</strong></div>`).join("")}</div></article>`}
-function serviceBlock(){return `<section class="section"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Services</div><h2 class="section-title">Grooms, stays & genuine care.</h2></div><a href="/book" data-link class="btn btn-gold">Book Now</a></div><div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Bath, blow dry, brush out, full body clip, face & feet finish, nail trim, ear clean and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Bath, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Home-style boarding. Your dog stays comfortable with routine, attention and real care.")}</div></div></section>`}
-function brandTitle(){return `<section class="brand-hero"><span class="float-tool ft-a" aria-hidden="true"><span class="tool-glyph">&#9986;</span></span><span class="float-tool ft-b" aria-hidden="true"><span class="tool-glyph">&#9986;</span></span><h1 class="brand-display brand-static">Barking Mad <span class="gold">Barbers</span></h1><canvas id="brandCanvas" class="hidden" aria-hidden="true"></canvas><div class="brand-rule"></div></section>`}
-function home(){return `${brandTitle()}<section class="hero"><div class="wrap hero-grid"><div class="reveal-left"><div class="eyebrow">Tawa dog grooming & boarding</div><h1 class="display"><span class="rl"><span>Groomed with <span class="gold">Love.</span></span></span><span class="rl"><span>Treated like <span class="gold">Family.</span></span></span></h1><p class="lead fade-up">Beautiful grooms and cozy boarding where your dog is genuinely cared for — calm space, familiar routines, and proper attention while you're away.</p><div class="hero-actions fade-up"><a href="/book" data-link class="btn btn-gold pulse-anim">Book Dog Care</a><a href="/services" data-link class="btn btn-soft">View Services</a></div><div class="lead"><strong>Mon–Sat 8:30am – 3:00pm • Bookings only</strong></div></div><div class="reveal-right">${poster()}</div></div></section><section class="section"><div class="wrap"><div class="section-head reveal"><div><div class="kicker">Why Barking Mad</div><h2 class="section-title">Premium groom or stay. Zero stress.</h2></div><p class="section-copy">Your dog stays somewhere safe, follows their routine, gets one-on-one attention, and is treated like part of the family.</p></div><div class="grid grid-4">${card("calm","Calm Sanctuary","Peaceful, low-stress space where dogs feel safe and loved.",1)}${card("boarding","Dog Boarding","A homely stay with care, company and routine.",2)}${card("experienced","Experienced Team","Skilled grooming with patient one-on-one attention.",3)}${card("text","Text to Book","Tap Book Now, and your text app opens with everything ready to send.",4)}</div></div></section>${serviceBlock()}${cta()}`}
-function services(){return shell('Services & <span class="gold">Prices</span>',"Premium grooming & boarding","Pick the service that suits your dog. Prices may vary for heavily matted coats. Boarding is arranged by enquiry.",`<div class="grid grid-3">${price("Full Groom","from $80",prices.full,"Bath, shampoo & condition, blow dry, brush out, full body clip, face & feet finish, nail trim, ear clean and anal gland expression.")}${price("Wash & Dry","from $45",prices.wash,"Bath, shampoo & condition, blow dry, brush out, nail trim, anal gland expression and cologne.")}${price("Dog Boarding","ask us",prices.boarding,"Comfortable boarding that feels like staying with people who actually love dogs — not a kennel.")}</div><section class="section"><div class="section-head reveal"><div><div class="kicker">Extras</div><h2 class="section-title">Add-on care.</h2></div></div><div class="grid grid-3">${prices.extras.map((r,i)=>`<article class="clean-card reveal stagger-${i+1}">${icon(r[2])}<h3>${r[0]}</h3><p><strong class="gold">${money(r[1])}</strong> added to your groom.</p></article>`).join("")}</div></section>`)}
-function boarding(){return shell('Dog <span class="gold">Boarding</span>',"Loved like family","Your dog stays in a calm, homely setting with familiar routines, real attention, and the kind of care you'd want from someone looking after your own pup.",`<div class="grid grid-3">${card("home","A real home stay","Comfortable, personal, settled — with company and calm care.",1)}${card("routine","Routine kept intact","Meals, medication, sleep habits, quirks — we follow your dog's routine.",2)}${card("love","Family-style love","We get to know your dog, reassure them, and treat them like ours.",3)}</div><section class="section"><div class="clean-card reveal" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Boarding enquiries</div><h2 class="section-title">Tell us about your dog.</h2><p class="section-copy">Send dates, breed, size, temperament, and feeding needs.</p></div><a href="/book" data-link class="btn btn-gold pulse-anim">Book boarding</a></div></section>`)}
-function sanctuary(){return shell('Calm <span class="gold">Sanctuary</span>',"Low-stress care","A quiet, appointment-only space for dogs who need patience, routine and kindness.",`<div class="grid grid-3">${card("calm","Calm first","We work around comfort, coat condition and confidence.",1)}${card("one","One-on-one","Less rush, less noise, more care for each dog.",2)}${card("clean","Clean & gentle","Gentle grooming products and a tidy finish every time.",3)}</div>`)}
-function team(){return shell('Meet the <span class="gold">Team</span>',"Our team","The people behind every happy groom and cozy stay.",`<div class="grid grid-2"><article class="clean-card reveal stagger-1"><img class="unveil" src="${AS}team-dog.webp" alt="Team member with dog" style="aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Dog-loving care</h3><p>Friendly, calm and focused on a finish that suits your dog.</p></article><article class="clean-card reveal stagger-2"><img class="unveil" src="${AS}team-beach.webp" alt="Barking Mad family photo" style="aspect-ratio:1/1;object-fit:cover;margin-bottom:18px"><h3>Local Tawa family</h3><p>A Wellington grooming & boarding business with a warm, personal feel.</p></article></div>`)}
-function family(){return shell('Our <span class="gold">Family</span>',"Loved like our own","Send photo links or family page requests by email.",`<div class="split"><form class="card form reveal stagger-1" id="galleryForm"><h3>Share your dog</h3><div class="form-grid"><div class="field"><label>Your name</label><input name="owner_name"></div><div class="field"><label>Email</label><input name="email" type="email"></div></div><div class="field"><label>Dog name</label><input name="dog_name" required></div><div class="field"><label>Photo URL</label><input name="image_url" placeholder="Paste a photo link"></div><div class="field"><label>Caption</label><textarea name="caption"></textarea></div><button class="btn btn-gold" type="submit">Email Photo Details</button><div id="galleryStatus"></div></form><form class="card form reveal stagger-2" id="requestForm"><h3>Send a request</h3><div class="form-grid"><div class="field"><label>Your name</label><input name="name" required></div><div class="field"><label>Email</label><input name="email" type="email"></div></div><div class="form-grid"><div class="field"><label>Phone</label><input name="phone"></div><div class="field"><label>Request type</label><input name="request_type"></div></div><div class="field"><label>Message</label><textarea name="message" required></textarea></div><button class="btn btn-dark" type="submit">Text Request</button><div id="requestStatus"></div></form></div>`)}
-function serviceOptions(){
-  return ["Full Groom","Wash & Dry","Face Tidy","Nail Trim","Teeth Brush","Flea Shampoo"].map(service=>`<label><input type="checkbox" name="services" value="${service}" aria-label="${service}"><span class="service-option-label"><span>${service}</span><strong data-service-price>${groomingServices[service]?`from ${money(prices[groomingServices[service]][0][1])}`:money(serviceAmount(service,""))}</strong></span></label>`).join("");
-}
-let dogFieldId=0;
-function dogCardFun(i=1){
-  const id=`dog-${++dogFieldId}`;
-  return `<div class="dog-card-fun" data-dog="${i}"><div class="dog-card-header"><div class="dog-avatar" aria-hidden="true">${iconSvg("dog")}</div><div class="dog-label">Dog ${i}</div><button class="btn btn-soft remove-dog" type="button" style="margin-left:auto;padding:8px 12px;font-size:12px">✕ Remove</button></div><div class="dog-card-body"><div class="form-grid"><div class="field"><label for="${id}-name">Dog's name</label><input id="${id}-name" name="dog_name" required placeholder="What's their name?"></div><div class="field"><label for="${id}-size">Size</label><select id="${id}-size" name="dog_size" required>${sizeOptions()}</select></div></div><div class="form-grid"><div class="field"><label for="${id}-breed">Breed</label><input id="${id}-breed" name="breed" required placeholder="e.g. Poodle, Labrador"></div><div class="field"><label for="${id}-time">Preferred time</label><input id="${id}-time" name="dog_preferred_time" placeholder="Morning / afternoon / any"></div></div><div class="field"><span id="${id}-services" class="services-label">Pick their services</span><div class="checkbox-fun" role="group" aria-labelledby="${id}-services">${serviceOptions()}</div><p class="estimate-note">Choose one groom, plus any extras, or book extras on their own.</p></div><p class="dog-estimate"></p></div></div>`;
-}
-function boardingFieldsWizard(){return `<div class="form-grid"><div class="field"><label>Dog's name</label><input name="boarding_dog_name" required placeholder="Your dog's name"></div><div class="field"><label>Breed</label><input name="boarding_breed" required placeholder="e.g. Golden Retriever"></div></div><div class="form-grid"><div class="field"><label for="boarding-size">Size</label><select id="boarding-size" name="boarding_size" required>${sizeOptions()}</select></div><div class="field"><label>Meet & greet date</label><input name="meet_greet" placeholder="When works for a meet?"></div></div><div class="form-grid"><div class="field"><label>Drop off</label><input name="drop_off" type="date" required></div><div class="field"><label>Pick up</label><input name="pick_up" type="date" required></div></div><div class="field"><label>Anything we should know?</label><textarea name="boarding_notes" placeholder="Feeding routine, medication, sleep habits, temperament..."></textarea></div>`}
-function book(){
-  return shell('Book Dog <span class="gold">Care</span>',"Grooming & boarding","Pick your service, add your dog's details, and we'll have your text ready to send in seconds.",`
-<div class="booking-shell">
-<div class="booking-form-card wizard" id="bookingWizard">
-  <div class="booking-form-head"><div><h3 class="shimmer-text">Let's book your pup in!</h3><p>Quick & easy — just follow the steps.</p></div><span class="tag goldtag">3 steps</span></div>
-  <div class="wizard-progress"><span class="wizard-step-dot active" data-step="1"></span><span class="wizard-connector"></span><span class="wizard-step-dot" data-step="2"></span><span class="wizard-connector"></span><span class="wizard-step-dot" data-step="3"></span></div>
-  <form id="bookingForm">
-    <div class="wizard-slide active" data-slide="1">
-      <div class="wizard-emoji" aria-hidden="true">${iconSvg("start")}</div>
-      <h3 class="wizard-title">What does your dog need?</h3>
-      <p class="wizard-subtitle">Pick the type of care and we'll ask the right questions.</p>
-      <div class="service-pick">
-        <div class="service-pick-card" data-value="Grooming" onclick="pickService(this)">
-          <span class="pick-emoji" aria-hidden="true">${iconSvg("groom")}</span>
-          <div class="pick-title">Grooming</div>
-          <div class="pick-desc">Full groom, wash & dry, or extras</div>
-        </div>
-        <div class="service-pick-card" data-value="Dog Boarding" onclick="pickService(this)">
-          <span class="pick-emoji" aria-hidden="true">${iconSvg("stay")}</span>
-          <div class="pick-title">Dog Boarding</div>
-          <div class="pick-desc">A comfy stay while you're away</div>
-        </div>
-      </div>
-      <input type="hidden" name="service_type" id="serviceTypeHidden" value="Grooming">
-      <div class="wizard-nav"><button type="button" class="btn btn-gold" onclick="wizardNext()">Next →</button></div>
-    </div>
-    <div class="wizard-slide" data-slide="2">
-      <div class="wizard-emoji" aria-hidden="true">${iconSvg("dog")}</div>
-      <h3 class="wizard-title">Tell us about your dog</h3>
-      <p class="wizard-subtitle">Add details so we can give them the best care.</p>
-      <div class="form-grid"><div class="field"><label>Your name</label><input name="owner_name" required placeholder="Your full name"></div><div class="field"><label>Phone number</label><input name="phone" required placeholder="027 ..."></div></div>
-      <div class="form-grid"><div class="field"><label>Email (optional)</label><input name="email" type="email" placeholder="you@email.com"></div><div class="field grooming-only"><label>Preferred date</label><input name="preferred_date" type="date"></div></div>
-      <div class="field grooming-only"><label>Preferred time</label><input name="preferred_time" placeholder="Morning / afternoon / any time"></div>
-      <div id="groomingPanel">
-        <div id="dogsList">${dogCardFun(1)}</div>
-        <button class="add-dog-fun" type="button" id="addDogBtn"><span class="add-icon" aria-hidden="true">${iconSvg("add")}</span> Add another dog</button>
-        <section class="booking-estimate" id="bookingEstimate" aria-label="Live grooming price estimate" aria-live="polite" aria-atomic="true"></section>
-        <div class="field" style="margin-top:14px"><label>Extra notes</label><textarea name="notes" placeholder="Anything else we should know?"></textarea></div>
-      </div>
-      <div id="boardingPanel" class="hidden">${boardingFieldsWizard()}</div>
-      <div class="wizard-nav"><button type="button" class="btn btn-soft" onclick="wizardPrev()">← Back</button><button type="button" class="btn btn-gold" onclick="wizardNext()">Next →</button></div>
-    </div>
-    <div class="wizard-slide" data-slide="3">
-      <div class="wizard-emoji" aria-hidden="true">${iconSvg("send")}</div>
-      <h3 class="wizard-title">Ready to send!</h3>
-      <p class="wizard-subtitle">Your text message is prepped. Hit send and you're done.</p>
-      <section class="booking-estimate" id="bookingReview" aria-label="Booking price estimate"></section>
-      <label class="sms-consent"><input name="booking_sms_consent" type="checkbox" required><span>This will open your text app with the message ready to send to Barking Mad Barbers.</span></label>
-      <div class="wizard-nav"><button type="button" class="btn btn-soft" onclick="wizardPrev()">← Back</button><button class="btn btn-gold" type="submit">Send Enquiry</button></div>
-      <div id="bookingStatus" style="margin-top:16px"></div>
-    </div>
-  </form>
-</div>
-<aside class="booking-side">
-  ${bookingPriceGuide()}
-  <div class="sms-notice reveal"><h3>Texting is best</h3><p>Your enquiry opens as a ready-to-send text. No apps, no accounts — just tap send.</p><a class="btn btn-dark" id="textToBookBtn" href="sms:${SMS}">Quick text</a></div>
-  <div class="clean-card reveal stagger-2"><h3>Good to know</h3><div class="note-list"><div class="note"><span class="dot"></span><span>Pick Grooming for the groom form.</span></div><div class="note"><span class="dot"></span><span>Pick Boarding for stay dates & care info.</span></div><div class="note"><span class="dot"></span><span>Final price depends on size, breed & coat condition.</span></div><div class="note"><span class="dot"></span><span>Bring your own food and harness for boarding stays.</span></div></div></div>
-</aside>
-</div>`)}
-function helper(){let body=encodeURIComponent("Hi Barking Mad Barbers, I have a question about my dog.");return shell('Dog Care <span class="gold">Helper</span>',"Text the team","Got a question? Send it straight to us by text — nothing gets lost.",`<div class="chat-shell"><div class="chat-phone reveal-scale"><div class="chat-head"><div class="avatar" aria-hidden="true">${iconSvg("chat")}</div><div><div class="chat-name">Barking Mad Helper</div><div class="chat-presence">Text-friendly help</div></div></div><div class="chat-feed" id="chatFeed"><div class="msg-row bot"><div class="avatar" aria-hidden="true">${iconSvg("chat")}</div><div class="bubble">Need help with grooming, boarding, matting, pricing, or booking? Text us and we'll reply when we're free.</div></div></div><div class="chat-composer"><a class="btn btn-gold" style="width:100%" href="sms:${SMS}?body=${body}">Text us your question</a><p class="section-copy" style="margin:0">We text back as soon as we can — we might be with a dog!</p></div></div></div>`)}
-function contact(){return shell('Contact <span class="gold">Us</span>',"Tawa, Wellington","Text to book, ask anything, or confirm what your dog needs.",`<div class="grid grid-3">${card("phone","Phone",PHONE,1)}${card("hours","Hours","Mon–Sat 8:30am – 3:00pm",2)}${card("location","Location","5A Tawa Street, Tawa Wellington",3)}</div><section class="section"><div class="split"><form class="card form reveal stagger-1" id="contactForm"><h3>Message the team</h3><div class="form-grid"><div class="field"><label>Name</label><input name="name" required></div><div class="field"><label>Phone</label><input name="phone"></div></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Message</label><textarea name="message" required></textarea></div><button class="btn btn-gold" type="submit">Send as text</button><div id="contactStatus"></div></form><div class="clean-card reveal stagger-2"><h3>Email</h3><p><a href="mailto:${EMAIL}">${EMAIL}</a></p><p>Texting is always fastest. If you need a call, text first and we'll ring you back.</p><div class="hero-actions"><a class="btn btn-gold" href="/book" data-link>Book online</a><a class="btn btn-soft" href="sms:${SMS}">Text now</a></div></div></div></section>`)}
-function signIn(){return shell('Saved <span class="gold">Details</span>',"Save on this device","Store your name, email and phone on this device so forms auto-fill next time.",`<div class="split"><form class="card form reveal stagger-1" id="profileForm"><div class="field"><label>Name</label><input name="name"></div><div class="field"><label>Email</label><input name="email" type="email"></div><div class="field"><label>Phone</label><input name="phone"></div><button class="btn btn-gold" type="submit">Save Details</button><div id="signinStatus"></div></form><div class="clean-card reveal stagger-2" id="profileBox"></div></div>`)}
-function admin(){return shell('Static <span class="gold">Enquiries</span>',"Local browser only","Shows enquiries saved on this browser. Real customer messages arrive by text or email.",`<div class="clean-card reveal"><h3>No server</h3><p>No login, no database, no shared dashboard. Customer enquiries arrive by text and email through the public booking forms.</p><div class="hero-actions"><button class="btn btn-soft" onclick="renderInbox()">Refresh local inbox</button><button class="btn btn-soft" onclick="clearInbox()">Clear local inbox</button></div></div><section class="section"><div id="adminStatus"></div><div id="staticInbox" class="admin-list"></div></section>`)}
-function cta(){return `<section class="section"><div class="wrap"><div class="clean-card reveal" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><div class="kicker">Ready?</div><h2 class="section-title">Make their next groom or stay feel <span class="shimmer-text">premium.</span></h2><p class="section-copy">Book calm care at 5A Tawa Street, Tawa Wellington.</p></div><a href="/book" data-link class="btn btn-gold pulse-anim">Message to book</a></div></div></section>`}
-function render(){const views={home,services,boarding,sanctuary,"our-family":family,team,book,helper,contact,"sign-in":signIn,admin};const app=$("#app");app.classList.remove("page-enter","page-exit");void app.offsetWidth;app.innerHTML=(views[key()]||home)();app.classList.add("page-enter");$$("a.nav-link").forEach(a=>a.classList.toggle("active",key(new URL(a.href).pathname)===key()));const db=$(".drop-btn");if(db)db.classList.toggle("active",$$(".drop-menu a.nav-link").some(a=>key(new URL(a.href).pathname)===key()));bindLinks();bindForms();scrollTo(0,0);if(key()==="sign-in")renderProfile();if(key()==="admin")renderInbox();initBrand();collectUnveil();initCardSprings();initReveal()}
-let navTimer=null;
-function navigate(path){
-  if(navTimer)return;
-  if(key(path)===key()){history.pushState({},"",path);scrollTo(0,0);return}
-  const app=$("#app");
-  if(REDUCED){history.pushState({},"",path);render();return}
-  app.classList.remove("page-enter");
-  app.classList.add("page-exit");
-  navTimer=setTimeout(()=>{navTimer=null;history.pushState({},"",path);render()},230);
-}
-function bindLinks(){$$("[data-link]").forEach(a=>a.onclick=e=>{let u=new URL(a.href);if(u.origin===location.origin){e.preventDefault();$("#mobileDrawer").classList.remove("open");$(".nav-drop")?.classList.remove("open");navigate(u.pathname)}})}
-function toggleMenu(){$("#mobileDrawer").classList.toggle("open")}
-addEventListener("popstate",render);
-function fd(f){return Object.fromEntries(new FormData(f).entries())}
-function dogs(){return $$(".dog-card-fun").map(e=>{let g=n=>e.querySelector(`[name="${n}"]`)?.value.trim()||"",services=[...e.querySelectorAll('[name="services"]:checked')].map(x=>x.value);return{dog_name:g("dog_name"),dog_size:g("dog_size"),breed:g("breed"),dog_preferred_time:g("dog_preferred_time"),service:services.join(", "),services}})}
-function refreshDogs(){$$(".dog-card-fun").forEach((e,i)=>{e.querySelector(".dog-label").textContent=`Dog ${i+1}`;let r=e.querySelector(".remove-dog");r.classList.toggle("hidden",$$(".dog-card-fun").length===1);r.onclick=()=>{e.remove();refreshDogs();updateWizard()}})}
+import { BUSINESS as B, SIZES, PRICES, EXTRAS, INCLUDED, PROFILE_KEY, INBOX_KEY, estimateDogs, money, esc, nzToday, stayError, smsUrl, bookingMessage } from './site-core.js';
+import { dogCard, icon } from './site-views.js';
 
-function updateBookingEstimate(){
-  const estimate=groomingEstimate(dogs());
-  $$(".dog-card-fun").forEach((card,i)=>{
-    const size=card.querySelector('[name="dog_size"]').value;
-    const selected=[...card.querySelectorAll('[name="services"]:checked')].map(input=>input.value);
-    card.querySelectorAll('[name="services"]').forEach(input=>{
-      const amount=serviceAmount(input.value,size,selected);
-      input.closest("label").querySelector('[data-service-price]').textContent=amount===null?`from ${money(prices[groomingServices[input.value]][0][1])}`:amount===0?"Included":money(amount);
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+const formData = form => Object.fromEntries([...new FormData(form)].map(([name, value]) => [name, typeof value === 'string' ? value.trim() : value]));
+function stored(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
+function writeStored(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch { return false; } }
+function removeStored(key) { try { localStorage.removeItem(key); return true; } catch { return false; } }
+function profile() { const data = stored(PROFILE_KEY, {}); return data && typeof data === 'object' && !Array.isArray(data) ? data : {}; }
+function history() { const data = stored(INBOX_KEY, []); return Array.isArray(data) ? data.filter(item => item && typeof item === 'object') : []; }
+function saveHistory(type, data) {
+  writeStored(INBOX_KEY, [{ type, data, created_at: new Date().toLocaleString('en-NZ'), id: Date.now().toString(36) }, ...history()].slice(0, 100));
+}
+function announce(target, message, error = false) {
+  target.innerHTML = `<div class="status${error ? ' error' : ''}">${esc(message)}</div>`;
+}
+async function copyText(text, target, preview, email = false) {
+  let feedback = $('.copy-feedback', target);
+  if (!feedback) { feedback = document.createElement('p'); feedback.className = 'copy-feedback status'; feedback.setAttribute('role', 'status'); target.append(feedback); }
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(text);
+    feedback.textContent = `Copied. Paste the message into ${email ? `an email to ${B.email}` : `a text to ${B.phone}`}, then send it.`;
+  } catch {
+    if (preview) { preview.focus(); preview.select(); }
+    feedback.textContent = 'Your browser couldn’t copy automatically. Select and copy the message above.';
+  }
+}
+function prepareMessage(target, body, { email = false, subject = '', showPreview = true } = {}) {
+  const url = email ? `mailto:${B.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : smsUrl(body, navigator.userAgent);
+  target.innerHTML = `<div class="status"><strong>Your ${email ? 'email' : 'text'} is ready.</strong><p>${email ? `Send it from your email app to ${B.email}. You can attach your photo there.` : `Send it from your messaging app to ${B.phone}. If your app doesn’t open, copy the message instead.`}</p>${showPreview ? `<label class="sr-only" for="${target.id}-preview">Prepared message</label><textarea id="${target.id}-preview" rows="7" readonly>${esc(body)}</textarea>` : ''}<div class="actions"><a class="button primary" href="${esc(url)}">Open ${email ? 'email' : 'text'} app ${icon('diagonal')}</a><button type="button" class="button outline" data-copy-message>Copy message</button></div></div>`;
+  $('[data-copy-message]', target).addEventListener('click', () => copyText(body, target, $('textarea', target) || $('#booking-preview'), email));
+  // Preparing an enquiry never means it has been delivered or confirmed.
+  if (email || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)) window.location.href = url;
+}
+
+function initNavigation() {
+  const toggle = $('.menu-toggle'), nav = $('#mobile-nav'), about = $('.nav-details');
+  const close = () => { toggle.setAttribute('aria-expanded', 'false'); nav.hidden = true; };
+  toggle.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded)); nav.hidden = expanded;
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    if (!nav.hidden) { close(); toggle.focus(); }
+    if (about.open) { about.open = false; $('summary', about).focus(); }
+  });
+  document.addEventListener('click', event => {
+    if (!about.contains(event.target)) about.open = false;
+    if (!nav.hidden && !$('.site-header').contains(event.target)) close();
+  });
+  document.addEventListener('focusin', event => {
+    if (about.open && !about.contains(event.target)) about.open = false;
+  });
+  matchMedia('(min-width:981px)').addEventListener('change', event => { if (event.matches) close(); });
+}
+function initPrices() {
+  $$('[name="price-size"]').forEach(input => input.addEventListener('change', () => {
+    if (!input.checked) return;
+    const i = SIZES.indexOf(input.value);
+    $$('[data-price]').forEach(el => {
+      el.textContent = money(PRICES[el.dataset.price][i]);
+      el.nextElementSibling.textContent = `${input.value} dog · NZD`;
+      const link = $('.button', el.closest('.service-card'));
+      const url = new URL(link.href); url.searchParams.set('size', input.value); link.href = url.pathname + url.search;
     });
-    const dog=estimate.dogs[i];
-    card.querySelector(".dog-estimate").textContent=dog.complete?`Estimated price: ${money(dog.total)} NZD`:"Choose a size and services to see this dog's estimate.";
-  });
-  const isBoarding=$("#serviceTypeHidden")?.value==="Dog Boarding";
-  $(".booking-price-guide")?.classList.toggle("hidden",isBoarding);
-  const summary=$("#bookingEstimate");
-  if(summary)summary.innerHTML=estimateMarkup(estimate);
-  const review=$("#bookingReview");
-  if(review)review.innerHTML=isBoarding?'<h3>Boarding price</h3><p>By arrangement. We’ll confirm the price for your dog’s stay when we reply.</p>':estimateMarkup(estimate);
-}
-function validateDogServices(){
-  for(const card of $$(".dog-card-fun")){
-    const input=card.querySelector('[name="services"]');
-    const valid=!!card.querySelector('[name="services"]:checked');
-    input.setCustomValidity(valid?"":"Choose at least one service for this dog.");
-    if(!valid){currentStep=2;updateWizard();input.focus();input.reportValidity();return false}
-  }
-  return true;
-}
-
-// === WIZARD LOGIC ===
-let currentStep=1;
-function pickService(el){
-  $$(".service-pick-card").forEach(c=>c.classList.remove("selected"));
-  el.classList.add("selected");
-  const v=el.dataset.value;
-  $("#serviceTypeHidden").value=v;
-  updateWizard();
-}
-function wizardNext(){
-  if(currentStep>=3)return;
-  const form=$("#bookingForm");
-  // Validate current slide inputs
-  const slide=$(`.wizard-slide[data-slide="${currentStep}"]`);
-  const inputs=slide.querySelectorAll("input[required],select[required],textarea[required]");
-  for(const inp of inputs){
-    if(inp.closest(".hidden"))continue;
-    if(inp.type==="checkbox"){if(!inp.checked){inp.focus();inp.reportValidity();return}}
-    else if(!inp.value.trim()){inp.focus();inp.reportValidity();return}
-  }
-  if(currentStep===2&&$("#serviceTypeHidden").value!=="Dog Boarding"&&!validateDogServices())return;
-  currentStep++;
-  updateWizard();
-}
-function wizardPrev(){
-  if(currentStep<=1)return;
-  currentStep--;
-  updateWizard();
-}
-function updateWizard(){
-  const type=$("#serviceTypeHidden")?.value||"Grooming";
-  const isBoarding=type==="Dog Boarding";
-  // Toggle panels
-  $("#groomingPanel")?.classList.toggle("hidden",isBoarding);
-  $("#boardingPanel")?.classList.toggle("hidden",!isBoarding);
-  $$(".grooming-only").forEach(el=>el.classList.toggle("hidden",isBoarding));
-  // Disable hidden fields
-  $$("#groomingPanel input,#groomingPanel select,#groomingPanel textarea").forEach(el=>{el.disabled=isBoarding});
-  $$("#boardingPanel input,#boardingPanel select,#boardingPanel textarea").forEach(el=>{el.disabled=!isBoarding});
-  // Show/hide slides
-  $$(".wizard-slide").forEach(s=>{s.classList.toggle("active",+s.dataset.slide===currentStep)});
-  // Update progress dots
-  $$(".wizard-step-dot").forEach(d=>{
-    const s=+d.dataset.step;
-    d.classList.toggle("active",s===currentStep);
-    d.classList.toggle("done",s<currentStep);
-  });
-  $$(".wizard-connector").forEach((c,i)=>{c.classList.toggle("done",i<currentStep-1)});
-  updateBookingEstimate();
-}
-
-function bookingBody(d){if(d.service_type==="Dog Boarding"){return["Hi Barking Mad Barbers, I'd like to enquire about Dog Boarding.","",`Dog name: ${d.boarding_dog_name||""}`,`Breed: ${d.boarding_breed||""}`,`Size: ${d.boarding_size||""}`,`Meet & greet: ${d.meet_greet||""}`,`Drop off: ${d.drop_off||""}`,`Pick up: ${d.pick_up||""}`,"",`Notes: ${d.boarding_notes||""}`,"","I'll bring my own food and harness.","",[`Cheers`,d.owner_name||"",d.phone||""].filter(Boolean).join(" ")].filter((l,i,a)=>l||a[i-1]!=="").join("\n")}let ds=d.dogs||dogs(),pref=(d.preferred_time||"").trim(),date=(d.preferred_date||"").trim(),times=ds.map((x,i)=>`Dog ${i+1} (${x.dog_preferred_time||pref||"any time"})`),has=ds.some(x=>x.dog_preferred_time);let appt=has?["Preferred times:",...times,date?`Date: ${date}`:""].filter(Boolean).join("\n"):pref&&!/^whenever$/i.test(pref)?`Preferred time: ${[pref,date].filter(Boolean).join(" ")}`:`Preferred time: ${["any",date].filter(Boolean).join(" ")}`;let services=ds.flatMap((x,i)=>x.service?[`Dog ${i+1} services: ${x.service}`]:[]),estimate=groomingEstimate(ds);return["Hi Barking Mad Barbers, I'd like to book grooming.","",`Service: ${d.service_type||"Grooming"}`,"",...ds.map((x,i)=>`${i+1}. ${x.dog_name||"Dog"} — ${[x.dog_size,x.breed].filter(Boolean).join(", ")}`),"",...services,"",estimate.complete?`Estimated total: ${money(estimate.total)} NZD (final price subject to breed and coat condition).`:"","",appt,d.notes?`Notes: ${d.notes}`:"","",["Cheers,",d.owner_name||"",d.phone||""].filter(Boolean).join(" ")].filter((l,i,a)=>l||a[i-1]!=="").join("\n")}
-function sms(body){let b=encodeURIComponent(body);return /iPhone|iPad|iPod/i.test(navigator.userAgent)?`sms:${SMS}&body=${b}`:`sms:${SMS}?body=${b}`}
-function save(type,data){let a=JSON.parse(localStorage.getItem(STORE)||"[]");a.unshift({id:Date.now().toString(36),type,created_at:new Date().toLocaleString(),data});localStorage.setItem(STORE,JSON.stringify(a.slice(0,100)))}
-function fallback(el,body,url,label="Open text message"){el.innerHTML=`<div class="status good sms-open-card"><strong>&#10003; Your message is ready!</strong><p>If your text app didn't open, copy the message below and send it to ${PHONE}.</p><textarea class="sms-preview" readonly>${esc(body)}</textarea><div class="hero-actions"><button class="btn btn-gold" type="button" id="copyMsg">Copy text</button><a class="btn btn-soft" href="${url}">${label}</a></div></div>`;$("#copyMsg").onclick=async()=>{try{await navigator.clipboard.writeText(body);$("#copyMsg").textContent="Copied ✓"}catch{$("#copyMsg").textContent="Select and copy"}}}
-function openSms(body,el){let url=sms(body);fallback(el,body,url);if(/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent))location.href=url}
-function profile(){try{return JSON.parse(localStorage.getItem(PROFILE)||"null")}catch{return null}}
-function bindForms(){
-  let b=$("#bookingForm");
-  if(b){
-    currentStep=1;
-    updateWizard();
-    refreshDogs();
-    b.addEventListener("input",event=>{if(event.target.name==="dog_name")updateBookingEstimate()});
-    b.addEventListener("change",event=>{
-      const input=event.target;
-      if(input.name==="services"){
-        const card=input.closest(".dog-card-fun");
-        if(input.checked&&groomingServices[input.value])card.querySelectorAll('[name="services"]').forEach(other=>{if(other!==input&&groomingServices[other.value])other.checked=false});
-        card.querySelector('[name="services"]').setCustomValidity("");
-      }
-      updateBookingEstimate();
-    });
-    let p=profile();
-    if(p)["owner_name","email","phone"].forEach(n=>{if(b[n])b[n].value=n==="owner_name"?p.name||"":p[n]||""});
-    let open=()=>{
-      if($("#serviceTypeHidden").value!=="Dog Boarding"&&!validateDogServices())return;
-      if(!b.reportValidity())return;
-      let first=dogs()[0]||{},data={...fd(b),service_type:$("#serviceTypeHidden")?.value||"Grooming",dogs:dogs(),dog_name:first.dog_name||"",dog_size:first.dog_size||"",breed:first.breed||""},body=bookingBody(data);
-      save("booking",data);openSms(body,$("#bookingStatus"));
-      miniConfetti();
-    };
-    $("#addDogBtn").onclick=()=>{$("#dogsList").insertAdjacentHTML("beforeend",dogCardFun($$(".dog-card-fun").length+1));refreshDogs();updateWizard()};
-    $("#textToBookBtn").onclick=e=>{e.preventDefault();open()};
-    b.onsubmit=e=>{e.preventDefault();open()};
-  }
-  let s=$("#profileForm");
-  if(s){let p=profile();if(p){s.name.value=p.name||"";s.email.value=p.email||"";s.phone.value=p.phone||""}s.onsubmit=e=>{e.preventDefault();localStorage.setItem(PROFILE,JSON.stringify(fd(s)));$("#signinStatus").innerHTML='<div class="status good">&#10003; Saved on this device.</div>';renderProfile()}}
-  let c=$("#contactForm");
-  if(c)c.onsubmit=e=>{e.preventDefault();let d=fd(c),body=[`Name: ${d.name||""}`,`Phone: ${d.phone||""}`,`Email: ${d.email||""}`,"",d.message||""].join("\n");save("contact",d);openSms(body,$("#contactStatus"))};
-  let g=$("#galleryForm");
-  if(g)g.onsubmit=e=>{e.preventDefault();let d=fd(g),body=[`Owner: ${d.owner_name||""}`,`Email: ${d.email||""}`,`Dog: ${d.dog_name||""}`,`Photo URL: ${d.image_url||""}`,"",`Caption: ${d.caption||""}`].join("\n");save("gallery",d);location.href=`mailto:${EMAIL}?subject=${encodeURIComponent("Barking Mad Barbers photo submission")}&body=${encodeURIComponent(body)}`;$("#galleryStatus").innerHTML='<div class="status good">&#10003; Opening email with photo details.</div>'};
-  let r=$("#requestForm");
-  if(r)r.onsubmit=e=>{e.preventDefault();let d=fd(r),body=[`Request type: ${d.request_type||"Request"}`,`Name: ${d.name||""}`,`Phone: ${d.phone||""}`,`Email: ${d.email||""}`,"",d.message||""].join("\n");save("request",d);openSms(body,$("#requestStatus"))};
-}
-function miniConfetti(){
-  const canvas=document.createElement("canvas");
-  canvas.className="confetti-burst";
-  document.body.appendChild(canvas);
-  const ctx=canvas.getContext("2d");
-  canvas.width=innerWidth;canvas.height=innerHeight;
-  const pieces=Array.from({length:60},()=>({
-    x:innerWidth/2,y:innerHeight/2,
-    vx:(Math.random()-.5)*16,vy:Math.random()*-14-4,
-    r:3+Math.random()*5,
-    color:["#b7832a","#e7c778","#f2dfae","#8f6116","#fff"][Math.floor(Math.random()*5)],
-    rot:Math.random()*360,rv:(Math.random()-.5)*12
   }));
-  let frame=0;
-  (function loop(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    for(const p of pieces){
-      p.vy+=.4;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;
-      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillStyle=p.color;ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
-      ctx.restore();
-    }
-    frame++;
-    if(frame<80)requestAnimationFrame(loop);
-    else canvas.remove();
-  })();
-}
-function append(who,text){let f=$("#chatFeed"),row=document.createElement("div");row.className="msg-row "+(who==="me"?"me":"bot");row.innerHTML=who==="me"?`<div class="bubble">${esc(text)}</div>`:`<div class="avatar" aria-hidden="true">${iconSvg("chat")}</div><div class="bubble">${esc(text)}</div>`;f.appendChild(row);f.scrollTop=f.scrollHeight}
-function reply(t){let q=t.toLowerCase();if(q.includes("board")||q.includes("stay"))return"For boarding, tap Book Now → Dog Boarding → add dates, care info, and send. Easy!";if(q.includes("price")||q.includes("cost")||q.includes("full"))return"Full grooms: "+prices.full.map(([size,amount])=>`${money(amount)} ${size.toLowerCase()}`).join(", ")+". Final price depends on coat & condition.";if(q.includes("wash"))return"Wash & Dry: "+prices.wash.map(([size,amount])=>`${money(amount)} ${size.toLowerCase()}`).join(", ")+".";if(q.includes("knot")||q.includes("matt"))return"For matting, book a Full Groom and mention the coat condition — extra charge may apply.";if(q.includes("flea"))return"Flea shampoo is $20 extra added to any groom.";if(q.includes("hour")||q.includes("open"))return"Mon–Sat 8:30am – 3:00pm, bookings only.";if(q.includes("book"))return"Tap Book Now — pick your service, add dog details, hit send. Your text app does the rest!";return"Great question! Text it to us at "+PHONE+" and we'll reply when we're free."}
-function renderProfile(){let p=profile(),box=$("#profileBox");box.innerHTML=p?`<h3>Saved details</h3><p><strong>${esc(p.name||"")}</strong><br>${esc(p.email||"")}<br>${esc(p.phone||"")}</p><button class="btn btn-soft" onclick="localStorage.removeItem(PROFILE);render()">Clear saved details</button>`:"<h3>Your saved details</h3><p>Nothing saved yet.</p>"}
-function renderInbox(){let el=$("#staticInbox");if(!el)return;let a=JSON.parse(localStorage.getItem(STORE)||"[]");$("#adminStatus").innerHTML='<div class="status">Local only — customer messages arrive by text or email.</div>';el.innerHTML=a.length?a.map(x=>`<article class="booking-item"><div class="booking-top"><strong>${esc(x.type)}</strong><span class="tag">${esc(x.created_at)}</span></div><pre style="white-space:pre-wrap;font:inherit">${esc(JSON.stringify(x.data,null,2))}</pre></article>`).join(""):'<div class="status">No local enquiries.</div>'}
-function clearInbox(){localStorage.removeItem(STORE);renderInbox()}
-
-// === DOT FIELD (kept intact) ===
-function dotField(){
-  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-  const c=document.createElement("canvas");c.id="dotField";c.setAttribute("aria-hidden","true");document.body.prepend(c);
-  const ctx=c.getContext("2d");let W=0,H=0,dots=[],mx=-9999,my=-9999;
-  const REPEL=140,PUSH=1.5,SPRING=.012,FRICTION=.9;
-  function seed(){
-    W=c.width=innerWidth;H=c.height=innerHeight;
-    const n=Math.max(40,Math.min(140,Math.round(W*H/15000)));
-    dots=Array.from({length:n},()=>{const hx=Math.random()*W,hy=Math.random()*H;
-      return{hx,hy,x:hx,y:hy,vx:0,vy:0,r:1+Math.random()*1.9,a:.2+Math.random()*.45,gold:Math.random()<.72,ph:Math.random()*6.283,sp:.002+Math.random()*.004}});
-  }
-  seed();addEventListener("resize",seed);
-  addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});
-  addEventListener("pointerdown",e=>{mx=e.clientX;my=e.clientY});
-  document.addEventListener("mouseleave",()=>{mx=my=-9999});
-  (function tick(t){
-    ctx.clearRect(0,0,W,H);
-    for(const d of dots){
-      const dx=d.x-mx,dy=d.y-my,dist=Math.hypot(dx,dy)||1;
-      if(dist<REPEL){const f=(REPEL-dist)/REPEL*PUSH;d.vx+=dx/dist*f;d.vy+=dy/dist*f}
-      const wob=Math.sin(t*d.sp+d.ph)*10;
-      d.vx+=(d.hx+wob-d.x)*SPRING;d.vy+=(d.hy-wob*.6-d.y)*SPRING;
-      d.vx*=FRICTION;d.vy*=FRICTION;d.x+=d.vx;d.y+=d.vy;
-      const agitated=Math.min(1,Math.hypot(d.vx,d.vy)/3);
-      ctx.beginPath();ctx.arc(d.x,d.y,d.r+agitated*.9,0,6.2832);
-      ctx.fillStyle=d.gold?`rgba(183,131,42,${Math.min(.85,d.a+agitated*.4)})`:`rgba(11,10,7,${d.a*.4+agitated*.2})`;
-      ctx.fill();
-    }
-    requestAnimationFrame(tick);
-  })(0);
+  if ($('[name="price-size"]:checked')) $('[name="price-size"]:checked').dispatchEvent(new Event('change'));
 }
 
-// === BRAND PARTICLE DOTS (kept intact) ===
-const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const MOUSE={x:-9999,y:-9999};
-function setBrandPointer(e){MOUSE.x=e.clientX;MOUSE.y=e.clientY}
-function clearBrandTouch(e){if(e.pointerType&&e.pointerType!=="mouse")MOUSE.x=MOUSE.y=-9999}
-addEventListener("pointermove",setBrandPointer);
-addEventListener("pointerdown",setBrandPointer);
-addEventListener("pointerup",clearBrandTouch);
-addEventListener("pointercancel",clearBrandTouch);
-document.addEventListener("mouseleave",()=>{MOUSE.x=MOUSE.y=-9999});
-let brandState=null;
-function initBrand(){
-  brandState=null;
-  const cv=document.getElementById("brandCanvas");
-  if(!cv||REDUCED)return;
-  const hero=cv.closest(".brand-hero"),staticEl=hero.querySelector(".brand-static"),tools=[...hero.querySelectorAll(".float-tool")];
-  const dpr=Math.min(2,devicePixelRatio||1),ctx=cv.getContext("2d");
-  const state={cv,parts:[],w:0,h:0};
-  function build(){
-    const w=Math.max(280,Math.min(1140,hero.clientWidth-40)),narrow=w<560;
-    const lines=narrow?["BARKING MAD","BARBERS"]:["BARKING MAD BARBERS"];
-    const font=s=>`600 ${s}px Georgia, "Times New Roman", serif`;
-    const off=document.createElement("canvas"),oc=off.getContext("2d");
-    let fs=narrow?w/6.4:w/9.5;
-    oc.font=font(fs);
-    const widest=Math.max(...lines.map(ln=>oc.measureText(ln).width));
-    fs*=Math.min(1,(w*.96)/widest);
-    const h=Math.round(fs*1.3*lines.length+16);
-    state.w=w;state.h=h;
-    cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
-    cv.style.width=w+"px";cv.style.height=h+"px";
-    off.width=w;off.height=h;
-    oc.fillStyle="#000";oc.textAlign="center";oc.textBaseline="middle";
-    oc.font=font(fs);
-    lines.forEach((ln,i)=>oc.fillText(ln,w/2,(i+.62)*fs*1.3+8));
-    const img=oc.getImageData(0,0,w,h).data;
-    state.amp=Math.max(1,Math.min(2.5,fs*.022));
-    let gap=Math.max(3,Math.round(w/230)),pts=[];
-    do{
-      pts=[];
-      for(let y=2;y<h;y+=gap)for(let x=2;x<w;x+=gap)if(img[(y*w+x)*4+3]>128)pts.push([x,y]);
-      if(pts.length>1700)gap++;
-    }while(pts.length>1700);
-    state.parts=pts.map(([x,y])=>{
-      const g=x/w,R=Math.round(143+(231-143)*g),G=Math.round(97+(199-97)*g),B=Math.round(22+(120-22)*g);
-      return{hx:x,hy:y,x:x+(Math.random()-.5)*w*.4,y:y+(Math.random()-.5)*120,vx:0,vy:0,
-        r:gap*.36+Math.random()*.65,ph:Math.random()*6.283,c:`rgba(${R},${G},${B},`,a:.7+Math.random()*.3};
+function initBooking() {
+  const form = $('#booking-form');
+  if (!form) return;
+  let step = 1, dogId = 1, lastSavedMessage = '';
+  const readDogs = () => $$('.dog-card', form).map(card => ({
+    dog_name: $('[name="dog_name"]', card).value.trim(), dog_size: $('[name="dog_size"]', card).value,
+    breed: $('[name="breed"]', card).value.trim(), dog_preferred_time: $('[name="dog_preferred_time"]', card).value.trim(),
+    services: $$('[name="services"]:checked', card).map(input => input.value)
+  }));
+  const isBoarding = () => form.elements.service_type.value === 'Dog Boarding';
+  const read = () => ({ ...formData(form), dogs: isBoarding() ? [] : readDogs() });
+  const showStep = (next, focus = true) => {
+    step = next;
+    $$('[data-step]', form).forEach(section => { section.hidden = Number(section.dataset.step) !== step; });
+    $$('[data-step-indicator]').forEach(indicator => {
+      const number = Number(indicator.dataset.stepIndicator);
+      if (number === step) indicator.setAttribute('aria-current', 'step'); else indicator.removeAttribute('aria-current');
+      indicator.classList.toggle('complete', number < step);
     });
-  }
-  build();
-  staticEl.classList.add("sr-only");
-  cv.classList.remove("hidden");
-  brandState=state;
-  let lastW=hero.clientWidth;
-  const onResize=()=>{if(brandState===state&&cv.isConnected&&Math.abs(hero.clientWidth-lastW)>40){lastW=hero.clientWidth;build()}};
-  addEventListener("resize",onResize);
-  (function loop(t){
-    if(!cv.isConnected||brandState!==state){removeEventListener("resize",onResize);return}
-    const r=cv.getBoundingClientRect(),mx=MOUSE.x-r.left,my=MOUSE.y-r.top;
-    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,state.w,state.h);
-    for(const p of state.parts){
-      const amp=state.amp||2.4,tx=p.hx+Math.sin(t*.0011+p.ph)*amp,ty=p.hy+Math.cos(t*.0009+p.ph)*amp*.9;
-      const dx=p.x-mx,dy=p.y-my,dist=Math.hypot(dx,dy)||1;
-      if(dist<95){const f=(95-dist)/95*1.3;p.vx+=dx/dist*f;p.vy+=dy/dist*f}
-      p.vx+=(tx-p.x)*.045;p.vy+=(ty-p.y)*.045;
-      p.vx*=.86;p.vy*=.86;p.x+=p.vx;p.y+=p.vy;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fillStyle=p.c+p.a+")";ctx.fill();
+    if (step === 3) $('#booking-preview').value = bookingMessage(read());
+    if (focus) {
+      const heading = $(`[data-step="${step}"] h2`, form);
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({block:'start',behavior:'instant'});
     }
-    const px=(MOUSE.x/innerWidth-.5),py=(MOUSE.y/innerHeight-.5);
-    tools.forEach((tl,i)=>{if(MOUSE.x>-999)tl.style.transform=`translate(${px*(i?-16:24)}px,${py*(i?-12:18)}px)`});
-    requestAnimationFrame(loop);
-  })(0);
-}
-
-// === SCROLL REVEAL ===
-function initReveal(){
-  const els=$$(".reveal,.reveal-left,.reveal-right,.reveal-scale");
-  if(REDUCED){els.forEach(el=>el.classList.add("visible"));return}
-  const obs=new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target)}});
-  },{threshold:0.12,rootMargin:"0px 0px -40px 0px"});
-  els.forEach(el=>obs.observe(el));
-  // Never leave real content hidden if a browser skips an observer callback.
-  setTimeout(()=>els.forEach(el=>{el.classList.add("visible");obs.unobserve(el)}),1200);
-}
-
-// === UNVEIL (kept intact) ===
-let unveilEls=[];
-function collectUnveil(){unveilEls=REDUCED?[]:$$(".unveil");applyUnveil()}
-function applyUnveil(){
-  const vh=innerHeight;
-  for(const el of unveilEls){
-    if(!el.isConnected)continue;
-    const r=el.getBoundingClientRect();
-    let p=(vh-r.top)/(vh*.55);p=Math.max(0,Math.min(1,p));
-    const e=1-Math.pow(1-p,2);
-    el.style.clipPath=`inset(${(1-e)*16}% ${(1-e)*26}%)`;
-    el.style.transform=`scale(${1.32-.32*e})`;
-    el.style.filter=`brightness(${.55+.45*e})`;
-  }
-}
-addEventListener("scroll",()=>requestAnimationFrame(applyUnveil),{passive:true});
-addEventListener("resize",()=>requestAnimationFrame(applyUnveil));
-
-// === CARD SPRINGS (kept intact) ===
-function initCardSprings(){
-  if(REDUCED)return;
-  $$(".price-card").forEach(card=>{
-    let rx=0,ry=0,s=1,vrx=0,vry=0,vs=0,trx=0,tryy=0,ts=1,raf=null,hover=false;
-    const STIFF=.14,DAMP=.74;
-    function loop(){
-      vrx+=(trx-rx)*STIFF;vry+=(tryy-ry)*STIFF;vs+=(ts-s)*STIFF;
-      vrx*=DAMP;vry*=DAMP;vs*=DAMP;
-      rx+=vrx;ry+=vry;s+=vs;
-      card.style.transform=`perspective(900px) rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg) scale(${s.toFixed(4)})`;
-      const energy=Math.abs(vrx)+Math.abs(vry)+Math.abs(vs)+Math.abs(trx-rx)+Math.abs(tryy-ry)+Math.abs(ts-s);
-      if(hover||energy>.003)raf=requestAnimationFrame(loop);
-      else{raf=null;card.style.transform=""}
+  };
+  const updateDates = () => {
+    form.elements.preferred_date.min = nzToday();
+    form.elements.drop_off.min = nzToday();
+    const drop = form.elements.drop_off.value;
+    if (drop) {
+      const next = new Date(`${drop}T12:00:00Z`); next.setUTCDate(next.getUTCDate() + 1);
+      form.elements.pick_up.min = next.toISOString().slice(0, 10);
+    } else form.elements.pick_up.min = nzToday();
+  };
+  const updateEstimate = () => {
+    const aside = $('#booking-estimate');
+    $('.aside-guide').hidden = isBoarding();
+    $('.estimate-card>.fine-print').hidden = isBoarding();
+    if (isBoarding()) {
+      aside.innerHTML = '<p>Boarding prices are by arrangement.</p><div class="estimate-total"><span>Your stay</span><strong>Let’s talk</strong></div><p class="fine-print">We’ll confirm availability and cost for your dates when we reply.</p>';
+      return;
     }
-    const kick=()=>{if(!raf)raf=requestAnimationFrame(loop)};
-    card.addEventListener("pointermove",e=>{
-      if(e.pointerType&&e.pointerType!=="mouse")return;
-      const r=card.getBoundingClientRect();
-      hover=true;
-      tryy=((e.clientX-r.left)/r.width-.5)*9;
-      trx=(.5-(e.clientY-r.top)/r.height)*8;
-      ts=1.035;kick();
+    const dogs = readDogs(), estimate = estimateDogs(dogs);
+    $$('.dog-card', form).forEach((card, i) => {
+      const current = estimate.dogs[i], selected = dogs[i].services;
+      const main = selected.includes('Full Groom') ? 'Full Groom' : selected.includes('Wash & Dry') ? 'Wash & Dry' : '';
+      $$('[name="services"]', card).forEach(input => {
+        const service = input.value;
+        const amount = INCLUDED[main]?.includes(service) ? 0 : PRICES[service]?.[SIZES.indexOf(current.size)] ?? EXTRAS[service];
+        $('[data-option-price]', input.closest('label')).textContent = amount === 0 ? 'Included in your groom' : amount === undefined ? `from ${money(PRICES[service][0])}` : money(amount);
+      });
+      $('.dog-subtotal', card).textContent = current.complete ? `Estimated price: ${money(current.total)} NZD` : 'Choose a size and service to see an estimate.';
     });
-    card.addEventListener("pointerleave",()=>{hover=false;trx=0;tryy=0;ts=1;kick()});
+    aside.innerHTML = estimate.dogs.map(dog => `<div class="estimate-dog"><h3>${esc(dog.name)}${dog.size ? ` <small>· ${esc(dog.size)}</small>` : ''}</h3>${dog.items.length ? dog.items.map(item => `<div class="estimate-line"><span>${esc(item.service)}</span><strong>${item.amount === null ? 'Choose size' : item.amount === 0 ? 'Included' : money(item.amount)}</strong></div>`).join('') : '<p>Choose their services.</p>'}</div>`).join('') + `<div class="estimate-total"><span>${estimate.complete ? 'Estimated total' : 'Subtotal so far'}</span><strong>${estimate.dogs.some(d => d.items.length) ? money(estimate.total) : '—'}</strong></div>${estimate.complete ? '' : '<p class="fine-print">Choose a size and service for each dog to complete the estimate.</p>'}`;
+  };
+  const updatePanels = () => {
+    const boarding = isBoarding();
+    for (const [id, hidden] of [['grooming-fields', boarding], ['boarding-fields', !boarding]]) {
+      const panel = $(`#${id}`); panel.hidden = hidden;
+      $$('input,select,textarea,button', panel).forEach(input => { input.disabled = hidden; });
+    }
+    updateDates(); updateEstimate();
+  };
+  const validate = () => {
+    updateDates();
+    const error = $('#booking-error'); error.hidden = true;
+    for (const control of $$('[data-step="2"] input,[data-step="2"] select,[data-step="2"] textarea', form)) {
+      if (control.disabled) continue;
+      if (control.required && ['text','tel'].includes(control.type)) control.value = control.value.trim();
+      if (!control.checkValidity()) { showStep(2, false); control.focus(); control.reportValidity(); return false; }
+    }
+    if (isBoarding()) {
+      const message = stayError(form.elements.drop_off.value, form.elements.pick_up.value);
+      if (message) { error.textContent = message; error.hidden = false; showStep(2, false); form.elements.pick_up.focus(); return false; }
+    } else {
+      for (const card of $$('.dog-card', form)) {
+        const valid = Boolean($('[name="services"]:checked', card));
+        $('[data-services-error]', card).hidden = valid;
+        $$('[name="services"]', card).forEach(input => {
+          if (!valid) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
+        });
+        if (!valid) { showStep(2, false); $('[name="services"]', card).focus(); return false; }
+      }
+    }
+    return true;
+  };
+  const savePrepared = data => {
+    const body = bookingMessage(data);
+    if (body !== lastSavedMessage) { saveHistory('booking', data); lastSavedMessage = body; }
+    if (form.elements.remember_details.checked) writeStored(PROFILE_KEY, {name:data.owner_name,email:data.email,phone:data.phone});
+    return body;
+  };
+  $$('[data-next]', form).forEach(button => button.addEventListener('click', () => { if (step === 1 || validate()) showStep(step + 1); }));
+  $$('[data-back]', form).forEach(button => button.addEventListener('click', () => showStep(step - 1)));
+  form.addEventListener('change', event => {
+    const input = event.target;
+    if (input.name === 'service_type') updatePanels();
+    if (input.name === 'drop_off') updateDates();
+    if (input.name === 'services') {
+      const card = input.closest('.dog-card');
+      if (input.checked && Object.hasOwn(PRICES, input.value)) $$('[name="services"]', card).forEach(other => { if (other !== input && Object.hasOwn(PRICES, other.value)) other.checked = false; });
+      $('[data-services-error]', card).hidden = true;
+      $$('[name="services"]', card).forEach(other => other.removeAttribute('aria-invalid'));
+    }
+    updateEstimate();
   });
+  form.addEventListener('input', event => { if (event.target.name === 'dog_name') updateEstimate(); });
+  $('.add-dog', form).addEventListener('click', () => {
+    $('#dogs-list').insertAdjacentHTML('beforeend', dogCard(++dogId));
+    renumberDogs(); updateEstimate();
+    $('.dog-card:last-child [name="dog_name"]', form).focus();
+  });
+  function renumberDogs() {
+    const cards = $$('.dog-card', form);
+    cards.forEach((card, i) => {
+      $('[data-dog-number]', card).textContent = i + 1;
+      $('[data-dog-heading]', card).textContent = `Dog ${i + 1}`;
+      const button = $('.remove-dog', card); button.hidden = cards.length === 1;
+      button.setAttribute('aria-label', `Remove dog ${i + 1}`);
+    });
+  }
+  form.addEventListener('click', event => {
+    const remove = event.target.closest('.remove-dog');
+    if (remove) { remove.closest('.dog-card').remove(); renumberDogs(); updateEstimate(); $('.add-dog').focus(); }
+  });
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (step < 3) { if (step === 1 || validate()) showStep(step + 1); return; }
+    if (!validate()) return;
+    prepareMessage($('#booking-status'), savePrepared(read()), {showPreview:false});
+  });
+  $('.copy-booking', form).addEventListener('click', () => {
+    if (!validate()) return;
+    copyText(savePrepared(read()), $('#booking-status'), $('#booking-preview'));
+  });
+  const saved = profile();
+  for (const [field, key] of [['owner_name','name'],['phone','phone'],['email','email']]) if (typeof saved[key] === 'string') form.elements[field].value = saved[key];
+  const params = new URLSearchParams(location.search), service = params.get('service'), size = params.get('size'), extra = params.get('extra');
+  if (service === 'boarding') form.elements.service_type.value = 'Dog Boarding';
+  if (SIZES.includes(size)) $('[name="dog_size"]', form).value = size;
+  const serviceName = service === 'full' ? 'Full Groom' : service === 'wash' ? 'Wash & Dry' : Object.hasOwn(EXTRAS, extra) ? extra : '';
+  if (serviceName) $$('[name="services"]', form).find(input => input.value === serviceName).checked = true;
+  updatePanels(); showStep(1, false);
 }
 
-setNav();render();dotField();
+function initForms() {
+  const contact = $('#contact-form');
+  contact?.addEventListener('submit', event => {
+    event.preventDefault(); const data = formData(contact);
+    if (!data.name || !data.message) { announce($('#contact-status'), 'Please add your name and a message.', true); return; }
+    const body = ['Hi Barking Mad Barbers,', '', data.message, '', `Name: ${data.name}`, data.phone ? `Phone: ${data.phone}` : '', data.email ? `Email: ${data.email}` : ''].filter(Boolean).join('\n');
+    saveHistory('contact', data); prepareMessage($('#contact-status'), body);
+  });
+  const gallery = $('#gallery-form');
+  gallery?.addEventListener('submit', event => {
+    event.preventDefault(); const data = formData(gallery);
+    if (!data.dog_name) { announce($('#gallery-status'), 'Please add your dog’s name.', true); return; }
+    const body = [`Dog: ${data.dog_name}`, `Owner: ${data.owner_name || ''}`, `Email: ${data.email || ''}`, `Photo link: ${data.image_url || 'I will attach a photo to this email.'}`, '', `Caption: ${data.caption || ''}`].join('\n');
+    saveHistory('gallery', data); prepareMessage($('#gallery-status'), body, {email:true,subject:'Barking Mad Barbers photo submission'});
+  });
+  const details = $('#profile-form');
+  if (details) {
+    const fill = () => { const data = profile(); ['name','phone','email'].forEach(name => { details.elements[name].value = typeof data[name] === 'string' ? data[name] : ''; }); };
+    fill();
+    details.addEventListener('submit', event => {
+      event.preventDefault(); const saved = writeStored(PROFILE_KEY, formData(details));
+      announce($('#profile-status'), saved ? 'Your details are saved on this device.' : 'This browser couldn’t save your details. You can still make an enquiry.', !saved);
+    });
+    $('#clear-profile').addEventListener('click', () => {
+      const cleared = removeStored(PROFILE_KEY); fill();
+      announce($('#profile-status'), cleared ? 'Your saved details have been cleared from this device.' : 'This browser couldn’t clear the saved details.', !cleared);
+    });
+  }
+  const inbox = $('#local-inbox');
+  if (inbox) {
+    const render = () => {
+      const items = history();
+      inbox.innerHTML = items.length ? items.map(item => `<article class="history-item"><h2>${esc(item.type)} · ${esc(item.created_at)}</h2><pre>${esc(JSON.stringify(item.data, null, 2))}</pre></article>`).join('') : '<p>No enquiries have been prepared on this device yet.</p>';
+    };
+    render();
+    $('#clear-inbox').addEventListener('click', () => {
+      const cleared = removeStored(INBOX_KEY); render();
+      announce($('#inbox-status'), cleared ? 'Local history cleared.' : 'This browser couldn’t clear its history.', !cleared);
+    });
+  }
+}
+initNavigation(); initPrices(); initBooking(); initForms();
